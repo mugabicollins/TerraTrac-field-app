@@ -141,5 +141,16 @@ interface FarmDAO {
         }
     }
 
+    // Query to get the total number of farms for a site
+    @Query("SELECT COUNT(*) FROM Farms WHERE siteId = :siteId")
+    fun getTotalFarmsForSite(siteId: Long): LiveData<Int>
+
+    // Query to get the number of farms with incomplete data for a site
+    @Query("SELECT COUNT(*) FROM Farms WHERE siteId = :siteId AND needsUpdate = 1")
+    fun getFarmsWithIncompleteDataForSite(siteId: Long): LiveData<Int>
+
+    @Query("SELECT * FROM CollectionSites LIMIT :limit OFFSET :offset")
+    fun getCollectionSites(offset: Int, limit: Int): List<CollectionSite>
+
 
 }

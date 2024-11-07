@@ -78,7 +78,6 @@ class MainActivity : ComponentActivity() {
         getSharedPreferences("FarmCollector", MODE_PRIVATE)
     }
 
-    private lateinit var sensorManager: SensorManager
 
     @SuppressLint("InlinedApi")
     @OptIn(ExperimentalPermissionsApi::class)

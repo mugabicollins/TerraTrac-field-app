@@ -37,7 +37,6 @@ import org.technoserve.farmcollector.utils.LanguageSelector
 import org.technoserve.farmcollector.utils.LanguageViewModel
 
 
-
 /**
  *
  *  This function is used to Display the home page of our application

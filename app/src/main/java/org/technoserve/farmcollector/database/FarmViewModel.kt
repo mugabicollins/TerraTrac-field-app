@@ -16,6 +16,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -201,6 +204,25 @@ class FarmViewModel(
             repository.deleteListSite(ids)
         }
     }
+
+    // Function to get the total number of farms for a site
+    fun getTotalFarms(siteId: Long): LiveData<Int> {
+        return repository.getTotalFarmsForSite(siteId)
+    }
+
+    // Function to get the number of farms with incomplete data for a site
+    fun getFarmsWithIncompleteData(siteId: Long): LiveData<Int> {
+        return repository.getFarmsWithIncompleteDataForSite(siteId)
+    }
+
+    val pager = Pager(PagingConfig(pageSize = 4)) {
+        MyPagingSource(this)
+    }.flow.cachedIn(viewModelScope)
+
+    suspend fun getCollectionSites(page: Int, pageSize: Int): List<CollectionSite> {
+        return repository.getCollectionSites(page, pageSize)
+    }
+
 
     private fun parseDateStringToTimestamp(dateString: String): Long {
         val dateFormatter =

@@ -3,6 +3,8 @@ package org.technoserve.farmcollector.database
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  *  this class represents FarmRepository that contains information about the FarmRepository a
@@ -135,5 +137,22 @@ class FarmRepository(private val farmDAO: FarmDAO) {
                 newFarm.longitude == "0.0" ||
                 newFarm.size == 0.0f ||
                 newFarm.remoteId.toString().isEmpty()
+    }
+
+    // Function to get the total number of farms for a site
+    fun getTotalFarmsForSite(siteId: Long): LiveData<Int> {
+        return farmDAO.getTotalFarmsForSite(siteId)
+    }
+
+    // Function to get the number of farms with incomplete data for a site
+    fun getFarmsWithIncompleteDataForSite(siteId: Long): LiveData<Int> {
+        return farmDAO.getFarmsWithIncompleteDataForSite(siteId)
+    }
+
+    suspend fun getCollectionSites(page: Int, pageSize: Int): List<CollectionSite> {
+        val offset = (page - 1) * pageSize
+        return withContext(Dispatchers.IO) {
+            farmDAO.getCollectionSites(offset, pageSize)
+        }
     }
 }

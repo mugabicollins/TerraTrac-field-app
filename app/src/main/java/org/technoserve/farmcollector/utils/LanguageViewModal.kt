@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
 
-class LanguageViewModel(application: Application) : AndroidViewModel(application) {
+open class LanguageViewModel(application: Application) : AndroidViewModel(application) {
     private val sharedPreferences =
         application.getSharedPreferences("settings", Context.MODE_PRIVATE)
     private val _currentLanguage = MutableStateFlow(getDefaultLanguage())

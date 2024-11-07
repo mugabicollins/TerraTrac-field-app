@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Environment
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -762,18 +763,33 @@ fun FarmList(
     @Composable
     fun showDataContent() {
         val hasData = listItems.isNotEmpty() // Check if there's data available
+        val pageSize = 5  // Set the page size (number of items per page)
+        var currentPage by remember { mutableStateOf(1) } // Track the current page
+        val currentCategoryIndex = pagerState.currentPage
+
+        // Filter the list into two categories: farms that need updates and farms that do not need updates
+        val filteredListItemsNeedUpdate = listItems.filter { it.needsUpdate }.filter {
+            it.farmerName.contains(searchQuery, ignoreCase = true)
+        }
+        val filteredListItemsNoUpdate = listItems.filter { !it.needsUpdate }.filter {
+            it.farmerName.contains(searchQuery, ignoreCase = true)
+        }
+
+        // Calculate the number of pages for each category
+        val totalPagesNeedUpdate = (filteredListItemsNeedUpdate.size + pageSize - 1) / pageSize
+        val totalPagesNoUpdate = (filteredListItemsNoUpdate.size + pageSize - 1) / pageSize
 
         if (hasData) {
             Column {
                 // Only show the TabRow and HorizontalPager if there is data
                 TabRow(
-                    selectedTabIndex = pagerState.currentPage,
+                    selectedTabIndex = currentCategoryIndex,
                     modifier = Modifier.background(MaterialTheme.colorScheme.surface),
                     contentColor = MaterialTheme.colorScheme.onSurface,
                     indicator = { tabPositions ->
                         SecondaryIndicator(
                             Modifier
-                                .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                                .tabIndicatorOffset(tabPositions[currentCategoryIndex])
                                 .height(3.dp),
                             color = MaterialTheme.colorScheme.onPrimary // Color for the indicator
                         )
@@ -782,7 +798,7 @@ fun FarmList(
                 ) {
                     tabs.forEachIndexed { index, title ->
                         Tab(
-                            selected = pagerState.currentPage == index,
+                            selected = currentCategoryIndex == index,
                             onClick = {
                                 coroutineScope.launch {
                                     pagerState.animateScrollToPage(index)
@@ -801,76 +817,84 @@ fun FarmList(
                         .weight(1f)
                         .fillMaxWidth(),
                 ) { page ->
+                    // Determine which category to display based on the current tab index
                     val filteredListItems = when (page) {
-                        1 -> listItems.filter { it.needsUpdate }
-                        else -> listItems
-                    }.filter {
-                        it.farmerName.contains(searchQuery, ignoreCase = true)
+                        1 -> filteredListItemsNeedUpdate // Farms that need update
+                        else -> filteredListItemsNoUpdate // Farms that do not need update
                     }
                     if (filteredListItems.isNotEmpty() || searchQuery.isNotEmpty()) {
-                        // Show the list only when loading is complete
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(bottom = 90.dp)
                         ) {
-                            val filteredList = filteredListItems.filter {
-                                it.farmerName.contains(searchQuery, ignoreCase = true)
-                            }
+                            val pageSize = 5
+                            val startIndex = maxOf(0, (currentPage - 1) * pageSize) // Ensure startIndex is non-negative
+                            val endIndex = minOf(filteredListItems.size, startIndex + pageSize) // Ensure endIndex is within bounds
 
-                            if (filteredList.isEmpty()) {
-                                item {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(16.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Top,
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.no_results_found),
-                                            modifier = Modifier
-                                                .padding(16.dp)
-                                                .fillMaxWidth(),
-                                            textAlign = TextAlign.Center,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                        )
-                                    }
-                                }
-                            } else {
-                                items(filteredList) { farm ->
+                            // Safeguard: Ensure indices are within bounds
+                            if (filteredListItems.isNotEmpty()) {
+                                // Show the items for the current page
+                                items(endIndex - startIndex) { index ->
+                                    val item = filteredListItems[startIndex + index]
                                     FarmCard(
-                                        farm = farm,
+                                        farm = item,
                                         onCardClick = {
                                             navController.currentBackStackEntry?.arguments?.apply {
                                                 putParcelableArrayList(
                                                     "coordinates",
-                                                    farm.coordinates?.map {
+                                                    item.coordinates?.map {
                                                         it.first?.let { it1 ->
                                                             it.second?.let { it2 ->
-                                                                ParcelablePair(
-                                                                    it1, it2
-                                                                )
+                                                                ParcelablePair(it1, it2)
                                                             }
                                                         }
                                                     }?.let { ArrayList(it) }
                                                 )
                                                 putParcelable(
                                                     "farmData",
-                                                    ParcelableFarmData(farm, "view")
+                                                    ParcelableFarmData(item, "view")
                                                 )
                                             }
                                             navController.navigate(route = "setPolygon")
                                         },
                                         onDeleteClick = {
-                                            selectedIds.add(farm.id)
-                                            selectedFarm.value = farm
+                                            selectedIds.add(item.id)
+                                            selectedFarm.value = item
                                             showDeleteDialog.value = true
                                         }
                                     )
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                   // Spacer(modifier = Modifier.height(16.dp))
+                                }
+
+                                item {
+                                    CustomPaginationControls(
+                                        currentPage = currentPage,
+                                        totalPages = when (currentCategoryIndex) {
+                                            0 -> totalPagesNoUpdate // Pages for farms that do not need updates
+                                            1 -> totalPagesNeedUpdate // Pages for farms needing updates
+                                            else -> 0
+                                        },
+                                        onPageChange = { newPage ->
+                                            currentPage = newPage
+                                        }
+                                    )
                                 }
                             }
+
+                            else {
+                                item {
+                                    Text(
+                                        text = stringResource(R.string.no_results_found),
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxWidth(),
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                    )
+                                }
+                            }
+
                         }
                     } else {
                         Spacer(modifier = Modifier.height(8.dp))

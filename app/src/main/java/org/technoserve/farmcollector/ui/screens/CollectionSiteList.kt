@@ -16,7 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -25,10 +26,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -37,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +58,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.delay
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.CollectionSite
@@ -69,6 +76,7 @@ import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
  *  This function is used to display the list of collection sites
  */
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectionSiteList(navController: NavController) {
     val context = LocalContext.current
@@ -79,7 +87,7 @@ fun CollectionSiteList(navController: NavController) {
     val selectedIds = remember { mutableStateListOf<Long>() }
     val showDeleteDialog = remember { mutableStateOf(false) }
     val listItems by farmViewModel.readAllSites.observeAsState(listOf())
-    val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
+    var (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
     fun onDelete() {
         val toDelete = mutableListOf<Long>()
         toDelete.addAll(selectedIds)
@@ -87,6 +95,7 @@ fun CollectionSiteList(navController: NavController) {
         selectedIds.removeAll(selectedIds)
         showDeleteDialog.value = false
     }
+
     val isLoading = remember { mutableStateOf(true) }
     var deviceId by remember { mutableStateOf("") }
     val restoreStatus by farmViewModel.restoreStatus.observeAsState()
@@ -101,6 +110,20 @@ fun CollectionSiteList(navController: NavController) {
     val inputLabelColor = if (isDarkTheme) Color.LightGray else Color.DarkGray
     val inputTextColor = if (isDarkTheme) Color.White else Color.Black
     val inputBorder = if (isDarkTheme) Color.LightGray else Color.DarkGray
+
+    val lazyPagingItems = farmViewModel.pager.collectAsLazyPagingItems()
+
+    val pageSize = 3
+    val pagedData = farmViewModel.pager.collectAsLazyPagingItems()
+    var currentPage by remember { mutableIntStateOf(1) }
+
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    val cwsListItems by farmViewModel.readAllSites.observeAsState(listOf())
+
+    val filteredList = cwsListItems.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
 
     LaunchedEffect(Unit) {
         deviceId = DeviceIdUtil.getDeviceId(context)
@@ -163,66 +186,111 @@ fun CollectionSiteList(navController: NavController) {
                     .padding(paddingValues)
                     .fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (isLoading.value) {
-                    Box(
+                // Search field below the header
+                if (isSearchActive) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        label = { Text(stringResource(R.string.search)) },
+                        singleLine = true,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            cursorColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    )
+                }
+
+                when {
+                    pagedData.loadState.refresh is LoadState.Loading -> {
+                        LazyColumn {
+                            items(4) {
+                                SkeletonSiteCard()
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
                     }
-                } else {
-                    if (listItems.isNotEmpty()) {
-                        LazyColumn(
+
+                    pagedData.loadState.refresh is LoadState.Error -> {
+                        Text(
+                            text = stringResource(id = R.string.error_loading_more_sites),
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(bottom = 90.dp)
-                        ) {
-                            val filteredList = listItems.filter {
-                                it.name.contains(searchQuery, ignoreCase = true)
-                            }
+                                .padding(8.dp),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Red
+                        )
+                    }
+
+                    cwsListItems.isNotEmpty() -> {
+                        Column(modifier = Modifier.weight(1f)) {
                             if (searchQuery.isNotEmpty() && filteredList.isEmpty()) {
-                                item {
-                                    Text(
-                                        text = stringResource(R.string.no_results_found),
-                                        modifier = Modifier
-                                            .padding(16.dp)
-                                            .fillMaxWidth(),
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                    )
-                                }
+                                Text(
+                                    text = stringResource(R.string.no_results_found),
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
                             } else {
-                                items(filteredList) { site ->
-                                    SiteCard(
-                                        site = site,
-                                        onCardClick = {
-                                            navController.navigate("farmList/${site.siteId}")
-                                        },
-                                        onDeleteClick = {
-                                            selectedIds.add(site.siteId)
-                                            showDeleteDialog.value = true
-                                        },
-                                        farmViewModel = farmViewModel,
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                LazyColumn {
+                                    val pageSize = 4
+                                    val startIndex = (currentPage - 1) * pageSize
+                                    val endIndex = minOf(startIndex + pageSize, filteredList.size)
+
+                                    items(endIndex - startIndex) { index ->
+                                        val siteIndex = startIndex + index
+                                        val site = filteredList[siteIndex]
+                                        SiteCard(
+                                            site = site,
+                                            onCardClick = {
+                                                navController.navigate("farmList/${site.siteId}")
+                                            },
+                                            totalFarms = farmViewModel.getTotalFarms(site.siteId)
+                                                .observeAsState(0).value,
+                                            farmsWithIncompleteData = farmViewModel.getFarmsWithIncompleteData(
+                                                site.siteId
+                                            )
+                                                .observeAsState(0).value,
+                                            onDeleteClick = {
+                                                selectedIds.add(site.siteId)
+                                                showDeleteDialog.value = true
+                                            },
+                                            farmViewModel = farmViewModel,
+                                        )
+                                        // Spacer(modifier = Modifier.height(8.dp))
+                                    }
+
+                                    item {
+                                        CustomPaginationControls(
+                                            currentPage = currentPage,
+                                            totalPages = (filteredList.size + pageSize - 1) / pageSize,
+                                            onPageChange = { newPage ->
+                                                currentPage = newPage
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
-                    } else {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Image(
-                            modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterHorizontally)
-                                .padding(16.dp, 8.dp),
-                            painter = painterResource(id = R.drawable.no_data2),
-                            contentDescription = null,
-                        )
+                    }
+
+                    else -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp, 8.dp),
+                                painter = painterResource(id = R.drawable.no_data2),
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
             }
@@ -439,6 +507,8 @@ fun CollectionSiteList(navController: NavController) {
 fun SiteCard(
     site: CollectionSite,
     onCardClick: () -> Unit,
+    totalFarms: Int,
+    farmsWithIncompleteData: Int,
     onDeleteClick: () -> Unit,
     farmViewModel: FarmViewModel,
 ) {
@@ -517,6 +587,27 @@ fun SiteCard(
                                 style = MaterialTheme.typography.bodySmall.copy(color = textColor),
                             )
                         }
+
+                        Text(
+                            text = stringResource(
+                                id = R.string.total_farms,
+                                totalFarms
+                            ),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold,
+                            ),
+                        )
+
+                        Text(
+                            text = stringResource(
+                                id = R.string.total_farms_with_incomplete_data,
+                                farmsWithIncompleteData
+                            ),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Blue
+                            ),
+                        )
                     }
                     IconButton(
                         onClick = {
@@ -551,6 +642,135 @@ fun SiteCard(
                     }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun SkeletonSiteCard() {
+    val isDarkTheme = isSystemInDarkTheme()
+    val backgroundColor = if (isDarkTheme) Color.Black else Color.White
+    val placeholderColor = if (isDarkTheme) Color.DarkGray else Color.LightGray
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 8.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+            modifier = Modifier
+                .background(backgroundColor)
+                .fillMaxWidth()
+                .padding(2.dp)
+                .shimmer()
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(backgroundColor)
+                    .padding(8.dp),
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(backgroundColor)
+                        .padding(2.dp)
+                        .fillMaxWidth()
+                ) {
+                    // Checkbox placeholder with shimmer
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(placeholderColor, shape = CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Placeholder for site info
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 2.dp)
+                    ) {
+                        repeat(5) { // Repeat placeholders for each text line
+                            Spacer(
+                                modifier = Modifier
+                                    .height(16.dp)
+                                    .fillMaxWidth(0.8f)
+                                    .background(placeholderColor, shape = RoundedCornerShape(4.dp))
+                                    .padding(bottom = 4.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Placeholder for farm info
+                        Box(
+                            modifier = Modifier
+                                .height(16.dp)
+                                .fillMaxWidth(0.5f)
+                                .background(placeholderColor, shape = RoundedCornerShape(4.dp))
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // Placeholder for farms with incomplete data
+                        Box(
+                            modifier = Modifier
+                                .height(16.dp)
+                                .fillMaxWidth(0.6f)
+                                .background(placeholderColor, shape = RoundedCornerShape(4.dp))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Icon placeholder with shimmer
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(placeholderColor, shape = CircleShape)
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun CustomPaginationControls(
+    currentPage: Int,
+    totalPages: Int,
+    onPageChange: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = { if (currentPage > 1) onPageChange(currentPage - 1) },
+            enabled = currentPage > 1
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.previous),
+                contentDescription = "Previous Page"
+            )
+        }
+
+        Text("Page $currentPage of $totalPages", modifier = Modifier.padding(horizontal = 16.dp))
+
+        IconButton(
+            onClick = { if (currentPage < totalPages) onPageChange(currentPage + 1) },
+            enabled = currentPage < totalPages
+        ) {
+            Icon(painter = painterResource(R.drawable.next), contentDescription = "Next Page")
         }
     }
 }
