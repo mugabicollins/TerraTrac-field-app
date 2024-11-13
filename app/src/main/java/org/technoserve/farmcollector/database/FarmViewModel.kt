@@ -223,6 +223,12 @@ class FarmViewModel(
         return repository.getCollectionSites(page, pageSize)
     }
 
+    fun restoreSite(site: CollectionSite) {
+        viewModelScope.launch {
+            // Implement your restore logic here
+        }
+    }
+
 
     private fun parseDateStringToTimestamp(dateString: String): Long {
         val dateFormatter =

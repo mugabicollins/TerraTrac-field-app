@@ -4,7 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
+import android.content.Intent
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -31,8 +33,11 @@ import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import org.technoserve.farmcollector.database.AppUpdateViewModel
+import org.technoserve.farmcollector.database.ExitConfirmationDialog
 import org.technoserve.farmcollector.database.FarmViewModel
 import org.technoserve.farmcollector.database.FarmViewModelFactory
+import org.technoserve.farmcollector.database.UpdateAlert
 import org.technoserve.farmcollector.map.LocationHelper
 import org.technoserve.farmcollector.map.MapViewModel
 import org.technoserve.farmcollector.ui.screens.AddFarm
@@ -109,6 +114,44 @@ class MainActivity : ComponentActivity() {
             var context = LocalContext.current
             var canExitApp by remember { mutableStateOf(false) }
             val currentLanguage by languageViewModel.currentLanguage.collectAsState()
+
+            val appUpdateViewModel: AppUpdateViewModel = viewModel()
+            val updateAvailable by appUpdateViewModel.updateAvailable.collectAsState()
+
+            var showExitDialog by remember { mutableStateOf(false) }
+
+
+            // Initialize update check
+            LaunchedEffect(Unit) {
+                appUpdateViewModel.initializeAppUpdateCheck(context as Activity)
+            }
+
+
+            // Handle back press
+            BackHandler {
+                showExitDialog = true
+            }
+
+            // Update Alert
+            UpdateAlert(
+                showDialog = updateAvailable,
+                onDismiss = { /* Cannot dismiss forced update */ },
+                onConfirm = {
+                    // Open Play Store
+                    context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("market://details?id=${context.packageName}")
+                    })
+                }
+            )
+
+            // Exit Confirmation
+            ExitConfirmationDialog(
+                showDialog = showExitDialog,
+                onDismiss = { showExitDialog = false },
+                onConfirm = { (context as? Activity)?.finish() }
+            )
+
+
 
             LaunchedEffect(currentLanguage) {
                 updateLocale(context = applicationContext, Locale(currentLanguage.code))

@@ -71,6 +71,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
@@ -118,6 +121,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.joda.time.Instant
 import org.technoserve.farmcollector.R
+import org.technoserve.farmcollector.database.CollectionSite
 import org.technoserve.farmcollector.database.Farm
 import org.technoserve.farmcollector.database.FarmViewModel
 import org.technoserve.farmcollector.database.FarmViewModelFactory
@@ -1399,11 +1403,60 @@ fun DeleteAllDialogPresenter(
     }
 }
 
+//@Composable
+//fun SiteDeleteAllDialogPresenter(
+//    showDeleteDialog: MutableState<Boolean>,
+//    onProceedFn: () -> Unit,
+//) {
+//    if (showDeleteDialog.value) {
+//        AlertDialog(
+//            modifier = Modifier.padding(horizontal = 32.dp),
+//            onDismissRequest = { showDeleteDialog.value = false },
+//            title = {
+//                Row(verticalAlignment = Alignment.CenterVertically) {
+//                    Icon(
+//                        imageVector = Icons.Default.Warning, // Use a built-in warning icon
+//                        contentDescription = stringResource(id = R.string.warning),
+//                        tint = MaterialTheme.colorScheme.error, // Use error color for the icon
+//                        modifier = Modifier.size(24.dp) // Adjust the size of the icon
+//                    )
+//                    Spacer(modifier = Modifier.width(8.dp))
+//                    Text(text = stringResource(id = R.string.delete_this_site))
+//                }
+//            },
+//            text = {
+//                Column {
+//                    Text(stringResource(id = R.string.are_you_sure))
+//                    Text(stringResource(id = R.string.site_will_be_deleted))
+//                }
+//            },
+//            confirmButton = {
+//                TextButton(onClick = { onProceedFn() }) {
+//                    Text(text = stringResource(id = R.string.yes))
+//                }
+//            },
+//            dismissButton = {
+//                TextButton(onClick = { showDeleteDialog.value = false }) {
+//                    Text(text = stringResource(id = R.string.no))
+//                }
+//            },
+//            containerColor = MaterialTheme.colorScheme.background, // Background that adapts to light/dark
+//            tonalElevation = 6.dp // Adds a subtle shadow for better UX
+//        )
+//    }
+//}
+
 @Composable
 fun SiteDeleteAllDialogPresenter(
     showDeleteDialog: MutableState<Boolean>,
+    site: CollectionSite,
+    farmViewModel: FarmViewModel,
+    snackbarHostState: SnackbarHostState,
     onProceedFn: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    var deletedSite by remember { mutableStateOf<CollectionSite?>(null) }
+
     if (showDeleteDialog.value) {
         AlertDialog(
             modifier = Modifier.padding(horizontal = 32.dp),
@@ -1411,10 +1464,10 @@ fun SiteDeleteAllDialogPresenter(
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Warning, // Use a built-in warning icon
+                        imageVector = Icons.Default.Warning,
                         contentDescription = stringResource(id = R.string.warning),
-                        tint = MaterialTheme.colorScheme.error, // Use error color for the icon
-                        modifier = Modifier.size(24.dp) // Adjust the size of the icon
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = stringResource(id = R.string.delete_this_site))
@@ -1427,7 +1480,40 @@ fun SiteDeleteAllDialogPresenter(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { onProceedFn() }) {
+                TextButton(
+                    onClick = {
+                        // Store the site before deletion
+                        deletedSite = site
+
+                        // Proceed with the deletion action
+                        onProceedFn()
+
+                        // Show snackbar with undo option
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = "Site deleted",
+                                actionLabel = "UNDO",
+                                duration = SnackbarDuration.Long
+                            )
+
+                            when (result) {
+                                SnackbarResult.ActionPerformed -> {
+                                    // Undo the deletion
+                                    deletedSite?.let { site ->
+                                        farmViewModel.restoreSite(site)
+                                        deletedSite = null
+                                    }
+                                }
+                                SnackbarResult.Dismissed -> {
+                                    // Clear the deleted site reference
+                                    deletedSite = null
+                                }
+                            }
+                        }
+
+                        showDeleteDialog.value = false
+                    }
+                ) {
                     Text(text = stringResource(id = R.string.yes))
                 }
             },
@@ -1436,11 +1522,13 @@ fun SiteDeleteAllDialogPresenter(
                     Text(text = stringResource(id = R.string.no))
                 }
             },
-            containerColor = MaterialTheme.colorScheme.background, // Background that adapts to light/dark
-            tonalElevation = 6.dp // Adds a subtle shadow for better UX
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 6.dp
         )
     }
 }
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

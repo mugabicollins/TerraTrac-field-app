@@ -186,6 +186,10 @@ dependencies {
 
     implementation 'com.opencsv:opencsv:5.5.2'
 
+    implementation 'com.google.android.play:app-update:2.1.0'
+    //Add the dependency below if you are using Kotlin in your application
+    implementation 'com.google.android.play:app-update-ktx:2.1.0'
+
 
     // testing
 

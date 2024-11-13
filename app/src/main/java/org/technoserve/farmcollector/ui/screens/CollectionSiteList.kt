@@ -33,6 +33,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -44,6 +46,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
@@ -57,6 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.C
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -66,7 +70,9 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.CollectionSite
 import org.technoserve.farmcollector.database.FarmViewModel
 import org.technoserve.farmcollector.database.FarmViewModelFactory
+import org.technoserve.farmcollector.database.RestoreDataAlert
 import org.technoserve.farmcollector.database.RestoreStatus
+import org.technoserve.farmcollector.database.UndoDeleteSnackbar
 import org.technoserve.farmcollector.database.sync.DeviceIdUtil
 import org.technoserve.farmcollector.ui.composes.UpdateCollectionDialog
 import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
@@ -85,6 +91,7 @@ fun CollectionSiteList(navController: NavController) {
             factory = FarmViewModelFactory(context.applicationContext as Application),
         )
     val selectedIds = remember { mutableStateListOf<Long>() }
+    val selectedSite = remember { mutableStateOf<CollectionSite?>(null) }
     val showDeleteDialog = remember { mutableStateOf(false) }
     val listItems by farmViewModel.readAllSites.observeAsState(listOf())
     var (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
@@ -125,6 +132,13 @@ fun CollectionSiteList(navController: NavController) {
         it.name.contains(searchQuery, ignoreCase = true)
     }
 
+    var showRestoreAlert by remember { mutableStateOf(false) }
+    var showUndoSnackbar by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+
+
     LaunchedEffect(Unit) {
         deviceId = DeviceIdUtil.getDeviceId(context)
     }
@@ -136,6 +150,7 @@ fun CollectionSiteList(navController: NavController) {
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             FarmListHeader(
                 title = stringResource(id = R.string.collection_site_list),
@@ -144,19 +159,20 @@ fun CollectionSiteList(navController: NavController) {
                 showSearch = true,
                 showRestore = true,
                 onRestoreClicked = {
-                    farmViewModel.restoreData(
-                        deviceId = deviceId,
-                        phoneNumber = "",
-                        email = "",
-                        farmViewModel = farmViewModel
-                    ) { success ->
-                        if (success) {
-                            finalMessage = context.getString(R.string.data_restored_successfully)
-                        } else {
-                            showFinalMessage = true
-                            showRestorePrompt = true
-                        }
-                    }
+//                    farmViewModel.restoreData(
+//                        deviceId = deviceId,
+//                        phoneNumber = "",
+//                        email = "",
+//                        farmViewModel = farmViewModel
+//                    ) { success ->
+//                        if (success) {
+//                            finalMessage = context.getString(R.string.data_restored_successfully)
+//                        } else {
+//                            showFinalMessage = true
+//                            showRestorePrompt = true
+//                        }
+//                    }
+                    showRestoreAlert = true
                 }
             )
         },
@@ -201,6 +217,25 @@ fun CollectionSiteList(navController: NavController) {
                         ),
                     )
                 }
+
+                // Restore Alert Dialog
+                // Show restore alert dialog
+                RestoreDataAlert(
+                    showDialog = showRestoreAlert,
+                    onDismiss = { showRestoreAlert = false },
+                    deviceId = deviceId,
+                    farmViewModel = farmViewModel
+                )
+
+                // Undo Delete Snackbar
+                UndoDeleteSnackbar(
+                    show = showUndoSnackbar,
+                    onDismiss = { showUndoSnackbar = false },
+                    onUndo = {
+                        // Implement undo logic here
+                        showUndoSnackbar = false
+                    }
+                )
 
                 when {
                     pagedData.loadState.refresh is LoadState.Loading -> {
@@ -257,6 +292,7 @@ fun CollectionSiteList(navController: NavController) {
                                                 .observeAsState(0).value,
                                             onDeleteClick = {
                                                 selectedIds.add(site.siteId)
+                                                selectedSite.value = site
                                                 showDeleteDialog.value = true
                                             },
                                             farmViewModel = farmViewModel,
@@ -498,7 +534,20 @@ fun CollectionSiteList(navController: NavController) {
     }
 
     if (showDeleteDialog.value) {
-        SiteDeleteAllDialogPresenter(showDeleteDialog, onProceedFn = { onDelete() })
+       // SiteDeleteAllDialogPresenter(showDeleteDialog, onProceedFn = { onDelete() })
+
+        selectedSite.value?.let {
+            SiteDeleteAllDialogPresenter(
+                showDeleteDialog = showDeleteDialog,
+                site = it,
+                farmViewModel = farmViewModel,
+                snackbarHostState = snackbarHostState,
+                onProceedFn = {
+                    farmViewModel.deleteListSite(selectedIds)
+                }
+            )
+        }
+
     }
 }
 
