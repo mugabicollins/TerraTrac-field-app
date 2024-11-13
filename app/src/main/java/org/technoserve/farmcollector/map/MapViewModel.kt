@@ -49,17 +49,21 @@ class MapViewModel @Inject constructor() : ViewModel() {
 
     // Method to set coordinates and calculated area
     fun calculateArea(coordinates: List<Pair<Double, Double>>?): Double {
-        _coordinates.value = coordinates
-        val area = GeoCalculator.calculateArea(coordinates)
-        _calculatedArea.value = area
-        return area
+        if(coordinates != null)
+        {
+            _coordinates.value = coordinates as List<Pair<Double, Double>>
+            val area = GeoCalculator.calculateArea(coordinates)
+            _calculatedArea.value = area
+            return area
+        }
+        return 0.0
     }
 
     // Method to show dialog for choosing area
     fun showAreaDialog(calculatedArea: String, enteredArea: String) {
         val areaNum = enteredArea.toDoubleOrNull()
         if (areaNum != null) {
-            _calculatedArea.value = calculatedArea.toDoubleOrNull()
+            _calculatedArea.value = calculatedArea.toDouble()
             _size.value = enteredArea
             _showDialog.value = true
         } else {
