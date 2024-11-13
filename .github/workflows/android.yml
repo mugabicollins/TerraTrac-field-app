@@ -38,6 +38,10 @@ jobs:
           distribution: 'adopt' # See 'Supported distributions' for available options
           java-version: '21.0.4+7.0.LTS'
 
+      # Ensure wrapper permissions before checking for gradle-wrapper.jar
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
       # Check for gradle-wrapper.jar and regenerate wrapper if missing
       - name: Check and regenerate Gradle wrapper if missing
         run: |
@@ -45,10 +49,6 @@ jobs:
             echo "gradle-wrapper.jar is missing. Regenerating wrapper..."
             ./gradlew wrapper
           fi
-
-      # Change wrapper permissions
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
 
       # Run Build Project
       - name: Build gradle project
