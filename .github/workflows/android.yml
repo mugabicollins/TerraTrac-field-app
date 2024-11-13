@@ -4,7 +4,7 @@ env:
   # The name of the main module repository
   main_project_module: app
 
-  # The name of Developer
+  # The name of the Developer
   dev_name: Lucien Shema
 
 on:
@@ -37,8 +37,16 @@ jobs:
         with:
           distribution: 'adopt' # See 'Supported distributions' for available options
           java-version: '21.0.4+7.0.LTS'
-#          cache: 'gradle'
 
+      # Check for gradle-wrapper.jar and regenerate wrapper if missing
+      - name: Check and regenerate Gradle wrapper if missing
+        run: |
+          if [ ! -f ./gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "gradle-wrapper.jar is missing. Regenerating wrapper..."
+            ./gradlew wrapper
+          fi
+
+      # Change wrapper permissions
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
@@ -49,6 +57,7 @@ jobs:
       # Run Tests Build
       - name: Run gradle tests
         run: ./gradlew test
+
 
 
 
