@@ -1,10 +1,7 @@
 name: Android CI
 
 env:
-  # Main module of the project
   main_project_module: app
-
-  # Developer's name
   dev_name: Lucien Shema
 
 on:
@@ -12,8 +9,6 @@ on:
     branches:
       - main
       - dev
-
-  # Allows manual workflow runs from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -37,7 +32,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt' # Available distributions can be found in the action's documentation
+          distribution: 'adopt'
           java-version: '21.0.4+7.0.LTS'
 
       # Set up Gradle with caching for dependencies
@@ -46,6 +41,12 @@ jobs:
         with:
           gradle-version: 8.10.2
           distribution-url: "https://services.gradle.org/distributions/gradle-8.10.2-bin.zip"
+
+      # Inject secrets as environment variables
+      - name: Inject secret variables
+        run: |
+          echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> $GITHUB_ENV
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
 
       # Change Gradle wrapper permissions
       - name: Change Gradle wrapper permissions
@@ -59,14 +60,6 @@ jobs:
             ./gradlew wrapper
           fi
 
-      - name: Download gradle-wrapper.jar if missing
-        run: |
-          if [ ! -f ./gradle/wrapper/gradle-wrapper.jar ]; then
-            mkdir -p ./gradle/wrapper
-            curl -L -o ./gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-wrapper-8.10.2.jar
-          fi
-
-
       # Build the project
       - name: Build Gradle project
         run: ./gradlew build
@@ -74,6 +67,7 @@ jobs:
       # Run tests
       - name: Run Gradle tests
         run: ./gradlew test
+
 
 
 

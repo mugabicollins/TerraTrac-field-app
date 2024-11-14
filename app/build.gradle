@@ -7,6 +7,10 @@ plugins {
     id 'kotlin-parcelize'
 }
 
+
+def googleMapsApiKey = System.getenv("GOOGLE_MAPS_API_KEY") ?: ""
+def baseUrl = System.getenv("BASE_URL") ?: ""
+
 android {
     namespace 'org.technoserve.farmcollector'
     compileSdk 34
@@ -21,6 +25,8 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        buildConfigField "String", "GOOGLE_MAPS_API_KEY", "\"${googleMapsApiKey}\""
+        buildConfigField "String", "BASE_URL", "\"${baseUrl}\""
     }
 
     buildTypes {
