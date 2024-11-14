@@ -8,8 +8,8 @@ plugins {
 }
 
 
-def googleMapsApiKey = System.getenv("GOOGLE_MAPS_API_KEY") ?: ""
-def baseUrl = System.getenv("BASE_URL") ?: ""
+//def googleMapsApiKey = System.getenv("GOOGLE_MAPS_API_KEY") ?: ""
+//def baseUrl = System.getenv("BASE_URL") ?: ""
 
 android {
     namespace 'org.technoserve.farmcollector'
@@ -25,8 +25,8 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-        buildConfigField "String", "GOOGLE_MAPS_API_KEY", "\"${googleMapsApiKey}\""
-        buildConfigField "String", "BASE_URL", "\"${baseUrl}\""
+//        buildConfigField "String", "GOOGLE_MAPS_API_KEY", "\"${googleMapsApiKey}\""
+//        buildConfigField "String", "BASE_URL", "\"${baseUrl}\""
     }
 
     buildTypes {
@@ -217,6 +217,21 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 
 //    androidTestImplementation "androidx.navigation:navigation-testing:2.8.4"
+
+    testImplementation "org.robolectric:robolectric:4.5.1"
+    testImplementation "org.assertj:assertj-core:3.14.0"
+    androidTestImplementation"androidx.test.espresso:espresso-intents:3.6.1"
+
+    androidTestImplementation("androidx.test:core:kotlinx-coroutines-android-junit4:1.9.0")
+    androidTestImplementation("org.robolectric:robolectric:4.7.6")
+    androidTestImplementation "androidx.work:work-testing:2.8.0"
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+
+
+
+
 
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.8"
     debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.8"
