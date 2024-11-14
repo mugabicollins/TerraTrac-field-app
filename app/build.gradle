@@ -87,6 +87,13 @@ android {
             enableSplit = false
         }
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -115,6 +122,7 @@ dependencies {
     implementation "androidx.compose.foundation:foundation:1.6.8"
     implementation 'com.google.firebase:firebase-crashlytics-buildtools:3.0.2'
     implementation 'androidx.test.ext:junit-ktx:1.2.1'
+    implementation 'androidx.navigation:navigation-testing:2.8.3'
     testImplementation 'androidx.compose.ui:ui-test-junit4-android:1.6.8'
 
 
@@ -147,7 +155,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
-    implementation "androidx.navigation:navigation-compose:2.4.0-alpha04"
+    implementation "androidx.navigation:navigation-compose:2.8.4"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -201,6 +209,34 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core:5.2.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+
+//    androidTestImplementation "androidx.navigation:navigation-testing:2.8.4"
+
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.8"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.8"
+
+
+    // To use the androidx.test.core APIs
+    androidTestImplementation("androidx.test:core:1.6.1")
+    // Kotlin extensions for androidx.test.core
+    androidTestImplementation("androidx.test:core-ktx:1.6.1")
+
+    // To use the androidx.test.espresso
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
+    // To use the JUnit Extension APIs
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    // Kotlin extensions for androidx.test.ext.junit
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.2.1")
+
+    // To use the Truth Extension APIs
+    androidTestImplementation("androidx.test.ext:truth:1.6.0")
+
+    // To use the androidx.test.runner APIs
+    androidTestImplementation("androidx.test:runner:1.6.2")
+
+    // To use android test orchestrator
+    androidTestUtil("androidx.test:orchestrator:1.5.1")
 
 
 }

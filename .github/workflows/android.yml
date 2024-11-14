@@ -1,10 +1,10 @@
 name: Android CI
 
 env:
-  # The name of the main module repository
+  # Main module of the project
   main_project_module: app
 
-  # The name of the Developer
+  # Developer's name
   dev_name: Lucien Shema
 
 on:
@@ -13,36 +13,42 @@ on:
       - main
       - dev
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows manual workflow runs from the Actions tab
   workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # Set Current Date As Env Variable
-      - name: Set current date as env variable
+      # Set the current date as an environment variable
+      - name: Set current date as environment variable
         run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      # Set Repository Name As Env Variable
-      - name: Set repository name as env variable
+      # Set repository name as an environment variable
+      - name: Set repository name as environment variable
         run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
 
-      - name: Set Up JDK
+      # Set up JDK
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt' # See 'Supported distributions' for available options
+          distribution: 'adopt' # See supported distributions for options
           java-version: '21.0.4+7.0.LTS'
 
-      # Ensure wrapper permissions before checking for gradle-wrapper.jar
+      # Set up Gradle with caching for dependencies
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Change Gradle wrapper permissions
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      # Check for gradle-wrapper.jar and regenerate wrapper if missing
+      # Check for gradle-wrapper.jar and regenerate if missing
       - name: Check and regenerate Gradle wrapper if missing
         run: |
           if [ ! -f ./gradle/wrapper/gradle-wrapper.jar ]; then
@@ -50,13 +56,14 @@ jobs:
             ./gradlew wrapper
           fi
 
-      # Run Build Project
-      - name: Build gradle project
+      # Build the project
+      - name: Build Gradle project
         run: ./gradlew build
 
-      # Run Tests Build
-      - name: Run gradle tests
+      # Run tests
+      - name: Run Gradle tests
         run: ./gradlew test
+
 
 
 
