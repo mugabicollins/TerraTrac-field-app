@@ -10,7 +10,6 @@ on:
       - main
       - dev
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,6 +18,14 @@ jobs:
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      # Create local.properties with environment variables
+      - name: Create local.properties
+        run: |
+          cat <<EOF > ./local.properties
+          GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
+          BASE_URL=${{ secrets.BASE_URL }}
+          EOF
 
       # Set the current date as an environment variable
       - name: Set current date as environment variable
@@ -42,14 +49,8 @@ jobs:
           gradle-version: 8.10.2
           distribution-url: "https://services.gradle.org/distributions/gradle-8.10.2-bin.zip"
 
-      # Inject secrets as environment variables
-      - name: Inject secret variables
-        run: |
-          echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> $GITHUB_ENV
-          echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
-
       # Change Gradle wrapper permissions
-      - name: Change Gradle wrapper permissions
+      - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
       # Check for gradle-wrapper.jar and regenerate if missing
@@ -67,11 +68,6 @@ jobs:
       # Run tests
       - name: Run Gradle tests
         run: ./gradlew test
-
-
-
-
-
 
 #      # Create APK Debug
 #      - name: Build apk debug project (APK)-${{ env.main_project_module }} module
