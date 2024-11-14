@@ -17,6 +17,7 @@ local.properties
 caches/
 daemon/
 
-# Ignore everything in gradle/wrapper except gradle-wrapper.jar
+# Ignore everything in gradle/wrapper except gradle-wrapper.jar and gradle-wrapper.properties
 gradle/wrapper/*
 !gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
