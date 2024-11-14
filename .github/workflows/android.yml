@@ -37,15 +37,18 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt' # See supported distributions for options
+          distribution: 'adopt' # Available distributions can be found in the action's documentation
           java-version: '21.0.4+7.0.LTS'
 
       # Set up Gradle with caching for dependencies
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.10.2
+          distribution-url: "https://services.gradle.org/distributions/gradle-8.10.2-bin.zip"
 
       # Change Gradle wrapper permissions
-      - name: Change wrapper permissions
+      - name: Change Gradle wrapper permissions
         run: chmod +x ./gradlew
 
       # Check for gradle-wrapper.jar and regenerate if missing
@@ -55,6 +58,14 @@ jobs:
             echo "gradle-wrapper.jar is missing. Regenerating wrapper..."
             ./gradlew wrapper
           fi
+
+      - name: Download gradle-wrapper.jar if missing
+        run: |
+          if [ ! -f ./gradle/wrapper/gradle-wrapper.jar ]; then
+            mkdir -p ./gradle/wrapper
+            curl -L -o ./gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-wrapper-8.10.2.jar
+          fi
+
 
       # Build the project
       - name: Build Gradle project
