@@ -126,7 +126,7 @@ class MainActivityTest {
 //            assertTrue(activity.isDialogVisible ("update_alert_dialog"))
 //        }
 //    }
-//
+
 //    @Test
 //    fun testExitDialogShownOnBackPress() {
 //        val scenario = ActivityScenario.launch(MainActivity::class.java)
@@ -139,7 +139,7 @@ class MainActivityTest {
 //            assertTrue(activity.isDialogVisible("exit_confirmation_dialog"))
 //        }
 //    }
-//
+
 //    @Test
 //    fun testNavigationToHome() {
 //        val scenario = ActivityScenario.launch(MainActivity::class.java)
@@ -151,7 +151,7 @@ class MainActivityTest {
 //            assertThat(navController.currentDestination?.route).isEqualTo(Routes.HOME)
 //        }
 //    }
-//
+
 //    @Test
 //    fun testLocaleUpdatedOnLanguageChange() = runBlocking {
 //        val languageViewModel = mock(LanguageViewModel::class.java)
@@ -165,7 +165,7 @@ class MainActivityTest {
 //            verify(languageViewModel).updateLocale(app, Locale("es"))
 //        }
 //    }
-//
+
 //    @Test
 //    fun testOpenPlayStoreOnUpdateConfirm() {
 //        val scenario = ActivityScenario.launch(MainActivity::class.java)

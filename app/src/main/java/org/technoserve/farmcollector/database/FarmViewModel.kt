@@ -121,6 +121,9 @@ class FarmViewModel(
     val restoreStatus: LiveData<RestoreStatus> get() = _restoreStatus
     private val apiService: ApiService
 
+    // Declare FarmRepository as a lateinit variable
+    lateinit var farmRepository: FarmRepository
+
     init {
         val farmDAO = AppDatabase.getInstance(application).farmsDAO()
         repository = FarmRepository(farmDAO)
@@ -132,6 +135,9 @@ class FarmViewModel(
             .build()
 
         apiService = retrofit.create(ApiService::class.java)
+        // Initialize the repository by default
+        // Provide a default DAO for the repository
+        farmRepository = FarmRepository(farmDAO)
     }
 
     fun readAllData(siteId: Long): LiveData<List<Farm>> = repository.readAllFarms(siteId)
