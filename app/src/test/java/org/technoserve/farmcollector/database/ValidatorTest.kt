@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector
+package org.technoserve.farmcollector.database
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
