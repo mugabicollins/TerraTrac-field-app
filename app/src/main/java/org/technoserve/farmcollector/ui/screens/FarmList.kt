@@ -1667,11 +1667,19 @@ fun FarmListHeader(
                         }
                     },
                     singleLine = true,
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
+//                    colors = TextFieldDefaults.outlinedTextFieldColors(
+//                        cursorColor = MaterialTheme.colorScheme.onSurface,
+//                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        focusedTextColor = MaterialTheme.colorScheme.onSurface
+//                    ),
+                    colors = TextFieldDefaults.colors(
                         cursorColor = MaterialTheme.colorScheme.onSurface,
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        errorCursorColor = Color.Red,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        errorIndicatorColor = Color.Red
                     ),
                     shape = RoundedCornerShape(0.dp)
                 )
@@ -1845,11 +1853,19 @@ fun FarmListHeaderPlots(
                         }
                     },
                     singleLine = true,
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
+//                    colors = TextFieldDefaults.outlinedTextFieldColors(
+//                        cursorColor = MaterialTheme.colorScheme.onSurface,
+//                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        focusedTextColor = MaterialTheme.colorScheme.onSurface
+//                    ),
+                    colors = TextFieldDefaults.colors(
                         cursorColor = MaterialTheme.colorScheme.onSurface,
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        errorCursorColor = Color.Red,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        errorIndicatorColor = Color.Red
                     ),
                     shape = RoundedCornerShape(0.dp)
                 )

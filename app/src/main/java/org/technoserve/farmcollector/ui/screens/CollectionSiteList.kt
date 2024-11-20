@@ -212,7 +212,7 @@ fun CollectionSiteList(navController: NavController) {
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         label = { Text(stringResource(R.string.search)) },
                         singleLine = true,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = TextFieldDefaults.colors(
                             cursorColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     )

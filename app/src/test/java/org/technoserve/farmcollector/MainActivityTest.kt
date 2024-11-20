@@ -45,8 +45,8 @@ class MainActivityTest {
     fun setUp() {
        // Intents.init()
         app = ApplicationProvider.getApplicationContext()
-        sharedPreferences = app.getSharedPreferences("FarmCollector", ComponentActivity.MODE_PRIVATE)
-        darkModePref = app.getSharedPreferences("theme_mode", ComponentActivity.MODE_PRIVATE)
+//        sharedPreferences = app.getSharedPreferences("FarmCollector", ComponentActivity.MODE_PRIVATE)
+//        darkModePref = app.getSharedPreferences("theme_mode", ComponentActivity.MODE_PRIVATE)
     }
     @After
     fun tearDown() {

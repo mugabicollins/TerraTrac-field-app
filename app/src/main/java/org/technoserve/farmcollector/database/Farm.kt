@@ -56,8 +56,10 @@ data class Farm(
     @ColumnInfo(name = "longitude")
     var longitude: String,
     @ColumnInfo(name = "coordinates")
+    @TypeConverters(CoordinateListConvert::class)
     var coordinates: List<Pair<Double?, Double?>>?,
     @ColumnInfo(name = "accuracyArray")  // New field
+    @TypeConverters(AccuracyListConvert::class)
     var accuracyArray: List<Float?>?,     // List to store accuracies
     @ColumnInfo(name = "synced", defaultValue = "0")
     val synced: Boolean = false,

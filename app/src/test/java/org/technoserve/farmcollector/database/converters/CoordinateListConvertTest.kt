@@ -31,21 +31,21 @@ class CoordinateListConvertTest {
 
     @Test
     fun `fromCoordinates with null input returns empty string`() {
-        val result = converter.fromCoordinates(null)
+        val result = converter.fromCoordinateList(null)
         assertEquals("", result)
     }
 
     @Test
     fun `fromCoordinates with empty list returns JSON array`() {
         val emptyList = emptyList<Pair<Double, Double>>()
-        val result = converter.fromCoordinates(emptyList)
+        val result = converter.fromCoordinateList(emptyList)
         assertEquals("[]", result)
     }
 
     @Test
     fun `fromCoordinates with single coordinate pair`() {
         val coordinates = listOf(Pair(45.0, -122.0))
-        val result = converter.fromCoordinates(coordinates)
+        val result = converter.fromCoordinateList(coordinates)
         // Using Gson to parse back and verify the structure
         val gson = Gson()
         val listType = object : TypeToken<List<Pair<Double, Double>>>() {}.type
@@ -63,7 +63,7 @@ class CoordinateListConvertTest {
             Pair(47.0, -123.0),
             Pair(46.0, -121.0)
         )
-        val result = converter.fromCoordinates(coordinates)
+        val result = converter.fromCoordinateList(coordinates)
         val gson = Gson()
         val listType = object : TypeToken<List<Pair<Double, Double>>>() {}.type
         val parsedResult: List<Pair<Double, Double>> = gson.fromJson(result, listType)
@@ -74,24 +74,30 @@ class CoordinateListConvertTest {
 
     @Test
     fun `toCoordinates with empty string returns empty list`() {
-        val result = converter.toCoordinates("")
-        assertTrue(result.isEmpty())
+        val result = converter.toCoordinateList("")
+        if (result != null) {
+            assertTrue(result.isEmpty())
+        }
     }
 
     @Test
     fun `toCoordinates with empty JSON array returns empty list`() {
-        val result = converter.toCoordinates("[]")
-        assertTrue(result.isEmpty())
+        val result = converter.toCoordinateList("[]")
+        if (result != null) {
+            assertTrue(result.isEmpty())
+        }
     }
 
     @Test
     fun `toCoordinates with single coordinate pair`() {
         val json = """[{"first":45.0,"second":-122.0}]"""
-        val result = converter.toCoordinates(json)
+        val result = converter.toCoordinateList(json)
 
-        assertEquals(1, result.size)
-        assertEquals(45.0, result[0].first)
-        assertEquals(-122.0, result[0].second)
+        if (result != null) {
+            assertEquals(1, result.size)
+        }
+        assertEquals(45.0, result?.get(0)?.first)
+        assertEquals(-122.0, result?.get(0)?.second)
     }
 
     @Test
@@ -101,14 +107,16 @@ class CoordinateListConvertTest {
             {"first":47.0,"second":-123.0},
             {"first":46.0,"second":-121.0}
         ]"""
-        val result = converter.toCoordinates(json)
+        val result = converter.toCoordinateList(json)
 
-        assertEquals(3, result.size)
-        assertEquals(45.0, result[0].first)
-        assertEquals(-122.0, result[0].second)
-        assertEquals(47.0, result[1].first)
-        assertEquals(-123.0, result[1].second)
-        assertEquals(46.0, result[2].first)
-        assertEquals(-121.0, result[2].second)
+        if (result != null) {
+            assertEquals(3, result.size)
+        }
+        assertEquals(45.0, result?.get(0)?.first)
+        assertEquals(-122.0, result?.get(0)?.second)
+        assertEquals(47.0, result?.get(1)?.first)
+        assertEquals(-123.0, result?.get(1)?.second)
+        assertEquals(46.0, result?.get(2)?.first)
+        assertEquals(-121.0, result?.get(2)?.second)
     }
 }

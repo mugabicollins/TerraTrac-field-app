@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit
 class FarmCollectorApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        val config = Configuration.Builder()
-            .setMinimumLoggingLevel(android.util.Log.DEBUG)
-            .build()
-        WorkManager.initialize(this, config)
-        android.util.Log.d("WorkManager", "WorkManager initialized successfully")
+//        val config = Configuration.Builder()
+//            .setMinimumLoggingLevel(android.util.Log.DEBUG)
+//            .build()
+//        WorkManager.initialize(this, config)
+//        android.util.Log.d("WorkManager", "WorkManager initialized successfully")
         initializeWorkManager()
     }
 

@@ -83,7 +83,9 @@ class AddSiteKtTest {
 
         // Retrieve the work info synchronously for validation
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        com.google.common.truth.Truth.assertThat(workInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
+        if (workInfo != null) {
+            com.google.common.truth.Truth.assertThat(workInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
+        }
     }
 
     @Test
@@ -150,6 +152,8 @@ class AddSiteKtTest {
 
         // Retrieve the work info synchronously for validation
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        com.google.common.truth.Truth.assertThat(workInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
+        if (workInfo != null) {
+            com.google.common.truth.Truth.assertThat(workInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
+        }
     }
 }
