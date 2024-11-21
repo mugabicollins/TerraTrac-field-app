@@ -1,6 +1,6 @@
-package org.technoserve.farmcollector.database.remote
+package org.technoserve.farmcollector.database.sync.remote
 
-import org.technoserve.farmcollector.database.DeviceFarmDto
+import org.technoserve.farmcollector.database.models.DeviceFarmDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

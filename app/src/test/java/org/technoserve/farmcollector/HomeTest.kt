@@ -183,7 +183,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.technoserve.farmcollector.ui.screens.Home
+import org.technoserve.farmcollector.ui.screens.home.Home
 import org.technoserve.farmcollector.utils.Language
 import org.technoserve.farmcollector.utils.LanguageViewModel
 

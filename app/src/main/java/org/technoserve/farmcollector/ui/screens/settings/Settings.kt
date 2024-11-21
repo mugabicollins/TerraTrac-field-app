@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.settings
 
 import android.content.Context
 import androidx.compose.foundation.background

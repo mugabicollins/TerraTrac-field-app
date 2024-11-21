@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.farms
 
 import android.annotation.SuppressLint
 import android.app.Activity

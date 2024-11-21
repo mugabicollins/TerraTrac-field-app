@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.collectionsites
 
 import android.app.Application
 import android.widget.Toast
@@ -16,20 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -55,27 +48,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.C
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.delay
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.database.CollectionSite
-import org.technoserve.farmcollector.database.FarmViewModel
-import org.technoserve.farmcollector.database.FarmViewModelFactory
-import org.technoserve.farmcollector.database.RestoreDataAlert
-import org.technoserve.farmcollector.database.RestoreStatus
-import org.technoserve.farmcollector.database.UndoDeleteSnackbar
-import org.technoserve.farmcollector.database.sync.DeviceIdUtil
-import org.technoserve.farmcollector.ui.composes.UpdateCollectionDialog
+import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.ui.components.CustomPaginationControls
+import org.technoserve.farmcollector.ui.components.SiteCard
+import org.technoserve.farmcollector.ui.components.SkeletonSiteCard
+import org.technoserve.farmcollector.viewmodels.FarmViewModel
+import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
+import org.technoserve.farmcollector.viewmodels.RestoreDataAlert
+import org.technoserve.farmcollector.viewmodels.RestoreStatus
+import org.technoserve.farmcollector.viewmodels.UndoDeleteSnackbar
+import org.technoserve.farmcollector.utils.DeviceIdUtil
 import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
+import org.technoserve.farmcollector.ui.screens.farms.FarmListHeader
+import org.technoserve.farmcollector.ui.screens.farms.SiteDeleteAllDialogPresenter
+import org.technoserve.farmcollector.ui.screens.farms.isSystemInDarkTheme
 
 
 /**
@@ -552,274 +546,7 @@ fun CollectionSiteList(navController: NavController) {
 }
 
 
-@Composable
-fun SiteCard(
-    site: CollectionSite,
-    onCardClick: () -> Unit,
-    totalFarms: Int,
-    farmsWithIncompleteData: Int,
-    onDeleteClick: () -> Unit,
-    farmViewModel: FarmViewModel,
-) {
-    val showDialog = remember { mutableStateOf(false) }
-    if (showDialog.value) {
-        UpdateCollectionDialog(
-            site = site,
-            showDialog = showDialog,
-            farmViewModel = farmViewModel,
-        )
-    }
-    val textColor = MaterialTheme.colorScheme.onBackground
-    val iconColor = MaterialTheme.colorScheme.onBackground
-
-    Column(
-        modifier =
-        Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ElevatedCard(
-            elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = 6.dp,
-            ),
-            modifier =
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxWidth()
-                .padding(8.dp),
-            onClick = {
-                onCardClick()
-            },
-        ) {
-            Column(
-                modifier =
-                Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp),
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(
-                        modifier =
-                        Modifier
-                            .weight(1.1f)
-                            .padding(bottom = 4.dp),
-                    ) {
-                        Text(
-                            text = site.name,
-                            style =
-                            MaterialTheme.typography.bodySmall.copy(
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = textColor,
-                            ),
-                            modifier =
-                            Modifier
-                                .padding(bottom = 1.dp),
-                        )
-                        Text(
-                            text = "${stringResource(id = R.string.agent_name)}: ${site.agentName}",
-                            style = MaterialTheme.typography.bodySmall.copy(color = textColor),
-                            modifier =
-                            Modifier
-                                .padding(bottom = 1.dp),
-                        )
-                        if (site.phoneNumber.isNotEmpty()) {
-                            Text(
-                                text = "${stringResource(id = R.string.phone_number)}: ${site.phoneNumber}",
-                                style = MaterialTheme.typography.bodySmall.copy(color = textColor),
-                            )
-                        }
-
-                        Text(
-                            text = stringResource(
-                                id = R.string.total_farms,
-                                totalFarms
-                            ),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Bold,
-                            ),
-                        )
-
-                        Text(
-                            text = stringResource(
-                                id = R.string.total_farms_with_incomplete_data,
-                                farmsWithIncompleteData
-                            ),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Blue
-                            ),
-                        )
-                    }
-                    IconButton(
-                        onClick = {
-                            showDialog.value = true
-                        },
-                        modifier =
-                        Modifier
-                            .size(24.dp)
-                            .padding(4.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Update",
-                            tint = iconColor,
-                        )
-                    }
-                    Spacer(modifier = Modifier.padding(10.dp))
-                    IconButton(
-                        onClick = {
-                            onDeleteClick()
-                        },
-                        modifier =
-                        Modifier
-                            .size(24.dp)
-                            .padding(4.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 
-@Composable
-fun SkeletonSiteCard() {
-    val isDarkTheme = isSystemInDarkTheme()
-    val backgroundColor = if (isDarkTheme) Color.Black else Color.White
-    val placeholderColor = if (isDarkTheme) Color.DarkGray else Color.LightGray
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ElevatedCard(
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-            modifier = Modifier
-                .background(backgroundColor)
-                .fillMaxWidth()
-                .padding(2.dp)
-                .shimmer()
-        ) {
-            Column(
-                modifier = Modifier
-                    .background(backgroundColor)
-                    .padding(8.dp),
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .background(backgroundColor)
-                        .padding(2.dp)
-                        .fillMaxWidth()
-                ) {
-                    // Checkbox placeholder with shimmer
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .background(placeholderColor, shape = CircleShape)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Placeholder for site info
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 2.dp)
-                    ) {
-                        repeat(5) { // Repeat placeholders for each text line
-                            Spacer(
-                                modifier = Modifier
-                                    .height(16.dp)
-                                    .fillMaxWidth(0.8f)
-                                    .background(placeholderColor, shape = RoundedCornerShape(4.dp))
-                                    .padding(bottom = 4.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Placeholder for farm info
-                        Box(
-                            modifier = Modifier
-                                .height(16.dp)
-                                .fillMaxWidth(0.5f)
-                                .background(placeholderColor, shape = RoundedCornerShape(4.dp))
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        // Placeholder for farms with incomplete data
-                        Box(
-                            modifier = Modifier
-                                .height(16.dp)
-                                .fillMaxWidth(0.6f)
-                                .background(placeholderColor, shape = RoundedCornerShape(4.dp))
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Icon placeholder with shimmer
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .background(placeholderColor, shape = CircleShape)
-                    )
-                }
-            }
-        }
-    }
-}
 
 
-@Composable
-fun CustomPaginationControls(
-    currentPage: Int,
-    totalPages: Int,
-    onPageChange: (Int) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = { if (currentPage > 1) onPageChange(currentPage - 1) },
-            enabled = currentPage > 1
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.previous),
-                contentDescription = "Previous Page"
-            )
-        }
-
-        Text("Page $currentPage of $totalPages", modifier = Modifier.padding(horizontal = 16.dp))
-
-        IconButton(
-            onClick = { if (currentPage < totalPages) onPageChange(currentPage + 1) },
-            enabled = currentPage < totalPages
-        ) {
-            Icon(painter = painterResource(R.drawable.next), contentDescription = "Next Page")
-        }
-    }
-}

@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.settings
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

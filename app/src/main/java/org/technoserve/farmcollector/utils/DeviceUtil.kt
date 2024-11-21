@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.database.sync
+package org.technoserve.farmcollector.utils
 
 
 import android.annotation.SuppressLint

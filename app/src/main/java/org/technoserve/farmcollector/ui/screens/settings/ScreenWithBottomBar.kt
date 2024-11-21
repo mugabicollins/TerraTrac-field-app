@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.settings
 
 import android.annotation.SuppressLint
 import androidx.compose.material3.Scaffold

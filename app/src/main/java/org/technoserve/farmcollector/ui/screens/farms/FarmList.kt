@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.farms
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Environment
 import android.os.Parcel
 import android.os.Parcelable
-import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,7 +34,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -116,26 +114,29 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.joda.time.Instant
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.database.CollectionSite
-import org.technoserve.farmcollector.database.Farm
-import org.technoserve.farmcollector.database.FarmViewModel
-import org.technoserve.farmcollector.database.FarmViewModelFactory
-import org.technoserve.farmcollector.database.RestoreStatus
-import org.technoserve.farmcollector.database.sync.DeviceIdUtil
+import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.database.models.Farm
+
+import org.technoserve.farmcollector.viewmodels.FarmViewModel
+import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
+import org.technoserve.farmcollector.viewmodels.RestoreStatus
+import org.technoserve.farmcollector.utils.DeviceIdUtil
 import org.technoserve.farmcollector.hasLocationPermission
 import org.technoserve.farmcollector.map.LocationHelper
 import org.technoserve.farmcollector.map.MapViewModel
+import org.technoserve.farmcollector.ui.components.CustomPaginationControls
+import org.technoserve.farmcollector.ui.components.FarmCard
+import org.technoserve.farmcollector.ui.components.KeepPolygonDialog
 import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
+
 import org.technoserve.farmcollector.utils.convertSize
 import java.io.BufferedWriter
 import java.io.File
 import java.io.IOException
-import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -202,65 +203,6 @@ data class ParcelableFarmData(val farm: Farm, val view: String) : Parcelable {
     }
 }
 
-/**
- *  This function is used to allow the user to either keep the existing polygon or capture a new polygon
- */
-
-
-@Composable
-fun KeepPolygonDialog(
-    onDismiss: () -> Unit,
-    onKeepExisting: () -> Unit,
-    onCaptureNew: () -> Unit,
-) {
-
-    val mapViewModel: MapViewModel = viewModel()
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(id = R.string.update_polygon),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        },
-        text = {
-            Text(
-                text = stringResource(id = R.string.keep_existing_polygon_or_capture_new),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = onKeepExisting,
-                modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                colors = ButtonDefaults.buttonColors()
-            ) {
-                Text(
-                    text = stringResource(id = R.string.keep_existing),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = {
-                    mapViewModel.clearCoordinates()
-                    onCaptureNew()
-                },
-                modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                colors = ButtonDefaults.buttonColors()
-            ) {
-                Text(
-                    text = stringResource(id = R.string.capture_new),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 6.dp
-    )
-}
 
 
 @Composable
@@ -1875,127 +1817,6 @@ fun FarmListHeaderPlots(
     }
 }
 
-@Composable
-fun FarmCard(
-    farm: Farm,
-    onCardClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-) {
-    val textColor = MaterialTheme.colorScheme.onBackground
-    Column(
-        modifier =
-        Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ElevatedCard(
-            elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = 6.dp,
-            ),
-            modifier =
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxWidth()
-                .padding(8.dp),
-            onClick = {
-                onCardClick()
-            },
-        ) {
-            Column(
-                modifier =
-                Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp),
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = farm.farmerName,
-                        style =
-                        MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = textColor,
-                        ),
-                        modifier =
-                        Modifier
-                            .weight(1.1f)
-                            .padding(bottom = 4.dp),
-                    )
-                    Text(
-                        text = "${stringResource(id = R.string.size)}: ${formatInput(farm.size.toString())} ${
-                            stringResource(id = R.string.ha)
-                        }",
-                        style = MaterialTheme.typography.bodySmall.copy(color = textColor),
-                        modifier =
-                        Modifier
-                            .weight(0.9f)
-                            .padding(bottom = 4.dp),
-                    )
-                    IconButton(
-                        onClick = {
-                            onDeleteClick()
-                        },
-                        modifier =
-                        Modifier
-                            .size(24.dp)
-                            .padding(4.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red,
-                        )
-                    }
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = "${stringResource(id = R.string.village)}: ${farm.village}",
-                        style = MaterialTheme.typography.bodySmall.copy(color = textColor),
-                        modifier = Modifier.weight(1f),
-                    )
-                    Text(
-                        text = "${stringResource(id = R.string.district)}: ${farm.district}",
-                        style = MaterialTheme.typography.bodySmall.copy(color = textColor),
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-
-                // Show the label if the farm needs an update
-                if (farm.needsUpdate) {
-                    Text(
-                        text = stringResource(id = R.string.needs_update),
-                        color = Color.Blue,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,  // Adjust font size
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-fun OutputStream.writeCsv(farms: List<Farm>) {
-    val writer = bufferedWriter()
-    writer.write(""""Farmer Name", "Village", "District"""")
-    writer.newLine()
-    farms.forEach {
-        writer.write("${it.farmerName}, ${it.village}, \"${it.district}\"")
-        writer.newLine()
-    }
-    writer.flush()
-}
 
 
 @SuppressLint("MissingPermission")

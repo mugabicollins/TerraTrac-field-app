@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.collectionsites
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -51,9 +51,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.joda.time.Instant
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.database.CollectionSite
-import org.technoserve.farmcollector.database.FarmViewModel
-import org.technoserve.farmcollector.database.FarmViewModelFactory
+import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.ui.screens.farms.FarmListHeader
+import org.technoserve.farmcollector.ui.screens.farms.isSystemInDarkTheme
+import org.technoserve.farmcollector.viewmodels.FarmViewModel
+import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 
 /**
  * This function is used to add a collection site

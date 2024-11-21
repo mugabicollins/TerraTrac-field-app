@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.database
+package org.technoserve.farmcollector.viewmodels
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -27,9 +27,15 @@ import org.joda.time.Instant
 import org.json.JSONObject
 import org.technoserve.farmcollector.BuildConfig
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.database.remote.ApiService
-import org.technoserve.farmcollector.database.remote.FarmRequest
-import org.technoserve.farmcollector.ui.screens.truncateToDecimalPlaces
+import org.technoserve.farmcollector.database.AppDatabase
+import org.technoserve.farmcollector.repositories.FarmRepository
+import org.technoserve.farmcollector.database.MyPagingSource
+import org.technoserve.farmcollector.database.RefreshableLiveData
+import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.database.models.Farm
+import org.technoserve.farmcollector.database.sync.remote.ApiService
+import org.technoserve.farmcollector.database.sync.remote.FarmRequest
+import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.BufferedReader

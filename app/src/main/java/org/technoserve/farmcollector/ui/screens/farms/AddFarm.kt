@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens
+package org.technoserve.farmcollector.ui.screens.farms
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -68,9 +68,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import org.joda.time.Instant
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.database.Farm
-import org.technoserve.farmcollector.database.FarmViewModel
-import org.technoserve.farmcollector.database.FarmViewModelFactory
+import org.technoserve.farmcollector.database.models.Farm
+
+import org.technoserve.farmcollector.viewmodels.FarmViewModel
+import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 import org.technoserve.farmcollector.map.LocationHelper
 import org.technoserve.farmcollector.map.LocationState
 import org.technoserve.farmcollector.map.MapViewModel

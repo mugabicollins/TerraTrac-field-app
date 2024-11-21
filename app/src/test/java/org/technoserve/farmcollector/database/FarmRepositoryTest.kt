@@ -3,17 +3,16 @@ package org.technoserve.farmcollector.database
 import org.junit.Assert.*
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
-import org.mockito.junit.MockitoJUnit
+import org.technoserve.farmcollector.database.dao.FarmDAO
+import org.technoserve.farmcollector.repositories.FarmRepository
 import java.util.UUID
 
 class FarmRepositoryTest {

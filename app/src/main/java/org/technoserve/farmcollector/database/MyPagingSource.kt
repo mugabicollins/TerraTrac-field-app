@@ -1,10 +1,11 @@
 package org.technoserve.farmcollector.database
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.viewmodels.FarmViewModel
 
 class MyPagingSource(
     private val farmViewModel: FarmViewModel
