@@ -10,7 +10,7 @@ import org.robolectric.RobolectricTestRunner
 import org.technoserve.farmcollector.map.MapViewModel
 
 @RunWith(RobolectricTestRunner::class)
-class MapViewModelUnitTest {
+class MapViewModelKtTest {
 
 
     @get:Rule

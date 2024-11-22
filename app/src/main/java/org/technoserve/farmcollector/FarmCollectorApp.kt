@@ -21,7 +21,7 @@ class FarmCollectorApp : Application() {
 //        WorkManager.initialize(this, config)
 //        android.util.Log.d("WorkManager", "WorkManager initialized successfully")
         ContextProvider.initialize(this)
-        initializeWorkManager()
+        // initializeWorkManager()
     }
 
     // private

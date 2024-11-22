@@ -64,11 +64,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     buildFeatures {
         compose true
@@ -231,8 +231,12 @@ dependencies {
     androidTestImplementation 'com.google.dagger:hilt-android-testing:2.48'
 
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.5"
 
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.5")
+
+//    implementation("group:artifact") {
+//        exclude group: "org.junit.jupiter", module: "junit-jupiter-engine"
+//    }
 }

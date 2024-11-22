@@ -653,9 +653,6 @@ fun FarmForm(
         /**
          * Function to handle location permission and coordinate calculation
          */
-        /**
-         * Function to handle location permission and coordinate calculation
-         */
         fun handleLocationAndNavigate(size: String, selectedUnit: String) {
             val enteredSize =
                 size.toDoubleOrNull()?.let { convertSize(it, selectedUnit).toFloat() } ?: 0f

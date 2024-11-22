@@ -172,12 +172,6 @@ fun FarmListHeader(
                         }
                     },
                     singleLine = true,
-//                    colors = TextFieldDefaults.outlinedTextFieldColors(
-//                        cursorColor = MaterialTheme.colorScheme.onSurface,
-//                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-//                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        focusedTextColor = MaterialTheme.colorScheme.onSurface
-//                    ),
                     colors = TextFieldDefaults.colors(
                         cursorColor = MaterialTheme.colorScheme.onSurface,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,

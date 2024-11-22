@@ -182,12 +182,17 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import org.technoserve.farmcollector.ui.screens.home.Home
 import org.technoserve.farmcollector.utils.Language
 import org.technoserve.farmcollector.utils.LanguageViewModel
 
-class HomeTest {
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33])
+class HomeKtTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()

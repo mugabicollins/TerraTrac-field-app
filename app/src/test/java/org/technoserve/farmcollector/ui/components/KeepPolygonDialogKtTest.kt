@@ -1,21 +1,18 @@
 package org.technoserve.farmcollector.ui.components
 
-import org.junit.Assert.*
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-//@RunWith(AndroidJUnit4::class)
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [29])
-class KeepPolygonDialogTest {
+@Config(sdk = [33])
+class KeepPolygonDialogKtTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()

@@ -1,33 +1,17 @@
 package org.technoserve.farmcollector.database.converters
 
-//import org.junit.jupiter.api.Assertions.*
-//import com.google.gson.Gson
-//import com.google.gson.reflect.TypeToken
-//import org.junit.jupiter.api.AfterEach
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.Test
+
 
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CoordinateListConvertTest {
-   // private lateinit var converter: CoordinateListConvert
 
     private val converter = CoordinateListConvert()
 
-//    @BeforeEach
-//    fun setUp() {
-//        converter = CoordinateListConvert()
-//    }
-//
-//    @AfterEach
-//    fun tearDown() {
-//        // No cleanup needed
-//    }
 
     @Test
     fun `fromCoordinates with null input returns empty string`() {
