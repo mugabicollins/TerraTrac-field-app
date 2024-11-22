@@ -22,7 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
-import org.technoserve.farmcollector.ui.screens.farms.isSystemInDarkTheme
+import org.technoserve.farmcollector.utils.isSystemInDarkTheme
+
 
 @Composable
 fun SkeletonSiteCard() {

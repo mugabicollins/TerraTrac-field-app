@@ -41,15 +41,6 @@ import kotlin.coroutines.resumeWithException
  *
  */
 
-data class LocationState(
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0,
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val isUsingGPS: Boolean = true,
-    val accuracy: Float = 0f
-)
-
 suspend fun <T> Task<T>.await(): T {
     return suspendCancellableCoroutine { continuation ->
         addOnSuccessListener { result ->
@@ -102,56 +93,7 @@ class LocationHelper(private val context: Context) : SensorEventListener {
                 ) == PackageManager.PERMISSION_GRANTED
     }
 
-//    // Primary location update function
-//    @SuppressLint("MissingPermission")
-//    fun getLocationUpdates(): Flow<Location> = callbackFlow {
-//        if (!hasLocationPermission()) {
-//            showPermissionRequest.value = true
-//            throw LocationException("Missing location permission")
-//        }
-//
-//        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-//        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-//
-//        if (!isGpsEnabled && !isNetworkEnabled) {
-//            showLocationDialog.value = true
-//            startDeadReckoning()
-//            throw LocationException("GPS and Network are disabled")
-//        }
-//
-//        val locationCallback = object : LocationCallback() {
-//            override fun onLocationResult(result: LocationResult) {
-//                result.lastLocation?.let { location ->
-//                    trySend(location)
-//                    updateLocationState(
-//                        location.latitude,
-//                        location.longitude,
-//                        location.accuracy,
-//                        isUsingGPS = true
-//                    )
-//                }
-//            }
-//        }
-//
-//        fusedLocationClient.requestLocationUpdates(
-//            locationRequest,
-//            locationCallback,
-//            Looper.getMainLooper()
-//        ).addOnFailureListener {
-//            _locationState.value = LocationState(
-//                error = it.message,
-//                isLoading = false,
-//                isUsingGPS = false
-//            )
-//            startDeadReckoning()
-//        }
-//
-//        awaitClose {
-//            fusedLocationClient.removeLocationUpdates(locationCallback)
-//            stopSensorUpdates()
-//        }
-//    }
+
 
     // Fallback method using dead reckoning with sensors
     private fun startDeadReckoning() {
@@ -365,30 +307,6 @@ class LocationHelper(private val context: Context) : SensorEventListener {
         }
     }
 
-//    @SuppressLint("MissingPermission")
-//    fun requestLocationUpdates(onLocationUpdate: (Location?) -> Unit) {
-//        if (!hasLocationPermission()) {
-//            showPermissionRequest.value = true
-//            return
-//        }
-//
-//        val locationCallback = object : LocationCallback() {
-//            override fun onLocationResult(locationResult: LocationResult) {
-//                val location = locationResult.lastLocation
-//                onLocationUpdate(location)
-//                location?.let {
-//                    updateLocationState(it.latitude, it.longitude, it.accuracy, true)
-//                }
-//            }
-//        }
-//
-//        fusedLocationClient.requestLocationUpdates(
-//            locationRequest,
-//            locationCallback,
-//            Looper.getMainLooper()
-//        )
-//    }
-
     @SuppressLint("MissingPermission")
     fun requestLocationUpdates(onLocationUpdate: (Location?) -> Unit) {
         // Check location permission
@@ -461,7 +379,6 @@ class LocationHelper(private val context: Context) : SensorEventListener {
     }
 }
 
-//class LocationException(message: String) : Exception(message)
 
 
 

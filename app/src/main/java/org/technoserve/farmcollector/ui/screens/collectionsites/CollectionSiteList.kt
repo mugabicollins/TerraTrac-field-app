@@ -58,18 +58,18 @@ import kotlinx.coroutines.delay
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.ui.components.CustomPaginationControls
+import org.technoserve.farmcollector.ui.components.FarmListHeader
+import org.technoserve.farmcollector.ui.components.RestoreDataAlert
 import org.technoserve.farmcollector.ui.components.SiteCard
+import org.technoserve.farmcollector.ui.components.SiteDeleteAllDialogPresenter
 import org.technoserve.farmcollector.ui.components.SkeletonSiteCard
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
-import org.technoserve.farmcollector.viewmodels.RestoreDataAlert
 import org.technoserve.farmcollector.viewmodels.RestoreStatus
 import org.technoserve.farmcollector.viewmodels.UndoDeleteSnackbar
 import org.technoserve.farmcollector.utils.DeviceIdUtil
 import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
-import org.technoserve.farmcollector.ui.screens.farms.FarmListHeader
-import org.technoserve.farmcollector.ui.screens.farms.SiteDeleteAllDialogPresenter
-import org.technoserve.farmcollector.ui.screens.farms.isSystemInDarkTheme
+import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 
 
 /**

@@ -1,14 +1,10 @@
-package org.technoserve.farmcollector.database
+package org.technoserve.farmcollector.database.mappers
 
 import org.technoserve.farmcollector.database.dao.FarmDAO
 import org.technoserve.farmcollector.database.models.CollectionSiteDto
 import org.technoserve.farmcollector.database.models.DeviceFarmDto
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.database.models.FarmDetailDto
-
-/**
- * This file contains the information about the entities in the database including farms and collection sites
- */
 
 fun List<Farm>.toDeviceFarmDtoList(deviceId: String, farmDao: FarmDAO): List<DeviceFarmDto> {
     return this.groupBy { it.siteId } // Group by siteId
@@ -57,6 +53,3 @@ fun List<Farm>.toDeviceFarmDtoList(deviceId: String, farmDao: FarmDAO): List<Dev
             )
         }
 }
-
-
-

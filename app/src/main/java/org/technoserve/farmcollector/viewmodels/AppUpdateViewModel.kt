@@ -68,55 +68,7 @@ fun UpdateAlert(
     }
 }
 
-@Composable
-fun RestoreDataAlert(
-    showDialog: Boolean,
-    onDismiss: () -> Unit,
-    deviceId: String,
-    farmViewModel: FarmViewModel,
-) {
-    val context = LocalContext.current
-    var finalMessage by remember { mutableStateOf("") }
-    var showFinalMessage by remember { mutableStateOf(false) }
-    var showRestorePrompt by remember { mutableStateOf(false) }
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Data Restoration") },
-            text = {
-                Text("During restoration, you will recover some of the previously deleted records. Do you want to continue?")
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        farmViewModel.restoreData(
-                            deviceId = deviceId,
-                            phoneNumber = "",
-                            email = "",
-                            farmViewModel = farmViewModel
-                        ) { success ->
-                            if (success) {
-                                finalMessage = context.getString(R.string.data_restored_successfully)
-                            } else {
-                                showFinalMessage = true
-                                showRestorePrompt = true
-                            }
-                            onDismiss()
-                        }
-                    }
-                ) {
-                    Text("Continue")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-}
 
 @Composable
 fun ExitConfirmationDialog(

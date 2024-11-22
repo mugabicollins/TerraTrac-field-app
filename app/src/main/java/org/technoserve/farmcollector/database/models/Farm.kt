@@ -12,8 +12,12 @@ import kotlinx.parcelize.Parcelize
 import org.technoserve.farmcollector.database.converters.AccuracyListConvert
 import org.technoserve.farmcollector.database.converters.CoordinateListConvert
 import org.technoserve.farmcollector.database.converters.DateConverter
-import org.technoserve.farmcollector.ui.screens.farms.ParcelablePair
 import java.util.UUID
+
+/**
+ * This file contains the information about the entities in the database including farms and collection sites
+ */
+
 
 @Entity(
     tableName = "Farms",

@@ -52,13 +52,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.technoserve.farmcollector.R
+import org.technoserve.farmcollector.database.models.ParcelableFarmData
+import org.technoserve.farmcollector.database.models.ParcelablePair
 import org.technoserve.farmcollector.hasLocationPermission
 import org.technoserve.farmcollector.map.LocationHelper
 import org.technoserve.farmcollector.map.MapScreen
 import org.technoserve.farmcollector.map.MapViewModel
+import org.technoserve.farmcollector.ui.components.InvalidPolygonDialog
 import org.technoserve.farmcollector.ui.composes.AreaDialog
 import org.technoserve.farmcollector.ui.composes.ConfirmDialog
 import org.technoserve.farmcollector.utils.convertSize
+import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 
 /**
  * This screen helps you to capture and visualize farm polygon.
@@ -707,31 +711,5 @@ fun SetPolygon(
     }
 }
 
-/**
- *  This function is used to display the message when the user captures the invalid polygon
- */
-
-@Composable
-fun InvalidPolygonDialog(
-    showDialog: MutableState<Boolean>,
-    onDismiss: () -> Unit
-) {
-    if (showDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showDialog.value = false },
-            title = { Text(text = stringResource(id = R.string.invalid_polygon_title)) },
-            text = { Text(text = stringResource(id = R.string.invalid_polygon_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    onDismiss()
-                }) {
-                    Text(text = stringResource(id = R.string.ok))
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.background,
-            tonalElevation = 6.dp
-        )
-    }
-}
 
 

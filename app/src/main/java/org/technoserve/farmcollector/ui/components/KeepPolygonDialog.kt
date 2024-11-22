@@ -18,7 +18,6 @@ import org.technoserve.farmcollector.map.MapViewModel
  *  This function is used to allow the user to either keep the existing polygon or capture a new polygon
  */
 
-
 @Composable
 fun KeepPolygonDialog(
     onDismiss: () -> Unit,

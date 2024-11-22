@@ -12,6 +12,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.technoserve.farmcollector.database.dao.FarmDAO
+import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.repositories.FarmRepository
 import java.util.UUID
 

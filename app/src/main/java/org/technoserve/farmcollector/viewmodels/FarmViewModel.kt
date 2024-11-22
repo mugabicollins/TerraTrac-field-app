@@ -29,10 +29,16 @@ import org.technoserve.farmcollector.BuildConfig
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.AppDatabase
 import org.technoserve.farmcollector.repositories.FarmRepository
-import org.technoserve.farmcollector.database.MyPagingSource
-import org.technoserve.farmcollector.database.RefreshableLiveData
+import org.technoserve.farmcollector.database.helpers.MyPagingSource
+import org.technoserve.farmcollector.database.helpers.RefreshableLiveData
 import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.database.models.CollectionSiteRestore
 import org.technoserve.farmcollector.database.models.Farm
+import org.technoserve.farmcollector.database.models.FarmAddResult
+import org.technoserve.farmcollector.database.models.FarmRestore
+import org.technoserve.farmcollector.database.models.ImportResult
+import org.technoserve.farmcollector.database.models.ParsedFarms
+import org.technoserve.farmcollector.database.models.ServerFarmResponse
 import org.technoserve.farmcollector.database.sync.remote.ApiService
 import org.technoserve.farmcollector.database.sync.remote.FarmRequest
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
@@ -43,26 +49,6 @@ import java.io.InputStreamReader
 import java.util.UUID
 import java.util.regex.Pattern
 
-data class ImportResult(
-    val success: Boolean,
-    val message: String,
-    val importedFarms: List<Farm>,
-    val duplicateFarms: List<String> = emptyList(),
-    val farmsNeedingUpdate: List<Farm> = emptyList(),
-    val invalidFarms: List<String> = emptyList()
-)
-
-data class FarmAddResult(
-    val success: Boolean,
-    val message: String,
-    val farm: Farm,
-)
-
-data class ParsedFarms(
-    val validFarms: List<Farm>,
-    val invalidFarms: List<String>
-)
-
 // Define a sealed class for restore status
 sealed class RestoreStatus {
     data object InProgress : RestoreStatus()
@@ -71,45 +57,6 @@ sealed class RestoreStatus {
 
     data class Error(val message: String) : RestoreStatus()
 }
-
-
-data class CollectionSiteRestore(
-    val id: Long,
-    val local_cs_id: Long,
-    val name: String,
-    val device_id: String,
-    val agent_name: String,
-    val email: String,
-    val phone_number: String,
-    val village: String,
-    val district: String,
-    val created_at: String,
-    val updated_at: String
-)
-
-data class FarmRestore(
-    val id: Long,
-    val remote_id: String,
-    val farmer_name: String,
-    val member_id: String?,
-    val size: Double,
-    val agent_name: String?,
-    val village: String,
-    val district: String,
-    val latitude: Double,
-    val longitude: Double,
-    val coordinates: List<List<Double>>,
-    val accuracyArray: List<Float?>?,
-    val created_at: String,
-    val updated_at: String,
-    val site_id: Long
-)
-
-data class ServerFarmResponse(
-    val device_id: String,
-    val collection_site: CollectionSiteRestore,
-    val farms: List<FarmRestore>
-)
 
 /**
  * This class represents farmviewmodel

@@ -52,8 +52,9 @@ import androidx.navigation.NavController
 import org.joda.time.Instant
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.CollectionSite
-import org.technoserve.farmcollector.ui.screens.farms.FarmListHeader
-import org.technoserve.farmcollector.ui.screens.farms.isSystemInDarkTheme
+import org.technoserve.farmcollector.ui.components.FarmListHeader
+import org.technoserve.farmcollector.utils.isSystemInDarkTheme
+
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 

@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.database
+package org.technoserve.farmcollector.database.helpers
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

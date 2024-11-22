@@ -16,8 +16,8 @@ import okhttp3.OkHttpClient
 import org.technoserve.farmcollector.BuildConfig
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.AppDatabase
+import org.technoserve.farmcollector.database.mappers.toDeviceFarmDtoList
 import org.technoserve.farmcollector.database.sync.remote.ApiService
-import org.technoserve.farmcollector.database.toDeviceFarmDtoList
 import org.technoserve.farmcollector.utils.DeviceIdUtil
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
