@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.utils
+package org.technoserve.farmcollector.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

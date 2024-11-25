@@ -50,10 +50,8 @@ import org.technoserve.farmcollector.ui.screens.farms.SetPolygon
 import org.technoserve.farmcollector.ui.screens.settings.SettingsScreen
 import org.technoserve.farmcollector.ui.screens.farms.UpdateFarmForm
 import org.technoserve.farmcollector.ui.theme.FarmCollectorTheme
-import org.technoserve.farmcollector.utils.LanguageViewModel
-import org.technoserve.farmcollector.utils.LanguageViewModelFactory
-import org.technoserve.farmcollector.utils.getLocalizedLanguages
-import org.technoserve.farmcollector.utils.updateLocale
+import org.technoserve.farmcollector.viewmodels.LanguageViewModel
+import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
 import java.util.Locale
 
 
@@ -109,9 +107,12 @@ class MainActivity : ComponentActivity() {
             sharedPref.edit().remove("selectedUnit").apply()
         }
 
+        // Apply language preference when the activity starts
+        applyLanguagePreference()
+
         setContent {
             val navController = rememberNavController()
-            var context = LocalContext.current
+            val context = LocalContext.current
             var canExitApp by remember { mutableStateOf(false) }
             val currentLanguage by languageViewModel.currentLanguage.collectAsState()
 
@@ -154,7 +155,7 @@ class MainActivity : ComponentActivity() {
 
 
             LaunchedEffect(currentLanguage) {
-                updateLocale(context = applicationContext, Locale(currentLanguage.code))
+                languageViewModel.updateLocale(context = applicationContext, Locale(currentLanguage.code))
             }
 
             FarmCollectorTheme(darkTheme = darkMode.value) {
@@ -175,7 +176,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    val languages = getLocalizedLanguages(applicationContext)
+//                    val languages = getLocalizedLanguages(applicationContext)
+                    val languages = languageViewModel.languages
                     val farmViewModel: FarmViewModel =
                         viewModel(
                             factory = FarmViewModelFactory(applicationContext as Application),
@@ -272,6 +274,18 @@ class MainActivity : ComponentActivity() {
             }
 
         }
+    }
+
+    private fun applyLanguagePreference() {
+        // Get the preferred language from shared preferences
+        val savedLanguageCode = getSharedPreferences("settings", MODE_PRIVATE)
+            .getString("preferred_language", Locale.getDefault().language)
+
+        val preferredLanguage = languageViewModel.languages .find { it.code == savedLanguageCode }
+            ?: languageViewModel.languages.first()
+
+        // Update the locale using the LanguageViewModel
+        languageViewModel.selectLanguage(preferredLanguage, this)
     }
 
     override fun onDestroy() {

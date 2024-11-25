@@ -187,8 +187,7 @@ import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.technoserve.farmcollector.ui.screens.home.Home
-import org.technoserve.farmcollector.utils.Language
-import org.technoserve.farmcollector.utils.LanguageViewModel
+import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])

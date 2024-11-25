@@ -235,7 +235,7 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.5"
 
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.5")
-
+//
 //    implementation("group:artifact") {
 //        exclude group: "org.junit.jupiter", module: "junit-jupiter-engine"
 //    }

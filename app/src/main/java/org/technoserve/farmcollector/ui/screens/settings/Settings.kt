@@ -31,8 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.utils.Language
-import org.technoserve.farmcollector.utils.LanguageViewModel
+import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 
 /**
  *  This function is used to display the dark mode toggle and language selection

@@ -12,10 +12,11 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.verify
+import org.technoserve.farmcollector.ui.screens.settings.LanguageSelector
+import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 
 
 // Mock Language class
@@ -23,7 +24,11 @@ data class Language(val displayName: String)
 
 // Mock ViewModel
 class LanguageViewModel : ViewModel() {
-    private val _currentLanguage = MutableStateFlow(Language("English"))
+    private val _currentLanguage = MutableStateFlow(
+        org.technoserve.farmcollector.database.models.Language(
+            "English"
+        )
+    )
     val currentLanguage: StateFlow<Language> get() = _currentLanguage
 
     fun selectLanguage(language: Language, context: Context) {
@@ -32,7 +37,7 @@ class LanguageViewModel : ViewModel() {
 }
 
 
-class LanguageUIKtTest{
+class LanguageSelectorKtTest{
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -41,7 +46,10 @@ class LanguageUIKtTest{
     @Test
     fun languageSelector_displaysCurrentLanguage() {
         val mockViewModel = mockk<LanguageViewModel>(relaxed = true)
-        val languages = listOf(Language("English"), Language("French"))
+        val languages = listOf(
+            org.technoserve.farmcollector.database.models.Language("English"),
+            org.technoserve.farmcollector.database.models.Language("French")
+        )
         val currentLanguage = MutableStateFlow(languages[0]) // English
 
         every { mockViewModel.currentLanguage } returns currentLanguage
@@ -57,7 +65,10 @@ class LanguageUIKtTest{
     @Test
     fun languageSelector_opensDropdownOnClick() {
         val mockViewModel = mockk<LanguageViewModel>(relaxed = true)
-        val languages = listOf(Language("English"), Language("French"))
+        val languages = listOf(
+            org.technoserve.farmcollector.database.models.Language("English"),
+            org.technoserve.farmcollector.database.models.Language("French")
+        )
         val currentLanguage = MutableStateFlow(languages[0]) // English
 
         every { mockViewModel.currentLanguage } returns currentLanguage
@@ -77,7 +88,10 @@ class LanguageUIKtTest{
     @Test
     fun languageSelector_selectsLanguageOnClick() {
         val mockViewModel = mockk<LanguageViewModel>(relaxed = true)
-        val languages = listOf(Language("English"), Language("French"))
+        val languages = listOf(
+            org.technoserve.farmcollector.database.models.Language("English"),
+            org.technoserve.farmcollector.database.models.Language("French")
+        )
         val currentLanguage = MutableStateFlow(languages[0]) // English
 
         every { mockViewModel.currentLanguage } returns currentLanguage
@@ -94,6 +108,9 @@ class LanguageUIKtTest{
         composeTestRule.onNodeWithText("French").performClick()
 
         // Verify that selectLanguage was called with the correct language
-        verify { mockViewModel.selectLanguage(Language("French"), mockContext) }
+        verify { mockViewModel.selectLanguage(
+            org.technoserve.farmcollector.database.models.Language(
+                "French"
+            ), mockContext) }
     }
 }

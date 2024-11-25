@@ -18,8 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -32,9 +36,9 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.ui.theme.Teal
 import org.technoserve.farmcollector.ui.theme.Turquoise
 import org.technoserve.farmcollector.ui.theme.White
-import org.technoserve.farmcollector.utils.Language
-import org.technoserve.farmcollector.utils.LanguageSelector
-import org.technoserve.farmcollector.utils.LanguageViewModel
+import org.technoserve.farmcollector.ui.screens.settings.LanguageSelector
+import org.technoserve.farmcollector.viewmodels.LanguageViewModel
+import java.util.Locale
 
 
 /**
@@ -48,6 +52,15 @@ fun Home(
     languageViewModel: LanguageViewModel,
     languages: List<Language>
 ) {
+
+    val currentLanguage by languageViewModel.currentLanguage.collectAsState()
+    val context = LocalContext.current
+
+
+    LaunchedEffect(currentLanguage) {
+        languageViewModel.updateLocale(context = context, Locale(currentLanguage.code))
+    }
+
     Column(
         Modifier
             .padding(top = 20.dp)
@@ -153,3 +166,4 @@ fun Home(
         Spacer(modifier = Modifier.height(5.dp))
     }
 }
+
