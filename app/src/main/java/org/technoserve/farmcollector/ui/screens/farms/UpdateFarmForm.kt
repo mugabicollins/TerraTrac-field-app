@@ -56,9 +56,9 @@ import org.joda.time.Instant
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.database.models.ParcelablePair
-import org.technoserve.farmcollector.hasLocationPermission
-import org.technoserve.farmcollector.map.LocationHelper
-import org.technoserve.farmcollector.map.MapViewModel
+import org.technoserve.farmcollector.utils.hasLocationPermission
+import org.technoserve.farmcollector.database.helpers.map.LocationHelper
+import org.technoserve.farmcollector.viewmodels.MapViewModel
 import org.technoserve.farmcollector.ui.components.FarmListHeader
 import org.technoserve.farmcollector.ui.components.KeepPolygonDialog
 import org.technoserve.farmcollector.utils.convertSize

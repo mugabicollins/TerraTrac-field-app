@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.map.MapViewModel
+import org.technoserve.farmcollector.viewmodels.MapViewModel
 
 /**
  *  This function is used to allow the user to either keep the existing polygon or capture a new polygon

@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector.viewmodels
 
 
 import android.content.Context
@@ -17,7 +17,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.technoserve.farmcollector.database.models.map.MapState
+import org.technoserve.farmcollector.database.models.map.ZoneClusterItem
+import org.technoserve.farmcollector.database.helpers.map.ZoneClusterManager
 import org.technoserve.farmcollector.utils.GeoCalculator
+import org.technoserve.farmcollector.utils.map.calculateCameraViewPoints
+import org.technoserve.farmcollector.utils.map.getCenterOfPolygon
 import javax.inject.Inject
 
 

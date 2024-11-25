@@ -16,7 +16,7 @@ class FarmCollectorApp : Application() {
     override fun onCreate() {
         super.onCreate()
         ContextProvider.initialize(this)
-        initializeWorkManager()
+        // initializeWorkManager()
     }
 
     // private

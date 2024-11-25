@@ -1,6 +1,7 @@
 package org.technoserve.farmcollector.database.dao
 
 import androidx.lifecycle.LiveData
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -9,6 +10,8 @@ import androidx.room.Update
 import org.technoserve.farmcollector.database.models.CollectionSite
 
 interface CollectionSiteDAO {
+
+
     @Transaction
     @Query("SELECT * FROM CollectionSites ORDER BY createdAt DESC")
     fun getAllSites(): List<CollectionSite>
@@ -22,6 +25,12 @@ interface CollectionSiteDAO {
 
     @Query("SELECT * FROM CollectionSites WHERE siteId = :siteId")
     suspend fun getSiteById(siteId: Long): CollectionSite?
+
+    @Update
+    fun update(collectionSite: CollectionSite)
+
+    @Delete
+    fun delete(collectionSite: CollectionSite)
 
     @Update
     fun updateSite(site: CollectionSite)

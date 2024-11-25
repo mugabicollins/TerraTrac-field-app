@@ -1,7 +1,8 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector.database.models.map
 
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.clustering.ClusterItem
+import org.technoserve.farmcollector.utils.map.getCenterOfPolygon
 
 data class ZoneClusterItem(
     val id: String,

@@ -28,13 +28,13 @@ class LanguageViewModel(application: Application) : AndroidViewModel(application
         // restartActivity(context)
     }
 
-    private fun getDefaultLanguage(): Language {
+    fun getDefaultLanguage(): Language {
         val savedLanguageCode =
             sharedPreferences.getString("preferred_language", Locale.getDefault().language)
         return languages.find { it.code == savedLanguageCode } ?: languages.first()
     }
 
-    private fun savePreferredLanguage(language: Language) {
+    fun savePreferredLanguage(language: Language) {
         sharedPreferences.edit().putString("preferred_language", language.code).apply()
     }
 

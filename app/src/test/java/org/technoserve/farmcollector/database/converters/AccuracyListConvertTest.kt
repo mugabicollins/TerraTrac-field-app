@@ -51,6 +51,7 @@ class AccuracyListConvertTest {
     @Test
     fun `toAccuracyList with empty brackets returns empty list`() {
         val result = converter.toAccuracyList("[]")
+        println(result)  // Debugging output
         assertEquals(emptyList<Float?>(), result)
     }
 

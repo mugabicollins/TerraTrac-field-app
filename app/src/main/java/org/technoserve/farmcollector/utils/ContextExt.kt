@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector
+package org.technoserve.farmcollector.utils
 
 import android.Manifest
 import android.content.Context

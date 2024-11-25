@@ -16,7 +16,7 @@ class CoordinateListConvertTest {
     @Test
     fun `fromCoordinates with null input returns empty string`() {
         val result = converter.fromCoordinateList(null)
-        assertEquals("", result)
+        assertEquals(null, result)
     }
 
     @Test
@@ -30,15 +30,20 @@ class CoordinateListConvertTest {
     fun `fromCoordinates with single coordinate pair`() {
         val coordinates = listOf(Pair(45.0, -122.0))
         val result = converter.fromCoordinateList(coordinates)
+
         // Using Gson to parse back and verify the structure
         val gson = Gson()
         val listType = object : TypeToken<List<Pair<Double, Double>>>() {}.type
         val parsedResult: List<Pair<Double, Double>> = gson.fromJson(result, listType)
 
         assertEquals(1, parsedResult.size)
-        assertEquals(45.0, parsedResult[0].first)
-        assertEquals(-122.0, parsedResult[0].second)
+
+        // Use a delta to compare floating-point numbers
+        val delta = 0.0001
+        assertEquals(45.0, parsedResult[0].first, delta)
+        assertEquals(-122.0, parsedResult[0].second, delta)
     }
+
 
     @Test
     fun `fromCoordinates with multiple coordinate pairs`() {

@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector.ui.screens.map
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -49,6 +49,8 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import org.technoserve.farmcollector.R
+import org.technoserve.farmcollector.database.models.map.MapState
+import org.technoserve.farmcollector.database.helpers.map.ZoneClusterManager
 
 @OptIn(MapsComposeExperimentalApi::class)
 @SuppressLint("PotentialBehaviorOverride")

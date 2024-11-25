@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector.database.helpers.map
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -32,6 +32,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.technoserve.farmcollector.R
+import org.technoserve.farmcollector.database.models.map.LocationState
+import org.technoserve.farmcollector.viewmodels.MapViewModel
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 

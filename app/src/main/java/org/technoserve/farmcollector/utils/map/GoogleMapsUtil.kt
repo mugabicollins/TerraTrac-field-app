@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector.utils.map
 
 /**
  * A set of utility functions for centering the camera given some [LatLng] points.

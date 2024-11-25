@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector.database.models.map
 
 import android.location.Location
 import com.google.maps.android.compose.MapType

@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.ui.screens.farms
+package org.technoserve.farmcollector.ui.screens.map
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -31,10 +31,8 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,13 +52,16 @@ import androidx.navigation.NavController
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.ParcelableFarmData
 import org.technoserve.farmcollector.database.models.ParcelablePair
-import org.technoserve.farmcollector.hasLocationPermission
-import org.technoserve.farmcollector.map.LocationHelper
-import org.technoserve.farmcollector.map.MapScreen
-import org.technoserve.farmcollector.map.MapViewModel
+import org.technoserve.farmcollector.utils.hasLocationPermission
+import org.technoserve.farmcollector.database.helpers.map.LocationHelper
+import org.technoserve.farmcollector.viewmodels.MapViewModel
 import org.technoserve.farmcollector.ui.components.InvalidPolygonDialog
 import org.technoserve.farmcollector.ui.composes.AreaDialog
 import org.technoserve.farmcollector.ui.composes.ConfirmDialog
+import org.technoserve.farmcollector.ui.screens.farms.formatInput
+import org.technoserve.farmcollector.ui.screens.farms.isLocationEnabled
+import org.technoserve.farmcollector.ui.screens.farms.promptEnableLocation
+import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import org.technoserve.farmcollector.utils.convertSize
 import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 

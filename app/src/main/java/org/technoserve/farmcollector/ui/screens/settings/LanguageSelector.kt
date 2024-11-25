@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.technoserve.farmcollector.R
+import org.technoserve.farmcollector.database.models.Language
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 
 /**

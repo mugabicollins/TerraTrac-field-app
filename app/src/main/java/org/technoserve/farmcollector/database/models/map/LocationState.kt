@@ -1,4 +1,4 @@
-package org.technoserve.farmcollector.map
+package org.technoserve.farmcollector.database.models.map
 
 data class LocationState(
     val latitude: Double = 0.0,

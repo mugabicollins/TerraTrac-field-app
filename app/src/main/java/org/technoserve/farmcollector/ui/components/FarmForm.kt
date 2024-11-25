@@ -58,10 +58,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLngBounds
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.map.LocationHelper
-import org.technoserve.farmcollector.map.LocationState
-import org.technoserve.farmcollector.map.MapViewModel
-import org.technoserve.farmcollector.map.getCenterOfPolygon
+import org.technoserve.farmcollector.database.helpers.map.LocationHelper
+import org.technoserve.farmcollector.database.models.map.LocationState
+import org.technoserve.farmcollector.viewmodels.MapViewModel
+import org.technoserve.farmcollector.utils.map.getCenterOfPolygon
 import org.technoserve.farmcollector.ui.screens.farms.LocationPermissionRequest
 import org.technoserve.farmcollector.ui.screens.farms.addFarm
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
