@@ -6,13 +6,17 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import org.technoserve.farmcollector.database.helpers.ContextProvider
 import org.technoserve.farmcollector.database.sync.SyncWorker
 import java.util.concurrent.TimeUnit
+
+
 
 class FarmCollectorApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        initializeWorkManager()
+        ContextProvider.initialize(this)
+        // initializeWorkManager()
     }
 
     // private

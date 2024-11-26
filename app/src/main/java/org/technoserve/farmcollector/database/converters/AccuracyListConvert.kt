@@ -16,6 +16,9 @@ class AccuracyListConvert {
     }
     @TypeConverter
     fun toAccuracyList(value: String?): List<Float?>? {
+        if (value == "[]") {
+            return emptyList()
+        }
         return value?.removePrefix("[")?.removeSuffix("]")?.split(",")?.map {
             it.trim().toFloatOrNull()
         }

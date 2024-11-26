@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
-import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,27 +33,25 @@ import androidx.navigation.compose.rememberNavController
 //import androidx.navigation.navArgument
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import org.technoserve.farmcollector.database.AppUpdateViewModel
-import org.technoserve.farmcollector.database.ExitConfirmationDialog
-import org.technoserve.farmcollector.database.FarmViewModel
-import org.technoserve.farmcollector.database.FarmViewModelFactory
-import org.technoserve.farmcollector.database.UpdateAlert
-import org.technoserve.farmcollector.map.LocationHelper
-import org.technoserve.farmcollector.map.MapViewModel
-import org.technoserve.farmcollector.ui.screens.AddFarm
-import org.technoserve.farmcollector.ui.screens.AddSite
-import org.technoserve.farmcollector.ui.screens.CollectionSiteList
-import org.technoserve.farmcollector.ui.screens.FarmList
-import org.technoserve.farmcollector.ui.screens.Home
-import org.technoserve.farmcollector.ui.screens.ScreenWithSidebar
-import org.technoserve.farmcollector.ui.screens.SetPolygon
-import org.technoserve.farmcollector.ui.screens.SettingsScreen
-import org.technoserve.farmcollector.ui.screens.UpdateFarmForm
+import org.technoserve.farmcollector.viewmodels.AppUpdateViewModel
+import org.technoserve.farmcollector.viewmodels.ExitConfirmationDialog
+import org.technoserve.farmcollector.viewmodels.FarmViewModel
+import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
+import org.technoserve.farmcollector.viewmodels.UpdateAlert
+import org.technoserve.farmcollector.database.helpers.map.LocationHelper
+import org.technoserve.farmcollector.viewmodels.MapViewModel
+import org.technoserve.farmcollector.ui.screens.farms.AddFarm
+import org.technoserve.farmcollector.ui.screens.collectionsites.AddSite
+import org.technoserve.farmcollector.ui.screens.collectionsites.CollectionSiteList
+import org.technoserve.farmcollector.ui.screens.farms.FarmList
+import org.technoserve.farmcollector.ui.screens.home.Home
+import org.technoserve.farmcollector.ui.screens.settings.ScreenWithSidebar
+import org.technoserve.farmcollector.ui.screens.map.SetPolygon
+import org.technoserve.farmcollector.ui.screens.settings.SettingsScreen
+import org.technoserve.farmcollector.ui.screens.farms.UpdateFarmForm
 import org.technoserve.farmcollector.ui.theme.FarmCollectorTheme
-import org.technoserve.farmcollector.utils.LanguageViewModel
-import org.technoserve.farmcollector.utils.LanguageViewModelFactory
-import org.technoserve.farmcollector.utils.getLocalizedLanguages
-import org.technoserve.farmcollector.utils.updateLocale
+import org.technoserve.farmcollector.viewmodels.LanguageViewModel
+import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
 import java.util.Locale
 
 
@@ -110,9 +107,12 @@ class MainActivity : ComponentActivity() {
             sharedPref.edit().remove("selectedUnit").apply()
         }
 
+        // Apply language preference when the activity starts
+        applyLanguagePreference()
+
         setContent {
             val navController = rememberNavController()
-            var context = LocalContext.current
+            val context = LocalContext.current
             var canExitApp by remember { mutableStateOf(false) }
             val currentLanguage by languageViewModel.currentLanguage.collectAsState()
 
@@ -155,7 +155,7 @@ class MainActivity : ComponentActivity() {
 
 
             LaunchedEffect(currentLanguage) {
-                updateLocale(context = applicationContext, Locale(currentLanguage.code))
+                languageViewModel.updateLocale(context = applicationContext, Locale(currentLanguage.code))
             }
 
             FarmCollectorTheme(darkTheme = darkMode.value) {
@@ -176,7 +176,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    val languages = getLocalizedLanguages(applicationContext)
+//                    val languages = getLocalizedLanguages(applicationContext)
+                    val languages = languageViewModel.languages
                     val farmViewModel: FarmViewModel =
                         viewModel(
                             factory = FarmViewModelFactory(applicationContext as Application),
@@ -273,6 +274,18 @@ class MainActivity : ComponentActivity() {
             }
 
         }
+    }
+
+    private fun applyLanguagePreference() {
+        // Get the preferred language from shared preferences
+        val savedLanguageCode = getSharedPreferences("settings", MODE_PRIVATE)
+            .getString("preferred_language", Locale.getDefault().language)
+
+        val preferredLanguage = languageViewModel.languages .find { it.code == savedLanguageCode }
+            ?: languageViewModel.languages.first()
+
+        // Update the locale using the LanguageViewModel
+        languageViewModel.selectLanguage(preferredLanguage, this)
     }
 
     override fun onDestroy() {
