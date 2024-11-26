@@ -1,38 +1,26 @@
 package org.technoserve.farmcollector
 
-import org.junit.Assert.*
-
 import android.Manifest
 import android.app.Application
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.Navigation.findNavController
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.technoserve.farmcollector.database.AppUpdateViewModel
-import org.technoserve.farmcollector.utils.LanguageViewModel
-import java.util.Locale
 
-@RunWith(AndroidJUnit4::class)
-//@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [29])
-class MainActivityTest {
+//@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33])
+class MainActivityKtTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()

@@ -4,11 +4,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.navigation.NavController
-import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import io.mockk.mockk
 import io.mockk.verify
+import org.technoserve.farmcollector.ui.screens.settings.BottomSidebar
 
 
 class BottomBarKtTest{

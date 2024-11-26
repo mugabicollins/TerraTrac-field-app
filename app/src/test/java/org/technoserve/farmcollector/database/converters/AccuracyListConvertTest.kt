@@ -1,8 +1,6 @@
 package org.technoserve.farmcollector.database.converters
 
-//import org.junit.jupiter.api.Assertions.*
-//
-//import org.junit.jupiter.api.Test
+
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -53,6 +51,7 @@ class AccuracyListConvertTest {
     @Test
     fun `toAccuracyList with empty brackets returns empty list`() {
         val result = converter.toAccuracyList("[]")
+        println(result)  // Debugging output
         assertEquals(emptyList<Float?>(), result)
     }
 

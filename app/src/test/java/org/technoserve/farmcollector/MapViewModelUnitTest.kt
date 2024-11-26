@@ -7,10 +7,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.technoserve.farmcollector.map.MapViewModel
+import org.technoserve.farmcollector.viewmodels.MapViewModel
 
 @RunWith(RobolectricTestRunner::class)
-class MapViewModelUnitTest {
+class MapViewModelKtTest {
 
 
     @get:Rule

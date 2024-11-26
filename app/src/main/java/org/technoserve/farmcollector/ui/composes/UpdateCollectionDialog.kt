@@ -30,8 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import org.technoserve.farmcollector.R
-import org.technoserve.farmcollector.database.CollectionSite
-import org.technoserve.farmcollector.database.FarmViewModel
+import org.technoserve.farmcollector.database.models.CollectionSite
+
+import org.technoserve.farmcollector.viewmodels.FarmViewModel
 
 fun isValidPhoneNumber(phoneNumber: String): Boolean {
     val regex = Regex("^\\+?(?:[0-9] ?){6,14}[0-9]\$")
