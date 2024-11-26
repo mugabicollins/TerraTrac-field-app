@@ -1,6 +1,7 @@
 package org.technoserve.farmcollector.database.dao
 
 import androidx.lifecycle.LiveData
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -9,6 +10,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import org.technoserve.farmcollector.database.models.CollectionSite
 
+@Dao
 interface CollectionSiteDAO {
 
 

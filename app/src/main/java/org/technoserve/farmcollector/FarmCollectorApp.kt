@@ -16,11 +16,11 @@ class FarmCollectorApp : Application() {
     override fun onCreate() {
         super.onCreate()
         ContextProvider.initialize(this)
-        // initializeWorkManager()
+        initializeWorkManager()
     }
 
     // private
-    fun initializeWorkManager() {
+    private fun initializeWorkManager() {
         val workRequest = PeriodicWorkRequestBuilder<SyncWorker>(2, TimeUnit.HOURS)
             .setConstraints(
                 Constraints.Builder()

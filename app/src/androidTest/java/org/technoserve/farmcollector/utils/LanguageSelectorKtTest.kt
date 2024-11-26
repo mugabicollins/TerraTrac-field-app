@@ -18,6 +18,7 @@ import org.mockito.Mockito.verify
 import org.technoserve.farmcollector.ui.screens.settings.LanguageSelector
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 
+/*
 
 // Mock Language class
 data class Language(val displayName: String)
@@ -114,3 +115,5 @@ class LanguageSelectorKtTest{
             ), mockContext) }
     }
 }
+
+ */

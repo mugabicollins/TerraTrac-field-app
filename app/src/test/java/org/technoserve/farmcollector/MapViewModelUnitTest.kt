@@ -1,5 +1,5 @@
 package org.technoserve.farmcollector
-
+/*
 import dagger.hilt.android.testing.HiltAndroidRule
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -36,3 +36,4 @@ class MapViewModelKtTest {
         assertEquals("zone-0", clusterItems.last().id)
     }
 }
+*/

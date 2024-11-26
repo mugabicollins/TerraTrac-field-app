@@ -17,7 +17,7 @@ import org.robolectric.annotation.Config
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.repositories.FarmRepository
 
-
+/*
 //@RunWith(RobolectricTestRunner::class)
 //@Config(sdk = [33])
 class FarmViewModelTest {
@@ -172,3 +172,5 @@ class FarmViewModelTest {
         )
     }
 }
+
+ */

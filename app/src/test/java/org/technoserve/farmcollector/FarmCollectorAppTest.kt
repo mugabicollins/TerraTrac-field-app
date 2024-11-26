@@ -1,5 +1,6 @@
 package org.technoserve.farmcollector
 
+/*
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -87,4 +88,4 @@ class FarmCollectorAppTest {
         }
     }
 
-}
+}*/

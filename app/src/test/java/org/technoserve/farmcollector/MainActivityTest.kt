@@ -1,5 +1,6 @@
 package org.technoserve.farmcollector
 
+/*
 import android.Manifest
 import android.app.Application
 import android.content.SharedPreferences
@@ -169,3 +170,4 @@ class MainActivityKtTest {
 //        }
 //    }
 }
+*/

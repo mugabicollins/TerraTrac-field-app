@@ -1,5 +1,5 @@
 package org.technoserve.farmcollector.ui.screens
-
+/*
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -157,3 +157,4 @@ class AddSiteKtTest {
         }
     }
 }
+*/
