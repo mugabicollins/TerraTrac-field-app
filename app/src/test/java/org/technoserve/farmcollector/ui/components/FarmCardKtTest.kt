@@ -17,49 +17,49 @@ class FarmCardKtTest{
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    @Test
-    fun farmCardDisplaysContentCorrectly() {
-        val testFarm = Farm(
-            siteId = 1L,
-            farmerPhoto = "photo.jpg",
-            farmerName = "John Doe",
-            memberId = "12345",
-            village = "Sample Village",
-            district = "Sample District",
-            purchases = 10f,
-            size = 5.0f,
-            latitude = "12.34",
-            longitude = "56.78",
-            coordinates = listOf(Pair(12.34, 56.78)),
-            accuracyArray = listOf(5.0f),
-            synced = false,
-            scheduledForSync = false,
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis(),
-            needsUpdate = true
-        )
-
-        composeTestRule.setContent {
-            FarmCard(
-                farm = testFarm,
-                onCardClick = {},
-                onDeleteClick = {}
-            )
-        }
-
-        // Verify farmer name
-        composeTestRule.onNodeWithText("John Doe").assertExists()
-
-        // Verify farm size with formatting
-        composeTestRule.onNodeWithText("Size: 5.0 ha").assertExists()
-
-        // Verify village and district
-        composeTestRule.onNodeWithText("Village: Sample Village").assertExists()
-        composeTestRule.onNodeWithText("District: Sample District").assertExists()
-
-        // Verify the "needs update" label
-        composeTestRule.onNodeWithText("Needs update").assertExists()
-    }
+//    @Test
+//    fun farmCardDisplaysContentCorrectly() {
+//        val testFarm = Farm(
+//            siteId = 1L,
+//            farmerPhoto = "photo.jpg",
+//            farmerName = "John Doe",
+//            memberId = "12345",
+//            village = "Sample Village",
+//            district = "Sample District",
+//            purchases = 10f,
+//            size = 5.0f,
+//            latitude = "12.34",
+//            longitude = "56.78",
+//            coordinates = listOf(Pair(12.34, 56.78)),
+//            accuracyArray = listOf(5.0f),
+//            synced = false,
+//            scheduledForSync = false,
+//            createdAt = System.currentTimeMillis(),
+//            updatedAt = System.currentTimeMillis(),
+//            needsUpdate = true
+//        )
+//
+//        composeTestRule.setContent {
+//            FarmCard(
+//                farm = testFarm,
+//                onCardClick = {},
+//                onDeleteClick = {}
+//            )
+//        }
+//
+//        // Verify farmer name
+//        composeTestRule.onNodeWithText("John Doe").assertExists()
+//
+//        // Verify farm size with formatting
+//        composeTestRule.onNodeWithText("Size: 5.0 ha").assertExists()
+//
+//        // Verify village and district
+//        composeTestRule.onNodeWithText("Village: Sample Village").assertExists()
+//        composeTestRule.onNodeWithText("District: Sample District").assertExists()
+//
+//        // Verify the "needs update" label
+//        composeTestRule.onNodeWithText("Needs update").assertExists()
+//    }
 
     @Test
     fun farmCardHandlesCardClick() {

@@ -18,7 +18,6 @@ import java.util.UUID
  * This file contains the information about the entities in the database including farms and collection sites
  */
 
-
 @Entity(
     tableName = "Farms",
     foreignKeys = [

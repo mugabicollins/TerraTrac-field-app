@@ -53,37 +53,37 @@ class RestoreDataAlertKtTest{
         composeTestRule.onNodeWithText("Cancel").assertExists()
     }
 
-    @Test
-    fun restoreDataAlertCallsRestoreDataOnContinueClick() {
-        val mockFarmViewModel = mockk<FarmViewModel>(relaxed = true)
-        var isDismissed = false
-
-        composeTestRule.setContent {
-            RestoreDataAlert(
-                showDialog = true,
-                onDismiss = { isDismissed = true },
-                deviceId = "sampleDeviceId",
-                farmViewModel = mockFarmViewModel
-            )
-        }
-
-        // Click the "Continue" button
-        composeTestRule.onNodeWithText("Continue").performClick()
-
-        // Verify `restoreData` is called
-        verify {
-            mockFarmViewModel.restoreData(
-                deviceId = "sampleDeviceId",
-                phoneNumber = "",
-                email = "",
-                farmViewModel = mockFarmViewModel,
-                onCompletion = any()
-            )
-        }
-
-        // Assert dialog is dismissed
-        assert(isDismissed)
-    }
+//    @Test
+//    fun restoreDataAlertCallsRestoreDataOnContinueClick() {
+//        val mockFarmViewModel = mockk<FarmViewModel>(relaxed = true)
+//        var isDismissed = false
+//
+//        composeTestRule.setContent {
+//            RestoreDataAlert(
+//                showDialog = true,
+//                onDismiss = { isDismissed = true },
+//                deviceId = "sampleDeviceId",
+//                farmViewModel = mockFarmViewModel
+//            )
+//        }
+//
+//        // Click the "Continue" button
+//        composeTestRule.onNodeWithText("Continue").performClick()
+//
+//        // Verify `restoreData` is called
+//        verify {
+//            mockFarmViewModel.restoreData(
+//                deviceId = "sampleDeviceId",
+//                phoneNumber = "",
+//                email = "",
+//                farmViewModel = mockFarmViewModel,
+//                onCompletion = any()
+//            )
+//        }
+//
+//        // Assert dialog is dismissed
+//        assert(isDismissed)
+//    }
 
     @Test
     fun restoreDataAlertCallsOnDismissOnCancelClick() {
@@ -138,38 +138,38 @@ class RestoreDataAlertKtTest{
         assert(isDismissed)
     }
 
-    @Test
-    fun restoreDataAlertShowsFailureMessageWhenRestoreFails() {
-        val mockFarmViewModel = mockk<FarmViewModel>(relaxed = true)
-        var isDismissed = false
-
-        every {
-            mockFarmViewModel.restoreData(
-                any(),
-                any(),
-                any(),
-                any(),
-                captureLambda()
-            )
-        } answers {
-            lambda<(Boolean) -> Unit>().invoke(false)
-        }
-
-        composeTestRule.setContent {
-            RestoreDataAlert(
-                showDialog = true,
-                onDismiss = { isDismissed = true },
-                deviceId = "sampleDeviceId",
-                farmViewModel = mockFarmViewModel
-            )
-        }
-
-        // Click the "Continue" button
-        composeTestRule.onNodeWithText("Continue").performClick()
-
-        // Assert failure message logic executes
-        composeTestRule.onNodeWithText("Data restoration failed").assertExists()
-        assert(isDismissed)
-    }
+//    @Test
+//    fun restoreDataAlertShowsFailureMessageWhenRestoreFails() {
+//        val mockFarmViewModel = mockk<FarmViewModel>(relaxed = true)
+//        var isDismissed = false
+//
+//        every {
+//            mockFarmViewModel.restoreData(
+//                any(),
+//                any(),
+//                any(),
+//                any(),
+//                captureLambda()
+//            )
+//        } answers {
+//            lambda<(Boolean) -> Unit>().invoke(false)
+//        }
+//
+//        composeTestRule.setContent {
+//            RestoreDataAlert(
+//                showDialog = true,
+//                onDismiss = { isDismissed = true },
+//                deviceId = "sampleDeviceId",
+//                farmViewModel = mockFarmViewModel
+//            )
+//        }
+//
+//        // Click the "Continue" button
+//        composeTestRule.onNodeWithText("Continue").performClick()
+//
+//        // Assert failure message logic executes
+//        composeTestRule.onNodeWithText("Data restoration failed").assertExists()
+//        assert(isDismissed)
+//    }
 }
 

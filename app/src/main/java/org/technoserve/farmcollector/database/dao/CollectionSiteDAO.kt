@@ -10,6 +10,11 @@ import androidx.room.Transaction
 import androidx.room.Update
 import org.technoserve.farmcollector.database.models.CollectionSite
 
+
+/**
+ * This interface provides methods to interact with the database
+ */
+
 @Dao
 interface CollectionSiteDAO {
 

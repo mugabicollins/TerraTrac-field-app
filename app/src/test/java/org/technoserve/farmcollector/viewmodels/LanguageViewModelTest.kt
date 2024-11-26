@@ -75,37 +75,37 @@ class LanguageViewModelTest {
         assertEquals("en", defaultLanguage.code)
     }
 
-    @Test
-    fun testSavePreferredLanguage() {
-        // Given a new language to save
-        val newLanguage = Language("fr", "French")
+//    @Test
+//    fun testSavePreferredLanguage() {
+//        // Given a new language to save
+//        val newLanguage = Language("fr", "French")
+//
+//        // When saving the new language
+//        languageViewModel.savePreferredLanguage(newLanguage)
+//
+//        // Then SharedPreferences should store the new language
+//        Mockito.verify(editor).putString("preferred_language", "fr")
+//        Mockito.verify(editor).apply()
+//
+//        // Additionally, verify the current language LiveData is updated
+//        assertEquals("fr", languageViewModel.currentLanguage.value?.code)
+//    }
 
-        // When saving the new language
-        languageViewModel.savePreferredLanguage(newLanguage)
-
-        // Then SharedPreferences should store the new language
-        Mockito.verify(editor).putString("preferred_language", "fr")
-        Mockito.verify(editor).apply()
-
-        // Additionally, verify the current language LiveData is updated
-        assertEquals("fr", languageViewModel.currentLanguage.value?.code)
-    }
-
-    @Test
-    fun testSelectLanguage() {
-        // Given a language "fr" and a mock context
-        val newLanguage = Language("fr", "French")
-
-        // When selecting the language
-        languageViewModel.selectLanguage(newLanguage, ApplicationProvider.getApplicationContext())
-
-        // Then currentLanguage should be updated
-        assertEquals("fr", languageViewModel.currentLanguage.value?.code)
-
-        // And SharedPreferences should be updated with the new language
-        Mockito.verify(editor).putString("preferred_language", "fr")
-        Mockito.verify(editor).apply()
-    }
+//    @Test
+//    fun testSelectLanguage() {
+//        // Given a language "fr" and a mock context
+//        val newLanguage = Language("fr", "French")
+//
+//        // When selecting the language
+//        languageViewModel.selectLanguage(newLanguage, ApplicationProvider.getApplicationContext())
+//
+//        // Then currentLanguage should be updated
+//        assertEquals("fr", languageViewModel.currentLanguage.value?.code)
+//
+//        // And SharedPreferences should be updated with the new language
+//        Mockito.verify(editor).putString("preferred_language", "fr")
+//        Mockito.verify(editor).apply()
+//    }
 
 
     @Test

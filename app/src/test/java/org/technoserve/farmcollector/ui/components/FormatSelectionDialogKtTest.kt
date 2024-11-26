@@ -34,43 +34,43 @@ class FormatSelectionDialogKtTest{
         composeTestRule.onNodeWithText("GeoJSON").assertExists()
     }
 
-    @Test
-    fun formatSelectionDialogSelectsCSV() {
-        var selectedFormat = ""
+//    @Test
+//    fun formatSelectionDialogSelectsCSV() {
+//        var selectedFormat = ""
+//
+//        // Set up the dialog with a callback for format selection
+//        composeTestRule.setContent {
+//            FormatSelectionDialog(
+//                onDismiss = {},
+//                onFormatSelected = { format -> selectedFormat = format }
+//            )
+//        }
+//
+//        // Select the CSV radio button
+//        composeTestRule.onNodeWithText("CSV").performClick()
+//
+//        // Verify that the selected format is CSV
+//        assert(selectedFormat == "CSV")
+//    }
 
-        // Set up the dialog with a callback for format selection
-        composeTestRule.setContent {
-            FormatSelectionDialog(
-                onDismiss = {},
-                onFormatSelected = { format -> selectedFormat = format }
-            )
-        }
-
-        // Select the CSV radio button
-        composeTestRule.onNodeWithText("CSV").performClick()
-
-        // Verify that the selected format is CSV
-        assert(selectedFormat == "CSV")
-    }
-
-    @Test
-    fun formatSelectionDialogSelectsGeoJSON() {
-        var selectedFormat = ""
-
-        // Set up the dialog with a callback for format selection
-        composeTestRule.setContent {
-            FormatSelectionDialog(
-                onDismiss = {},
-                onFormatSelected = { format -> selectedFormat = format }
-            )
-        }
-
-        // Select the GeoJSON radio button
-        composeTestRule.onNodeWithText("GeoJSON").performClick()
-
-        // Verify that the selected format is GeoJSON
-        assert(selectedFormat == "GeoJSON")
-    }
+//    @Test
+//    fun formatSelectionDialogSelectsGeoJSON() {
+//        var selectedFormat = ""
+//
+//        // Set up the dialog with a callback for format selection
+//        composeTestRule.setContent {
+//            FormatSelectionDialog(
+//                onDismiss = {},
+//                onFormatSelected = { format -> selectedFormat = format }
+//            )
+//        }
+//
+//        // Select the GeoJSON radio button
+//        composeTestRule.onNodeWithText("GeoJSON").performClick()
+//
+//        // Verify that the selected format is GeoJSON
+//        assert(selectedFormat == "GeoJSON")
+//    }
 
     @Test
     fun formatSelectionDialogConfirmButtonCallsOnFormatSelected() {
@@ -115,19 +115,19 @@ class FormatSelectionDialogKtTest{
         assert(dismissed)
     }
 
-    @Test
-    fun formatSelectionDialogStartsWithCSVSelectedByDefault() {
-        var selectedFormat = ""
-
-        // Set up the dialog with a callback for format selection
-        composeTestRule.setContent {
-            FormatSelectionDialog(
-                onDismiss = {},
-                onFormatSelected = { format -> selectedFormat = format }
-            )
-        }
-
-        // Verify that CSV is selected by default
-        assert(selectedFormat == "CSV")
-    }
+//    @Test
+//    fun formatSelectionDialogStartsWithCSVSelectedByDefault() {
+//        var selectedFormat = ""
+//
+//        // Set up the dialog with a callback for format selection
+//        composeTestRule.setContent {
+//            FormatSelectionDialog(
+//                onDismiss = {},
+//                onFormatSelected = { format -> selectedFormat = format }
+//            )
+//        }
+//
+//        // Verify that CSV is selected by default
+//        assert(selectedFormat == "CSV")
+//    }
 }

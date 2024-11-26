@@ -35,12 +35,12 @@ import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.database.models.CollectionSiteRestore
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.database.models.FarmAddResult
+import org.technoserve.farmcollector.database.models.FarmRequest
 import org.technoserve.farmcollector.database.models.FarmRestore
 import org.technoserve.farmcollector.database.models.ImportResult
 import org.technoserve.farmcollector.database.models.ParsedFarms
 import org.technoserve.farmcollector.database.models.ServerFarmResponse
 import org.technoserve.farmcollector.database.sync.remote.ApiService
-import org.technoserve.farmcollector.database.sync.remote.FarmRequest
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

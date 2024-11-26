@@ -6,6 +6,9 @@ import org.technoserve.farmcollector.database.models.DeviceFarmDto
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.database.models.FarmDetailDto
 
+/**
+ *  This Function is responsible for converting the data before they are synchronized with the remote server
+ */
 fun List<Farm>.toDeviceFarmDtoList(deviceId: String, farmDao: FarmDAO): List<DeviceFarmDto> {
     return this.groupBy { it.siteId } // Group by siteId
         .mapNotNull { (siteId, farms) ->

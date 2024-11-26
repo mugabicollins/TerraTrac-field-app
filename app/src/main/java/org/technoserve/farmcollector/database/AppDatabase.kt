@@ -78,7 +78,6 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-
         fun getInstance(context: Context): AppDatabase {
             synchronized(this) {
                 var instance = INSTANCE

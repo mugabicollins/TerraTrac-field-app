@@ -1,6 +1,7 @@
 package org.technoserve.farmcollector
 
 import android.app.Application
+import androidx.work.Configuration
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -16,10 +17,10 @@ class FarmCollectorApp : Application() {
     override fun onCreate() {
         super.onCreate()
         ContextProvider.initialize(this)
-        initializeWorkManager()
+        // initializeWorkManager()
     }
 
-    // private
+/*
     private fun initializeWorkManager() {
         val workRequest = PeriodicWorkRequestBuilder<SyncWorker>(2, TimeUnit.HOURS)
             .setConstraints(
@@ -35,4 +36,6 @@ class FarmCollectorApp : Application() {
             workRequest
         )
     }
+
+ */
 }

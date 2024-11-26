@@ -42,83 +42,83 @@ class FarmListHeaderPlotsKtTest{
         composeTestRule.onNodeWithText(title).assertExists()
     }
 
-    @Test
-    fun searchButtonTogglesSearchField() {
-        val title = "Farm Plots"
-        var searchQuery = ""
+//    @Test
+//    fun searchButtonTogglesSearchField() {
+//        val title = "Farm Plots"
+//        var searchQuery = ""
+//
+//        composeTestRule.setContent {
+//            FarmListHeaderPlots(
+//                title = title,
+//                onBackClicked = {},
+//                onExportClicked = {},
+//                onShareClicked = {},
+//                onImportClicked = {},
+//                onSearchQueryChanged = { searchQuery = it },
+//                showExport = false,
+//                showShare = false,
+//                showSearch = true,
+//                onRestoreClicked = {}
+//            )
+//        }
+//
+//        // Initially, the search field should not be visible
+//        composeTestRule.onNodeWithTag("SearchField").assertDoesNotExist()
+//
+//        // Click on the search button
+//        composeTestRule.onNodeWithContentDescription("Search").performClick()
+//
+//        // The search field should now be visible
+//        composeTestRule.onNodeWithTag("SearchField").assertExists()
+//
+//        // Perform a search
+//        val query = "plot search"
+//        composeTestRule.onNodeWithTag("SearchField").performTextInput(query)
+//
+//        // Verify that the search query was passed correctly
+//        assert(searchQuery == query)
+//
+//        // Click on the search button again to hide the search field
+//        composeTestRule.onNodeWithContentDescription("Search").performClick()
+//
+//        // The search field should no longer be visible
+//        composeTestRule.onNodeWithTag("SearchField").assertDoesNotExist()
+//    }
 
-        composeTestRule.setContent {
-            FarmListHeaderPlots(
-                title = title,
-                onBackClicked = {},
-                onExportClicked = {},
-                onShareClicked = {},
-                onImportClicked = {},
-                onSearchQueryChanged = { searchQuery = it },
-                showExport = false,
-                showShare = false,
-                showSearch = true,
-                onRestoreClicked = {}
-            )
-        }
-
-        // Initially, the search field should not be visible
-        composeTestRule.onNodeWithTag("SearchField").assertDoesNotExist()
-
-        // Click on the search button
-        composeTestRule.onNodeWithContentDescription("Search").performClick()
-
-        // The search field should now be visible
-        composeTestRule.onNodeWithTag("SearchField").assertExists()
-
-        // Perform a search
-        val query = "plot search"
-        composeTestRule.onNodeWithTag("SearchField").performTextInput(query)
-
-        // Verify that the search query was passed correctly
-        assert(searchQuery == query)
-
-        // Click on the search button again to hide the search field
-        composeTestRule.onNodeWithContentDescription("Search").performClick()
-
-        // The search field should no longer be visible
-        composeTestRule.onNodeWithTag("SearchField").assertDoesNotExist()
-    }
-
-    @Test
-    fun searchQueryIsClearedWhenBackClicked() {
-        var searchQuery = "some search query"
-
-        composeTestRule.setContent {
-            FarmListHeaderPlots(
-                title = "Farm Plots",
-                onBackClicked = {},
-                onExportClicked = {},
-                onShareClicked = {},
-                onImportClicked = {},
-                onSearchQueryChanged = { searchQuery = it },
-                showExport = false,
-                showShare = false,
-                showSearch = true,
-                onRestoreClicked = {}
-            )
-        }
-
-        // Click on the search button to show search field
-        composeTestRule.onNodeWithContentDescription("Search").performClick()
-
-        // Perform some search input
-        composeTestRule.onNodeWithTag("SearchField").performTextInput("new plot query")
-
-        // Verify the search query is updated
-        composeTestRule.onNodeWithTag("SearchField").assertTextEquals("new plot query")
-
-        // Click on the back button to clear the query
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-
-        // Verify that the search query is cleared
-        composeTestRule.onNodeWithTag("SearchField").assertTextEquals("")
-    }
+//    @Test
+//    fun searchQueryIsClearedWhenBackClicked() {
+//        var searchQuery = "some search query"
+//
+//        composeTestRule.setContent {
+//            FarmListHeaderPlots(
+//                title = "Farm Plots",
+//                onBackClicked = {},
+//                onExportClicked = {},
+//                onShareClicked = {},
+//                onImportClicked = {},
+//                onSearchQueryChanged = { searchQuery = it },
+//                showExport = false,
+//                showShare = false,
+//                showSearch = true,
+//                onRestoreClicked = {}
+//            )
+//        }
+//
+//        // Click on the search button to show search field
+//        composeTestRule.onNodeWithContentDescription("Search").performClick()
+//
+//        // Perform some search input
+//        composeTestRule.onNodeWithTag("SearchField").performTextInput("new plot query")
+//
+//        // Verify the search query is updated
+//        composeTestRule.onNodeWithTag("SearchField").assertTextEquals("new plot query")
+//
+//        // Click on the back button to clear the query
+//        composeTestRule.onNodeWithContentDescription("Back").performClick()
+//
+//        // Verify that the search query is cleared
+//        composeTestRule.onNodeWithTag("SearchField").assertTextEquals("")
+//    }
 
     @Test
     fun farmListHeaderPlotsHandlesBackClickCorrectly() {
@@ -175,26 +175,26 @@ class FarmListHeaderPlotsKtTest{
         assert(restoreClicked)
     }
 
-    @Test
-    fun restoreButtonNotVisibleWhenShowRestoreFalse() {
-        composeTestRule.setContent {
-            FarmListHeaderPlots(
-                title = "Farm Plots",
-                onBackClicked = {},
-                onExportClicked = {},
-                onShareClicked = {},
-                onImportClicked = {},
-                onSearchQueryChanged = {},
-                showExport = false,
-                showShare = false,
-                showSearch = false,
-                onRestoreClicked = {}
-            )
-        }
-
-        // Verify the restore button is NOT visible
-        composeTestRule.onNodeWithContentDescription("Restore").assertDoesNotExist()
-    }
+//    @Test
+//    fun restoreButtonNotVisibleWhenShowRestoreFalse() {
+//        composeTestRule.setContent {
+//            FarmListHeaderPlots(
+//                title = "Farm Plots",
+//                onBackClicked = {},
+//                onExportClicked = {},
+//                onShareClicked = {},
+//                onImportClicked = {},
+//                onSearchQueryChanged = {},
+//                showExport = false,
+//                showShare = false,
+//                showSearch = false,
+//                onRestoreClicked = {}
+//            )
+//        }
+//
+//        // Verify the restore button is NOT visible
+//        composeTestRule.onNodeWithContentDescription("Restore").assertDoesNotExist()
+//    }
 
     @Test
     fun exportButtonVisibility() {

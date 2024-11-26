@@ -1,6 +1,7 @@
 package org.technoserve.farmcollector.database.sync.remote
 
 import org.technoserve.farmcollector.database.models.DeviceFarmDto
+import org.technoserve.farmcollector.database.models.FarmRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -10,13 +11,6 @@ import retrofit2.http.POST
  *  and restore them to the device using either device_id or email or phoneNUmber.
  *
  */
-
-data class FarmRequest(
-    val device_id: String,
-    val email: String = "",
-    val phone_number: String = ""
-)
-
 interface ApiService {
 
     @POST("/api/farm/sync/")

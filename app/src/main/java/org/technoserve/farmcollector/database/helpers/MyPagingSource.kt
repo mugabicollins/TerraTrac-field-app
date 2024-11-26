@@ -7,6 +7,10 @@ import kotlinx.coroutines.withContext
 import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 
+/**
+ *
+ * This class is used to implement a PagingSource for the CollectionSite entity
+ */
 class MyPagingSource(
     private val farmViewModel: FarmViewModel
 ) : PagingSource<Int, CollectionSite>() {

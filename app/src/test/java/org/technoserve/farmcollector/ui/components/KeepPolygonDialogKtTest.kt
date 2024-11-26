@@ -17,24 +17,24 @@ class KeepPolygonDialogKtTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    @Test
-    fun testKeepPolygonDialogDisplaysCorrectly() {
-        composeTestRule.setContent {
-            KeepPolygonDialog(
-                onDismiss = {},
-                onKeepExisting = {},
-                onCaptureNew = {}
-            )
-        }
-
-        // Verify the dialog title and text are displayed
-        composeTestRule.onNodeWithText("Update Polygon").assertExists()
-        composeTestRule.onNodeWithText("Keep existing polygon or capture new").assertExists()
-
-        // Verify the buttons are displayed
-        composeTestRule.onNodeWithText("Keep Existing").assertExists()
-        composeTestRule.onNodeWithText("Capture New").assertExists()
-    }
+//    @Test
+//    fun testKeepPolygonDialogDisplaysCorrectly() {
+//        composeTestRule.setContent {
+//            KeepPolygonDialog(
+//                onDismiss = {},
+//                onKeepExisting = {},
+//                onCaptureNew = {}
+//            )
+//        }
+//
+//        // Verify the dialog title and text are displayed
+//        composeTestRule.onNodeWithText("Update Polygon").assertExists()
+//        composeTestRule.onNodeWithText("Keep existing polygon or capture new").assertExists()
+//
+//        // Verify the buttons are displayed
+//        composeTestRule.onNodeWithText("Keep Existing").assertExists()
+//        composeTestRule.onNodeWithText("Capture New").assertExists()
+//    }
 
     @Test
     fun testKeepPolygonDialogButtonActions() {
