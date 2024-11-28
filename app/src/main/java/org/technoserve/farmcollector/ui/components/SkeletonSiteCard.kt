@@ -24,7 +24,21 @@ import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
 import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 
-
+/**
+ * This function is used to create a skeleton for the site card layout.
+ * It includes a shimmering card with placeholder content.
+ * The placeholder content includes a checkbox, a site name, and a brief description.
+ * The checkbox is a shimmering version of a checkbox, and the site name and description are placeholders.
+ * The card's background color is determined by the system theme.
+ *
+ * Note: This function assumes that the necessary UI components, such as Checkbox, Text, and Image, are already defined and imported.
+ * You may need to update the function to use the actual components provided by your project.
+ *
+ * @param isDarkTheme Whether the system theme is dark or light
+ * @param backgroundColor The background color for the card
+ * @param placeholderColor The color for the placeholder content (checkbox, site name, and description)
+ * @return A skeleton for the site card layout with shimmering card and placeholder content
+ */
 @Composable
 fun SkeletonSiteCard() {
     val isDarkTheme = isSystemInDarkTheme()

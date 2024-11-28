@@ -27,7 +27,13 @@ import androidx.compose.ui.unit.sp
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
-
+/**
+ * A card displaying a farm's information.
+ *
+ * @param farm The Farm object to display.
+ * @param onCardClick A callback to be invoked when the card is clicked.
+ * @param onDeleteClick A callback to be invoked when the delete icon is clicked.
+ */
 @Composable
 fun FarmCard(
     farm: Farm,

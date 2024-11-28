@@ -94,14 +94,26 @@ import java.util.Locale
 
 
 var siteID = 0L
-
+/**
+ *
+ * The Action enum represents the available actions for farm management.
+ * Export represents exporting farms in a specific format (e.g., CSV, JSON).
+ * Share represents sharing farms with other users or devices.
+ */
 enum class Action {
     Export,
     Share,
 }
 
 /**
- *  This function is used to display the list of farm Plots
+ *
+ * The FarmList screen displays a list of farms. Users can add, edit, delete, and share farms.
+ * The screen includes a search bar, a tabbed view, and a floating action button for adding a new farm.
+ * The farms are displayed in a paginated manner, with a custom pagination control implemented using the CustomPaginationControls component.
+ * The screen also includes a floating action button for exporting farms in a specific format (e.g., CSV, JSON).
+ * When the user selects a farm, they can view its details, edit it, or delete it.
+ * The screen supports dark mode by using the MaterialTheme.isSystemInDarkTheme() function.
+ *
  */
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -169,7 +181,6 @@ fun FarmList(
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
-//                    if (createFile(context, uri)) {
                     if (createFile(
                            context, uri,listItems,
                                 exportFormat,

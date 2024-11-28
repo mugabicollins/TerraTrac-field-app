@@ -69,7 +69,14 @@ import java.util.regex.Pattern
 
 
 private const val KEY_HAS_NEW_POLYGON = "has_new_polygon"
-
+/**
+ * This is the update farm form screen.
+ * It displays a form with fields for editing farm details.
+ * It also includes a button to save the updated farm details.
+ * If the user clicks the save button, it validates the input and saves the updated farm details to the database.
+ * It also includes a button to delete the farm from the database.
+ * If the user clicks the delete button, it displays a confirmation dialog to confirm the deletion.
+ */
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable

@@ -5,7 +5,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 /**
-This class converts long list of latitude and longitude pair into json format so that can be kept in database easily
+This class converts a list of latitude and longitude pair into a json string and vice versa
+ *
+ * Note: This converter assumes that the latitude and longitude are stored as Double values.
+ * If they are stored as strings, you would need to modify this converter to handle that case.
+
  */
 class CoordinateListConvert {
     private val gson = Gson()

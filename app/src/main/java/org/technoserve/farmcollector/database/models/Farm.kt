@@ -15,7 +15,18 @@ import org.technoserve.farmcollector.database.converters.DateConverter
 import java.util.UUID
 
 /**
- * This file contains the information about the entities in the database including farms and collection sites
+This class represents a Farm in the database. It includes details about the farmer
+and the farm's characteristics.
+
+@Entity: Indicates that this class is an entity that should be persisted in the database.
+tableName: Specifies the name of the table in the database where this entity will be stored.
+foreignKeys: Specifies the foreign key relationships with other entities. In this case, it references
+the CollectionSite entity using the siteId column.
+Parcelize: Indicates that this class can be parcelled, allowing it to be transferred between activities
+or fragments using Android's Parcelable interface.
+TypeConverters: Specifies the converters that will be used to convert certain data types to and from
+the database.
+
  */
 
 @Entity(

@@ -40,7 +40,12 @@ import java.math.RoundingMode
 import java.util.UUID
 
 /**
- * This function is used to add a capture farm details and location and ddd them to the database
+ * This function is used to add a capture farm details and location
+ * It also allows the user to add a polygon representing the farm's area
+ *
+ * @param navController the navigation controller to navigate between screens
+ * @param siteId the id of the collection site to which the farm belongs
+ * @param coordinatesData the initial coordinates of the farm's location
  */
 @Composable
 fun AddFarm(navController: NavController, siteId: Long) {

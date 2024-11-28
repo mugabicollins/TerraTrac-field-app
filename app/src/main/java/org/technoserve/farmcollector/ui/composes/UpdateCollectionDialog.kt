@@ -76,7 +76,15 @@ fun validateForm(
 
     return isValid
 }
-
+/**
+ * Update Collection Site Dialog
+ *
+ * This composable function displays a dialog for updating a collection site.
+ *
+ * @param site The collection site to be updated.
+ * @param showDialog A mutable state indicating whether the dialog is visible or not.
+ * @param farmViewModel
+ */
 @Composable
 fun UpdateCollectionDialog(
     site: CollectionSite,

@@ -18,6 +18,13 @@ import org.technoserve.farmcollector.database.models.Farm
 
 /**
  * This class is used to create app database and to run migrations from one db version to another
+ *
+ * @Database annotation is used to define the database.
+ * The entities array contains all the entities that will be included in the database.
+ * The version attribute specifies the version of the database.
+ * The exportSchema attribute is set to true to include a schema.sql file in the APK.
+ *  The typeConverter annotation is used to define the type of the database.
+ *
  */
 
 @Database(entities = [Farm::class, CollectionSite::class], version = 20, exportSchema = true)

@@ -15,6 +15,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.technoserve.farmcollector.R
 
+/**
+ * ViewModel for managing app update functionality.
+ *
+ * This ViewModel provides a state flow that indicates whether an update is available.
+ * When an update is available, it triggers the app update flow using the provided activity.
+ *
+ */
 class AppUpdateViewModel : ViewModel() {
     private val _updateAvailable = MutableStateFlow(false)
     val updateAvailable = _updateAvailable.asStateFlow()

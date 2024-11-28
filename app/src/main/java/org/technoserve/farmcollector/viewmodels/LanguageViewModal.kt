@@ -9,6 +9,18 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.Language
 import java.util.Locale
 
+/**
+ * This ViewModel is responsible for managing the selected language and updating the app's locale.
+ * It retrieves the list of supported languages from the Application's resources,
+ * and provides methods to select a language, save it, and update the app's locale.
+ *
+ * The ViewModel uses a MutableStateFlow to hold the current selected language,
+ * and exposes it as a StateFlow for observing and updating the UI.
+ *
+ * The ViewModel also handles the persistence of the preferred language using shared preferences.
+ *
+ * Finally, it provides a method to update the app's locale with the selected language.
+ */
 class LanguageViewModel(application: Application) : AndroidViewModel(application) {
     private val sharedPreferences =
         application.getSharedPreferences("settings", Context.MODE_PRIVATE)

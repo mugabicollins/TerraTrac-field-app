@@ -12,7 +12,6 @@ import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.database.models.Farm
 import java.util.UUID
 
-
 /**
  * This interface provides methods to interact with the database
  */

@@ -1,5 +1,8 @@
 package org.technoserve.farmcollector.database.models
 
+/**
+ * This class represents a restored collection site from the database.
+ */
 data class CollectionSiteRestore(
     val id: Long,
     val local_cs_id: Long,

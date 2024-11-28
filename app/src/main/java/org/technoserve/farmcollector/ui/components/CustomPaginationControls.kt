@@ -13,7 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import org.technoserve.farmcollector.R
-
+/**
+ * This function is used to create a custom pagination control with navigation buttons
+ *
+ * @param currentPage the current page number
+ * @param totalPages the total number of pages
+ * @param onPageChange a function to be called when the page number is changed
+ */
 @Composable
 fun CustomPaginationControls(
     currentPage: Int,

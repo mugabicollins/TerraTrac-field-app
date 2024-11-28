@@ -35,7 +35,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.technoserve.farmcollector.R
-
+/**
+ * The FarmListHeader component displays the top app bar with a title, search field, and navigation icons.
+ *
+ * @param title The title to be displayed in the top app bar.
+ * @param onSearchQueryChanged A callback function to handle changes in the search query.
+ * @param onBackClicked A callback function to handle the back button click event.
+ * @param showSearch A boolean flag indicating whether to show the search field.
+ * @param showRestore A boolean flag indicating whether to show the restore button.
+ *  @param onRestoreClicked A callback function to handle the restore button click event.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FarmListHeader(

@@ -73,7 +73,12 @@ import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 
 
 /**
- *  This function is used to display the list of collection sites
+ * This is the main screen for the collection sites list.
+ * It displays a list of collection sites, allows for search, select, and delete operations.
+ * It also handles the restore data prompt and final message.
+ *
+ * @param navController the navigation controller for navigating between screens
+ * @param farmViewModel the view model for interacting with the Farm database
  */
 
 @OptIn(ExperimentalMaterial3Api::class)

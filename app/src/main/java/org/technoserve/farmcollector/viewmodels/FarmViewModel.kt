@@ -49,7 +49,12 @@ import java.io.InputStreamReader
 import java.util.UUID
 import java.util.regex.Pattern
 
-// Define a sealed class for restore status
+/**
+ Define a sealed class for restore status
+ * sealed classes in Kotlin are a way to define a restricted set of types,
+ * similar to interfaces but with a different behavior.
+ * In Kotlin, sealed classes can have only one abstract function.
+ */
 sealed class RestoreStatus {
     data object InProgress : RestoreStatus()
     data class Success(val addedCount: Int, val message: String, val sitesCreated: Int = 0) :
@@ -60,6 +65,17 @@ sealed class RestoreStatus {
 
 /**
  * This class represents farmviewmodel
+ *
+ * ViewModel is responsible for maintaining UI-related data in a lifecycle-aware way.
+ * It's a single source of truth for the UI, which means any UI-related logic or state should be handled in the ViewModel.
+ *
+ * ViewModel provides a way to store and manage data in a lifecycle-conscious way.
+ * It's a great place to store data that the UI needs, but isn't tied to the lifecycle of the activity or fragment.
+ *
+ * ViewModel is a lifecycle-aware component, which means it automatically handles the lifecycle events of the hosting activity or fragment.
+ * This makes ViewModel a perfect candidate for holding data that needs to be available to the UI even when the activity or fragment is destroyed and recreated.
+ *
+ * ViewModel is a good place to perform any background operations that don't need to be tied to the lifecycle of the UI.
  */
 
 class FarmViewModel(

@@ -28,6 +28,15 @@ import java.util.Date
 import java.util.Locale
 
 
+/**
+ *
+ *  This function is used to create a CSV/GeoJson file with the given data
+ *  and share it with the user
+ *
+ *  @param context The application context
+ *  @param uri The Uri to save the CSV file to
+ */
+
 fun createFile(
     context: Context,
     uri: Uri,
@@ -139,7 +148,14 @@ fun createFile(
     }
 }
 
-
+/**
+ *
+ *  This function is used to create a CSV/GeoJson file with the given data
+ *  and share it with the user
+ *
+ *  @param context The application context
+ *  @param uri The Uri to save the CSV file to
+ */
 fun createFileForSharing(
     context: Context,
     listItems: List<Farm>,

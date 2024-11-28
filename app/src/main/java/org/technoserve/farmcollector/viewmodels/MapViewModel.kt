@@ -26,6 +26,13 @@ import org.technoserve.farmcollector.utils.map.getCenterOfPolygon
 import javax.inject.Inject
 
 
+/**
+ * ViewModel for the Map screen.
+ *
+ * Contains state and methods to manage the map, including the location, markers, clustering, and area calculations.
+ *
+ */
+
 @HiltViewModel
 class MapViewModel @Inject constructor() : ViewModel() {
     val state: MutableState<MapState> = mutableStateOf(

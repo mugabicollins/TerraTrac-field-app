@@ -28,7 +28,20 @@ import org.technoserve.farmcollector.database.models.Language
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 
 /**
- *  This function is used to select the language to use
+ * This composable function is used to display the language selector with dropdown menu
+ * It also handles the state change of the selected language and updates the app's language
+ *
+ * @param viewModel The LanguageViewModel for managing language state
+ * @param languages The list of available languages for the dropdown menu
+ *
+ * Note: This component assumes that the LanguageViewModel is provided with the necessary state and functions.
+ * Make sure to inject it into your composable function using dependency injection.
+ *
+ * Example usage:
+ * LanguageSelector(viewModel = languageViewModel, languages = listOf(English, Spanish, French))
+ *
+ * In the example above, the LanguageSelector composable function will display a dropdown menu with the available languages
+ * and update the app's language when a language is selected.
  */
 
 @Composable

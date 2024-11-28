@@ -32,7 +32,16 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.ui.composes.UpdateCollectionDialog
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
-
+/**
+ * A site card in the FarmList screen. Displays the site name, number of farms, and a button to edit or delete the site.
+ *
+ * @param site The site to display
+ * @param onCardClick A callback function to be called when the card is clicked
+ * @param totalFarms The total number of farms in the site
+ * @param farmsWithIncompleteData The number of farms with incomplete data
+ * @param onDeleteClick
+ * @param farmViewModel
+ */
 @Composable
 fun SiteCard(
     site: CollectionSite,

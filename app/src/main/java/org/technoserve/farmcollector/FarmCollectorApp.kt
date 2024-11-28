@@ -11,8 +11,10 @@ import androidx.work.WorkManager
 import org.technoserve.farmcollector.database.helpers.ContextProvider
 import org.technoserve.farmcollector.database.sync.SyncWorker
 import java.util.concurrent.TimeUnit
-
-
+/*
+ * This class initializes WorkManager and sets up a periodic sync job to fetch and update data from the server.
+ *
+ */
 
 class FarmCollectorApp : Application(), Configuration.Provider {
 

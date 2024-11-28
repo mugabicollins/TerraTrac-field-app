@@ -45,6 +45,10 @@ import java.util.Locale
 /**
  *
  *  This function is used to Display the home page of our application
+ *
+ *  @param navController: NavigationController to navigate between screens
+ *  @param languageViewModel: ViewModel for managing language settings
+ *  @param languages: List of supported languages for the application
  */
 
 @Composable

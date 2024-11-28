@@ -55,7 +55,18 @@ import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
 import java.util.Locale
 
 
-// Constants for navigation routes
+/*
+ * Constants for navigation routes. These are used to define the different screens in the app.
+ *
+ * For example, if you have a "Site" model with an "id" field, you could define routes like:
+ *
+ * const val SITE_LIST = "siteList"
+ * const val FARM_LIST = "farmList/{siteId}"
+ * const val ADD_FARM = "addFarm/{siteId}"
+ * const val ADD_SITE = "addSite"
+ * const val UPDATE_FARM = "updateFarm/{farmId}"
+ *
+ */
 object Routes {
     const val HOME = "home"
     const val SITE_LIST = "siteList"
@@ -67,7 +78,11 @@ object Routes {
     const val SETTINGS = "settings"
 }
 
-
+/**
+ * MainActivity is the entry point for the Android app. It sets up the navigation graph,
+ * manages permissions, and initializes the language and map view models.
+ *
+ */
 class MainActivity : ComponentActivity() {
     private lateinit var locationHelper: LocationHelper
     private val viewModel: MapViewModel by viewModels()
