@@ -55,7 +55,8 @@ import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
 import java.util.Locale
 
 
-/*
+/**
+ *
  * Constants for navigation routes. These are used to define the different screens in the app.
  *
  * For example, if you have a "Site" model with an "id" field, you could define routes like:

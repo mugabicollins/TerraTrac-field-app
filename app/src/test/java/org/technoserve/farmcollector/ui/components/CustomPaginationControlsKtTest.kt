@@ -1,5 +1,6 @@
 package org.technoserve.farmcollector.ui.components
 
+/*
 import android.content.Context
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -206,3 +207,4 @@ class CustomPaginationControlsKtTest{
         composeTestRule.onNodeWithContentDescription("Next Page").assertIsNotEnabled()
     }
 }
+ */

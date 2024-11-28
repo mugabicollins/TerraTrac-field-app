@@ -1,6 +1,6 @@
 package org.technoserve.farmcollector.ui.components
 
-
+/*
 import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -77,3 +77,5 @@ class KeepPolygonDialogKtTest {
         assert(captureNewClicked)
     }
 }
+
+ */

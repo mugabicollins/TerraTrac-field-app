@@ -11,12 +11,14 @@ import androidx.work.WorkManager
 import org.technoserve.farmcollector.database.helpers.ContextProvider
 import org.technoserve.farmcollector.database.sync.SyncWorker
 import java.util.concurrent.TimeUnit
-/*
+/**
+ *
  * This class initializes WorkManager and sets up a periodic sync job to fetch and update data from the server.
  *
  */
 
-class FarmCollectorApp : Application(), Configuration.Provider {
+//class FarmCollectorApp : Application(), Configuration.Provider {
+class FarmCollectorApp : Application(){
 
     override fun onCreate() {
         super.onCreate()
@@ -45,9 +47,9 @@ class FarmCollectorApp : Application(), Configuration.Provider {
         Log.d("WorkManager", "WorkManager is initialized successfully")
     }
 
-    // Provide the WorkManager configuration
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG) // Set logging level
-            .build()
+//    // Provide the WorkManager configuration
+//    override val workManagerConfiguration: Configuration
+//        get() = Configuration.Builder()
+//            .setMinimumLoggingLevel(Log.DEBUG) // Set logging level
+//            .build()
 }
