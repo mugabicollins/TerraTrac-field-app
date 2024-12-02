@@ -98,6 +98,9 @@ interface FarmDAO {
     @Query("DELETE FROM CollectionSites WHERE siteId IN (:ids)")
     fun deleteListSite(ids: List<Long>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun restoreSite(site: CollectionSite)
+
     @Query("SELECT * FROM Farms WHERE synced = 0")
     suspend fun getUnsyncedFarms(): List<Farm>
 

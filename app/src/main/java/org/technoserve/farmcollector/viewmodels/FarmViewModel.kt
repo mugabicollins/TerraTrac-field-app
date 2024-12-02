@@ -10,6 +10,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -92,6 +93,8 @@ class FarmViewModel(
 
     // Declare FarmRepository as a lateinit variable
     lateinit var farmRepository: FarmRepository
+
+    private val _recentlyDeletedSites = mutableStateOf<List<CollectionSite>>(emptyList())
 
     init {
         val farmDAO = AppDatabase.getInstance(application).farmsDAO()
@@ -203,6 +206,21 @@ class FarmViewModel(
             // Implement your restore logic here
         }
     }
+
+    // Function to restore the deleted sites
+    fun restoreDeletedSites() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _recentlyDeletedSites.value.forEach { site ->
+                // Implement logic to restore the site (e.g., add it back to the database)
+                repository.restoreSite(site)
+            }
+            // Clear the recently deleted sites after restoration
+            _recentlyDeletedSites.value = emptyList()
+        }
+    }
+
+    // Get the list of deleted sites for the undo operation
+    fun getRecentlyDeletedSites() = _recentlyDeletedSites.value
 
 
     private fun parseDateStringToTimestamp(dateString: String): Long {

@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -27,6 +30,9 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -373,102 +380,238 @@ fun SetPolygon(
                 horizontalArrangement = if (viewSelectFarm) Arrangement.Center else Arrangement.Start,
             ) {
                 // Hiding some buttons depending on page usage. Viewing verse setting farm polygon
+//                if (viewSelectFarm) {
+//                    Row {
+//                        if (farmInfo != null) {
+//                            Column(
+//                                modifier =
+//                                Modifier
+//                                    .background(MaterialTheme.colorScheme.background)
+//                                    .padding(5.dp),
+//                            ) {
+//                                Text(
+//                                    text = stringResource(id = R.string.farm_info),
+//                                    style =
+//                                    MaterialTheme.typography.bodySmall.copy(
+//                                        fontSize = 18.sp,
+//                                        fontWeight = FontWeight.Bold,
+//                                    ),
+//                                    modifier = Modifier.padding(5.dp),
+//                                )
+//                                Column(
+//                                    content = { },
+//                                    modifier =
+//                                    Modifier
+//                                        .width(200.dp)
+//                                        .background(Color.Black)
+//                                        .height(2.dp),
+//                                )
+//                                Text(
+//                                    text = "${stringResource(id = R.string.farm_name)}: ${farmInfo.farmerName}",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+//                                    modifier = Modifier.padding(top = 5.dp),
+//                                )
+//                                Text(
+//                                    text = "${stringResource(id = R.string.member_id)}: ${farmInfo.memberId.ifEmpty { "N/A" }}",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+//                                )
+//                                Text(
+//                                    text = "${stringResource(id = R.string.village)}: ${farmInfo.village}",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+//                                )
+//                                Text(
+//                                    text = "${stringResource(id = R.string.district)}: ${farmInfo.district}",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+//                                )
+//                                Text(
+//                                    text = "${stringResource(id = R.string.latitude)}: ${farmInfo.latitude}",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
+//                                )
+//                                Text(
+//                                    text = "${stringResource(id = R.string.longitude)}: ${farmInfo.longitude}",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
+//                                )
+//                                Text(
+//                                    text = "${stringResource(id = R.string.size)}: ${
+//                                        truncateToDecimalPlaces(
+//                                            formatInput(farmInfo.size.toString()),
+//                                            9
+//                                        )
+//                                    } ${
+//                                        stringResource(
+//                                            id = R.string.ha,
+//                                        )
+//                                    }",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
+//                                )
+//                            }
+//                        }
+//                    }
+//                    Row {
+//                        Button(
+//                            shape = RoundedCornerShape(10.dp),
+//                            modifier =
+//                            Modifier
+//                                .width(120.dp)
+//                                .fillMaxWidth(0.23f),
+//                            onClick = {
+//                                viewModel.clearCoordinates()
+//                                navController.navigateUp()
+//                            },
+//                        ) {
+//                            Text(text = stringResource(id = R.string.close))
+//                        }
+//                        Button(
+//                            shape = RoundedCornerShape(10.dp),
+//                            modifier =
+//                            Modifier
+//                                .width(150.dp)
+//                                .fillMaxWidth(0.23f)
+//                                .padding(start = 10.dp),
+//                            onClick = {
+//                                navController.navigate("updateFarm/${farmInfo?.id}")
+//                            },
+//                        ) {
+//                            Text(text = stringResource(id = R.string.update))
+//                        }
+//                    }
+//                }
                 if (viewSelectFarm) {
-                    Row {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
                         if (farmInfo != null) {
-                            Column(
-                                modifier =
-                                Modifier
-                                    .background(MaterialTheme.colorScheme.background)
-                                    .padding(5.dp),
+                            // Farm Information Card
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.elevatedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.background
+                                )
                             ) {
-                                Text(
-                                    text = stringResource(id = R.string.farm_info),
-                                    style =
-                                    MaterialTheme.typography.bodySmall.copy(
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                    ),
-                                    modifier = Modifier.padding(5.dp),
-                                )
                                 Column(
-                                    content = { },
-                                    modifier =
-                                    Modifier
-                                        .width(200.dp)
-                                        .background(Color.Black)
-                                        .height(2.dp),
-                                )
-                                Text(
-                                    text = "${stringResource(id = R.string.farm_name)}: ${farmInfo.farmerName}",
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
-                                    modifier = Modifier.padding(top = 5.dp),
-                                )
-                                Text(
-                                    text = "${stringResource(id = R.string.member_id)}: ${farmInfo.memberId.ifEmpty { "N/A" }}",
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
-                                )
-                                Text(
-                                    text = "${stringResource(id = R.string.village)}: ${farmInfo.village}",
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
-                                )
-                                Text(
-                                    text = "${stringResource(id = R.string.district)}: ${farmInfo.district}",
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
-                                )
-                                Text(
-                                    text = "${stringResource(id = R.string.latitude)}: ${farmInfo.latitude}",
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
-                                )
-                                Text(
-                                    text = "${stringResource(id = R.string.longitude)}: ${farmInfo.longitude}",
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
-                                )
-                                Text(
-                                    text = "${stringResource(id = R.string.size)}: ${
-                                        truncateToDecimalPlaces(
-                                            formatInput(farmInfo.size.toString()),
-                                            9
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                ) {
+                                    // Farm Info Title
+                                    Text(
+                                        text = stringResource(id = R.string.farm_info),
+                                        style = MaterialTheme.typography.headlineSmall.copy(
+                                            fontWeight = FontWeight.Bold,
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 8.dp)
+                                    )
+
+                                    // Divider
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                                    )
+
+                                    // Farm Details Grid
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        // Each farm detail as a row with responsive layout
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.farm_name),
+                                            value = farmInfo.farmerName
                                         )
-                                    } ${
-                                        stringResource(
-                                            id = R.string.ha,
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.member_id),
+                                            value = farmInfo.memberId.ifEmpty { "N/A" }
                                         )
-                                    }",
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor),
-                                )
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.village),
+                                            value = farmInfo.village
+                                        )
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.district),
+                                            value = farmInfo.district
+                                        )
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.latitude),
+                                            value = farmInfo.latitude.toString()
+                                        )
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.longitude),
+                                            value = farmInfo.longitude.toString()
+                                        )
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.size),
+                                            value = "${
+                                                truncateToDecimalPlaces(
+                                                    formatInput(farmInfo.size.toString()),
+                                                    9
+                                                )
+                                            } ${stringResource(id = R.string.ha)}"
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Action Buttons with Responsive Layout
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                // Close Button
+                                Button(
+                                    onClick = {
+                                        viewModel.clearCoordinates()
+                                        navController.navigateUp()
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .heightIn(min = 48.dp),
+                                    shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.close),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                // Update Button
+                                Button(
+                                    onClick = {
+                                        navController.navigate("updateFarm/${farmInfo?.id}")
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .heightIn(min = 48.dp),
+                                    shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.update),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                             }
                         }
                     }
-                    Row {
-                        Button(
-                            shape = RoundedCornerShape(10.dp),
-                            modifier =
-                            Modifier
-                                .width(120.dp)
-                                .fillMaxWidth(0.23f),
-                            onClick = {
-                                viewModel.clearCoordinates()
-                                navController.navigateUp()
-                            },
-                        ) {
-                            Text(text = stringResource(id = R.string.close))
-                        }
-                        Button(
-                            shape = RoundedCornerShape(10.dp),
-                            modifier =
-                            Modifier
-                                .width(150.dp)
-                                .fillMaxWidth(0.23f)
-                                .padding(start = 10.dp),
-                            onClick = {
-                                navController.navigate("updateFarm/${farmInfo?.id}")
-                            },
-                        ) {
-                            Text(text = stringResource(id = R.string.update))
-                        }
-                    }
-                } else {
+                }
+               else {
 
                     // "Start" button - visible only when not capturing coordinates and the "Finish" button hasn't been clicked
                     if (!isCapturingCoordinates && !showConfirmDialog.value && !showSaveButton) {
@@ -714,3 +857,35 @@ fun SetPolygon(
 
 
 
+// Composable for creating a responsive farm detail row
+@Composable
+fun ResponsiveFarmDetailRow(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    val textColor = MaterialTheme.colorScheme.onBackground
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "$label: ",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            modifier = Modifier.weight(0.4f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = textColor
+            ),
+            modifier = Modifier.weight(0.6f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}

@@ -17,7 +17,10 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +53,7 @@ fun SiteCard(
     farmsWithIncompleteData: Int,
     onDeleteClick: () -> Unit,
     farmViewModel: FarmViewModel,
+    snackbarHostState: SnackbarHostState
 ) {
     val showDialog = remember { mutableStateOf(false) }
     if (showDialog.value) {
@@ -61,6 +65,23 @@ fun SiteCard(
     }
     val textColor = MaterialTheme.colorScheme.onBackground
     val iconColor = MaterialTheme.colorScheme.onBackground
+
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    val showUndoSnackbar = remember { mutableStateOf(false) }
+
+    // Handle the delete dialog and undo snackbar
+    SiteDeleteAllDialogPresenter(
+        showDeleteDialog = showDeleteDialog,
+        site = site,
+        farmViewModel = farmViewModel,
+        snackbarHostState = snackbarHostState,
+        onProceedFn = {
+            // Proceed with deleting the site
+            farmViewModel.deleteListSite(listOf(site.siteId))
+        },
+        showUndoSnackbar = showUndoSnackbar
+    )
+
 
     Column(
         modifier =

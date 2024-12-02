@@ -143,7 +143,10 @@ fun SiteForm(navController: NavController) {
                     errorCursorColor = Color.Red,
                     focusedIndicatorColor = inputBorder,
                     unfocusedIndicatorColor = inputBorder,
-                    errorIndicatorColor = Color.Red
+                    errorIndicatorColor = Color.Red,
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -178,7 +181,10 @@ fun SiteForm(navController: NavController) {
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -223,7 +229,10 @@ fun SiteForm(navController: NavController) {
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             trailingIcon = {
                 IconButton(onClick = { showDisclaimerPhone = !showDisclaimerPhone }) {
@@ -293,7 +302,10 @@ fun SiteForm(navController: NavController) {
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             trailingIcon = {
                 IconButton(onClick = { showDisclaimerEmail = !showDisclaimerEmail }) {
@@ -356,7 +368,10 @@ fun SiteForm(navController: NavController) {
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -391,7 +406,10 @@ fun SiteForm(navController: NavController) {
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             modifier = Modifier
                 .fillMaxWidth()

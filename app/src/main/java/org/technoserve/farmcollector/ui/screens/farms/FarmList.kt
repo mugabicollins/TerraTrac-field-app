@@ -82,6 +82,7 @@ import org.technoserve.farmcollector.ui.components.FarmCard
 import org.technoserve.farmcollector.ui.components.FarmListHeaderPlots
 import org.technoserve.farmcollector.ui.components.FormatSelectionDialog
 import org.technoserve.farmcollector.ui.components.ImportFileDialog
+import org.technoserve.farmcollector.ui.components.RestoreDataAlert
 import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
 
 import org.technoserve.farmcollector.utils.createFile
@@ -159,6 +160,8 @@ fun FarmList(
     var showRestorePrompt by remember { mutableStateOf(false) }
     var finalMessage by remember { mutableStateOf("") }
     var showFinalMessage by remember { mutableStateOf(false) }
+
+    var showRestoreAlert by remember { mutableStateOf(false) }
 
 
     val isDarkTheme = isSystemInDarkTheme()
@@ -492,20 +495,21 @@ fun FarmList(
                 showShare = listItems.isNotEmpty(),
                 showSearch = listItems.isNotEmpty(),
                 onRestoreClicked = {
-                    farmViewModel.restoreData(
-                        deviceId = deviceId,
-                        phoneNumber = "",
-                        email = "",
-                        farmViewModel = farmViewModel
-                    ) { success ->
-                        if (success) {
-                            finalMessage = context.getString(R.string.data_restored_successfully)
-                            showFinalMessage = true
-                        } else {
-                            showFinalMessage = true
-                            showRestorePrompt = true
-                        }
-                    }
+//                    farmViewModel.restoreData(
+//                        deviceId = deviceId,
+//                        phoneNumber = "",
+//                        email = "",
+//                        farmViewModel = farmViewModel
+//                    ) { success ->
+//                        if (success) {
+//                            finalMessage = context.getString(R.string.data_restored_successfully)
+//                            showFinalMessage = true
+//                        } else {
+//                            showFinalMessage = true
+//                            showRestorePrompt = true
+//                        }
+//                    }
+                    showRestoreAlert = true
                 }
 
             )
@@ -539,6 +543,16 @@ fun FarmList(
                     .padding(paddingValues)
                     .fillMaxSize()
             ) {
+
+                // Restore Alert Dialog
+                // Show restore alert dialog
+                RestoreDataAlert(
+                    showDialog = showRestoreAlert,
+                    onDismiss = { showRestoreAlert = false },
+                    deviceId = deviceId,
+                    farmViewModel = farmViewModel
+                )
+
                 showDataContent()
             }
         }
@@ -562,22 +576,17 @@ fun FarmList(
                     .padding(top = 72.dp)
                     .fillMaxSize()
             ) {
-                // Display a completion message
                 val status = restoreStatus as RestoreStatus.Success
-                if (showFinalMessage) {
-                    // Show the toast
-                    Toast.makeText(
-                        context,
-                        context.getString(
-                            R.string.restoration_completed,
-                            status.addedCount,
-                            status.sitesCreated
-                        ),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                showFinalMessage = false
-                showRestorePrompt = false // Hide the restore prompt if restoration is successful
+                Toast.makeText(
+                    context,
+                    context.getString(
+                        R.string.restoration_completed,
+                        status.addedCount,
+                        status.sitesCreated
+                    ),
+                    Toast.LENGTH_LONG
+                ).show()
+                showRestorePrompt = false
             }
         }
 
@@ -599,7 +608,6 @@ fun FarmList(
                     ) {
 
                         if (showFinalMessage) {
-                            // Show the toast with the final message
                             Toast.makeText(
                                 context,
                                 context.getString(
@@ -688,7 +696,7 @@ fun FarmList(
                                 onClick = {
                                     if (phone.isNotBlank() || email.isNotBlank()) {
                                         showRestorePrompt =
-                                            false // Hide the restore prompt on retry
+                                            false
                                         farmViewModel.restoreData(
                                             deviceId = deviceId,
                                             phoneNumber = phone,
@@ -712,7 +720,6 @@ fun FarmList(
                         }
                     }
                 } else {
-
                     if (showFinalMessage) {
                         // Show the toast
                         Toast.makeText(
@@ -727,14 +734,13 @@ fun FarmList(
 
         null -> {
             if (isLoading.value) {
-                // Show loader while data is loading
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+
                 }
             } else {
                 Column(

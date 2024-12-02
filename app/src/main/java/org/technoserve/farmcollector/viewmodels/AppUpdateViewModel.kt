@@ -77,30 +77,30 @@ fun UpdateAlert(
 
 
 
-@Composable
-fun ExitConfirmationDialog(
-    showDialog: Boolean,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Exit App") },
-            text = { Text("Are you sure you want to exit the app?") },
-            confirmButton = {
-                Button(onClick = onConfirm) {
-                    Text("Yes")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("No")
-                }
-            }
-        )
-    }
-}
+//@Composable
+//fun ExitConfirmationDialog(
+//    showDialog: Boolean,
+//    onDismiss: () -> Unit,
+//    onConfirm: () -> Unit
+//) {
+//    if (showDialog) {
+//        AlertDialog(
+//            onDismissRequest = onDismiss,
+//            title = { Text("Exit App") },
+//            text = { Text("Are you sure you want to exit the app?") },
+//            confirmButton = {
+//                Button(onClick = onConfirm) {
+//                    Text("Yes")
+//                }
+//            },
+//            dismissButton = {
+//                TextButton(onClick = onDismiss) {
+//                    Text("No")
+//                }
+//            }
+//        )
+//    }
+//}
 
 @Composable
 fun UndoDeleteSnackbar(

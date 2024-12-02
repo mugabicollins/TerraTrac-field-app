@@ -87,6 +87,10 @@ class FarmRepository(private val farmDAO: FarmDAO) {
     fun deleteListSite(ids: List<Long>) {
         farmDAO.deleteListSite(ids)
     }
+    // Method to restore a site (by inserting it back into the database)
+    suspend fun restoreSite(site: CollectionSite) {
+        farmDAO.restoreSite(site)
+    }
 
     suspend fun isFarmDuplicateBoolean(farm: Farm): Boolean {
         return farmDAO.getFarmByDetails(

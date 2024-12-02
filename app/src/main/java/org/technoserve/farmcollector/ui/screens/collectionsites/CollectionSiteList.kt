@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -132,7 +131,9 @@ fun CollectionSiteList(navController: NavController) {
     }
 
     var showRestoreAlert by remember { mutableStateOf(false) }
-    var showUndoSnackbar by remember { mutableStateOf(false) }
+//    var showUndoSnackbar by remember { mutableStateOf(false) }
+    val showUndoSnackbar = remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -225,16 +226,16 @@ fun CollectionSiteList(navController: NavController) {
                     deviceId = deviceId,
                     farmViewModel = farmViewModel
                 )
-
-                // Undo Delete Snackbar
-                UndoDeleteSnackbar(
-                    show = showUndoSnackbar,
-                    onDismiss = { showUndoSnackbar = false },
-                    onUndo = {
-                        // Implement undo logic here
-                        showUndoSnackbar = false
-                    }
-                )
+//
+//                // Undo Delete Snackbar
+//                UndoDeleteSnackbar(
+//                    show = showUndoSnackbar,
+//                    onDismiss = { showUndoSnackbar = false },
+//                    onUndo = {
+//                        // Implement undo logic here
+//                        showUndoSnackbar = false
+//                    }
+//                )
 
                 when {
                     pagedData.loadState.refresh is LoadState.Loading -> {
@@ -295,6 +296,7 @@ fun CollectionSiteList(navController: NavController) {
                                                 showDeleteDialog.value = true
                                             },
                                             farmViewModel = farmViewModel,
+                                            snackbarHostState= snackbarHostState
                                         )
                                         // Spacer(modifier = Modifier.height(8.dp))
                                     }
@@ -543,7 +545,10 @@ fun CollectionSiteList(navController: NavController) {
                 snackbarHostState = snackbarHostState,
                 onProceedFn = {
                     farmViewModel.deleteListSite(selectedIds)
-                }
+                    // Show the undo snackbar
+                },
+                showUndoSnackbar = showUndoSnackbar
+
             )
         }
 

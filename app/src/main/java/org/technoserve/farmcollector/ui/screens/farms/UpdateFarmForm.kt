@@ -396,6 +396,17 @@ fun UpdateFarmForm(
                     }
                     false
                 },
+            colors = TextFieldDefaults.colors(
+                errorLeadingIconColor = Color.Red,
+                cursorColor = inputTextColor,
+                errorCursorColor = Color.Red,
+                focusedIndicatorColor = inputBorder,
+                unfocusedIndicatorColor = inputBorder,
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+            )
         )
         TextField(
             singleLine = true,
@@ -417,6 +428,11 @@ fun UpdateFarmForm(
                     }
                     false
                 },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+            )
         )
         TextField(
             singleLine = true,
@@ -433,6 +449,17 @@ fun UpdateFarmForm(
                 .focusRequester(focusRequester1)
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
+            colors = TextFieldDefaults.colors(
+                errorLeadingIconColor = Color.Red,
+                cursorColor = inputTextColor,
+                errorCursorColor = Color.Red,
+                focusedIndicatorColor = inputBorder,
+                unfocusedIndicatorColor = inputBorder,
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+            )
         )
         TextField(
             singleLine = true,
@@ -449,6 +476,17 @@ fun UpdateFarmForm(
                 .focusRequester(focusRequester2)
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
+            colors = TextFieldDefaults.colors(
+                errorLeadingIconColor = Color.Red,
+                cursorColor = inputTextColor,
+                errorCursorColor = Color.Red,
+                focusedIndicatorColor = inputBorder,
+                unfocusedIndicatorColor = inputBorder,
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+            )
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -484,20 +522,22 @@ fun UpdateFarmForm(
                     )
                 },
                 isError = size.toFloatOrNull() == null || size.toFloat() <= 0, // Validate size
-                colors =
-                TextFieldDefaults.colors(
+                modifier =
+                Modifier
+                    .focusRequester(focusRequester3)
+                    .weight(1f)
+                    .padding(bottom = 16.dp),
+                colors = TextFieldDefaults.colors(
                     errorLeadingIconColor = Color.Red,
                     cursorColor = inputTextColor,
                     errorCursorColor = Color.Red,
                     focusedIndicatorColor = inputBorder,
                     unfocusedIndicatorColor = inputBorder,
                     errorIndicatorColor = Color.Red,
-                ),
-                modifier =
-                Modifier
-                    .focusRequester(focusRequester3)
-                    .weight(1f)
-                    .padding(bottom = 16.dp),
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.background,
+                )
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -518,11 +558,16 @@ fun UpdateFarmForm(
                             expanded = expanded,
                         )
                     },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(
+                            focusedContainerColor = MaterialTheme.colorScheme.background,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                            disabledContainerColor = MaterialTheme.colorScheme.background,
+                    ),
                     modifier = Modifier.menuAnchor(),
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
+                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
                     onDismissRequest = {
                         expanded = false
                     },
@@ -588,6 +633,17 @@ fun UpdateFarmForm(
                     Modifier
                         .weight(1f)
                         .padding(bottom = 16.dp),
+                    colors = TextFieldDefaults.colors(
+                        errorLeadingIconColor = Color.Red,
+                        cursorColor = inputTextColor,
+                        errorCursorColor = Color.Red,
+                        focusedIndicatorColor = inputBorder,
+                        unfocusedIndicatorColor = inputBorder,
+                        errorIndicatorColor = Color.Red,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background,
+                    )
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 TextField(
@@ -631,6 +687,17 @@ fun UpdateFarmForm(
                     Modifier
                         .weight(1f)
                         .padding(bottom = 16.dp),
+                    colors = TextFieldDefaults.colors(
+                        errorLeadingIconColor = Color.Red,
+                        cursorColor = inputTextColor,
+                        errorCursorColor = Color.Red,
+                        focusedIndicatorColor = inputBorder,
+                        unfocusedIndicatorColor = inputBorder,
+                        errorIndicatorColor = Color.Red,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background,
+                    )
                 )
             }
         }
