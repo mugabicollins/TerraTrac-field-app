@@ -12,7 +12,6 @@ import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.database.models.Farm
 import java.util.UUID
 
-
 /**
  * This interface provides methods to interact with the database
  */
@@ -98,6 +97,9 @@ interface FarmDAO {
 
     @Query("DELETE FROM CollectionSites WHERE siteId IN (:ids)")
     fun deleteListSite(ids: List<Long>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun restoreSite(site: CollectionSite)
 
     @Query("SELECT * FROM Farms WHERE synced = 0")
     suspend fun getUnsyncedFarms(): List<Farm>

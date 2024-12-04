@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -73,7 +72,12 @@ import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 
 
 /**
- *  This function is used to display the list of collection sites
+ * This is the main screen for the collection sites list.
+ * It displays a list of collection sites, allows for search, select, and delete operations.
+ * It also handles the restore data prompt and final message.
+ *
+ * @param navController the navigation controller for navigating between screens
+ * @param farmViewModel the view model for interacting with the Farm database
  */
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,7 +131,9 @@ fun CollectionSiteList(navController: NavController) {
     }
 
     var showRestoreAlert by remember { mutableStateOf(false) }
-    var showUndoSnackbar by remember { mutableStateOf(false) }
+//    var showUndoSnackbar by remember { mutableStateOf(false) }
+    val showUndoSnackbar = remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -220,16 +226,16 @@ fun CollectionSiteList(navController: NavController) {
                     deviceId = deviceId,
                     farmViewModel = farmViewModel
                 )
-
-                // Undo Delete Snackbar
-                UndoDeleteSnackbar(
-                    show = showUndoSnackbar,
-                    onDismiss = { showUndoSnackbar = false },
-                    onUndo = {
-                        // Implement undo logic here
-                        showUndoSnackbar = false
-                    }
-                )
+//
+//                // Undo Delete Snackbar
+//                UndoDeleteSnackbar(
+//                    show = showUndoSnackbar,
+//                    onDismiss = { showUndoSnackbar = false },
+//                    onUndo = {
+//                        // Implement undo logic here
+//                        showUndoSnackbar = false
+//                    }
+//                )
 
                 when {
                     pagedData.loadState.refresh is LoadState.Loading -> {
@@ -290,6 +296,7 @@ fun CollectionSiteList(navController: NavController) {
                                                 showDeleteDialog.value = true
                                             },
                                             farmViewModel = farmViewModel,
+                                            snackbarHostState= snackbarHostState
                                         )
                                         // Spacer(modifier = Modifier.height(8.dp))
                                     }
@@ -538,7 +545,10 @@ fun CollectionSiteList(navController: NavController) {
                 snackbarHostState = snackbarHostState,
                 onProceedFn = {
                     farmViewModel.deleteListSite(selectedIds)
-                }
+                    // Show the undo snackbar
+                },
+                showUndoSnackbar = showUndoSnackbar
+
             )
         }
 

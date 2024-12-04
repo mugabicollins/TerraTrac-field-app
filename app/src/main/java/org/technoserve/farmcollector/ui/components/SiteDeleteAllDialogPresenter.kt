@@ -11,12 +11,14 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,11 +29,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 
+/**
+ * This component presents a confirmation dialog for deleting a site.
+ *
+ * @param showDeleteDialog: MutableState indicating whether the dialog should be shown.
+ * @param site: The site to be deleted.
+ * @param farmViewModel: The FarmViewModel for interacting with the database.
+ * @param snackbarHostState: The SnackbarHostState for displaying snackbars.
+ * @param onProceedFn Called when the application is about to proceed to the next page.
+ */
 @Composable
 fun SiteDeleteAllDialogPresenter(
     showDeleteDialog: MutableState<Boolean>,
@@ -39,6 +49,7 @@ fun SiteDeleteAllDialogPresenter(
     farmViewModel: FarmViewModel,
     snackbarHostState: SnackbarHostState,
     onProceedFn: () -> Unit,
+    showUndoSnackbar: MutableState<Boolean> ,
 ) {
     val scope = rememberCoroutineScope()
     var deletedSite by remember { mutableStateOf<CollectionSite?>(null) }
@@ -74,28 +85,8 @@ fun SiteDeleteAllDialogPresenter(
                         // Proceed with the deletion action
                         onProceedFn()
 
-                        // Show snackbar with undo option
-                        scope.launch {
-                            val result = snackbarHostState.showSnackbar(
-                                message = "Site deleted",
-                                actionLabel = "UNDO",
-                                duration = SnackbarDuration.Long
-                            )
-
-                            when (result) {
-                                SnackbarResult.ActionPerformed -> {
-                                    // Undo the deletion
-                                    deletedSite?.let { site ->
-                                        farmViewModel.restoreSite(site)
-                                        deletedSite = null
-                                    }
-                                }
-                                SnackbarResult.Dismissed -> {
-                                    // Clear the deleted site reference
-                                    deletedSite = null
-                                }
-                            }
-                        }
+                        // Show the Undo Delete Snackbar
+                        showUndoSnackbar.value = true
 
                         showDeleteDialog.value = false
                     }
@@ -111,5 +102,21 @@ fun SiteDeleteAllDialogPresenter(
             containerColor = MaterialTheme.colorScheme.background,
             tonalElevation = 6.dp
         )
+    }
+    // Handle Undo Snackbar
+    if (showUndoSnackbar.value && deletedSite != null) {
+        LaunchedEffect(deletedSite) {
+            snackbarHostState.showSnackbar(
+                message = "Item deleted",
+                actionLabel = "UNDO",
+                duration = SnackbarDuration.Short
+            ).apply {
+                if (this == SnackbarResult.ActionPerformed) {
+                    // If user clicked "UNDO", restore the site
+                    farmViewModel.restoreDeletedSites()
+                    showUndoSnackbar.value = false
+                }
+            }
+        }
     }
 }

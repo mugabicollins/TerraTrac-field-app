@@ -20,8 +20,8 @@ android {
         applicationId "org.technoserve.farmcollector"
         minSdk 21
         targetSdk 35
-        versionCode 51
-        versionName "2.37"
+        versionCode 53
+        versionName "2.39"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -98,6 +98,11 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources = true
+//            all {
+//                systemProperty 'robolectric.enabledSdks', '33'
+//                systemProperty 'robolectric.build.model', 'DEVICE'
+//                environment 'BUILD_FINGERPRINT', 'foo'
+//            }
         }
     }
 
@@ -125,8 +130,9 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.3.1")
     implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
     implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
-   implementation 'androidx.work:work-runtime-ktx:2.10.0'
-    implementation 'androidx.work:work-runtime:2.8.0'
+//    implementation 'androidx.work:work-runtime-ktx:2.10.0'
+    implementation 'androidx.work:work-runtime-ktx:2.9.0'
+    // implementation 'androidx.work:work-runtime:2.8.0'
 
 
     // camera dependencies
@@ -159,7 +165,7 @@ dependencies {
 
     // Room
 
-    def room_version = "2.7.0-alpha01"
+    def room_version = "2.6.1"
     implementation "androidx.room:room-runtime:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
     //noinspection GradleDependency
@@ -185,7 +191,7 @@ dependencies {
     ksp "com.google.dagger:hilt-compiler:2.51.1"
     implementation "androidx.documentfile:documentfile:1.0.1"
 
-    def appcompat_version = "1.7.0"
+    def appcompat_version = "1.6.1"
     implementation("androidx.appcompat:appcompat:$appcompat_version")
     implementation("androidx.appcompat:appcompat-resources:$appcompat_version")
     implementation("com.google.code.gson:gson:2.10.1")
@@ -213,18 +219,30 @@ dependencies {
     implementation 'androidx.navigation:navigation-testing:2.4.0-alpha04'
     implementation 'androidx.test.ext:junit-ktx:1.2.1'
 
-    testImplementation "androidx.test:core:1.6.1"
+    testImplementation "androidx.test:core:1.5.0"
     testImplementation "org.mockito:mockito-core:5.7.0"
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.3.1"
     testImplementation "io.mockk:mockk:1.13.7"
-    testImplementation "org.robolectric:robolectric:4.10.3"
+    // testImplementation "org.robolectric:robolectric:4.10.3"
     testImplementation 'com.google.dagger:hilt-android-testing:2.48'
     testImplementation 'androidx.compose.ui:ui-test-junit4-android:1.7.5'
     testImplementation 'androidx.arch.core:core-testing:2.2.0'
     testImplementation "com.google.truth:truth:1.1.3"
     testImplementation "io.mockk:mockk:1.13.7"
     testImplementation "io.mockk:mockk-android:1.13.5"
-    testImplementation "org.robolectric:robolectric:4.9"
+    //testImplementation "org.robolectric:robolectric:4.9"
+    testImplementation("androidx.work:work-testing:2.8.1")
+
+    // testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.13")
+
+
+
+    // testImplementation "org.robolectric:robolectric:4.11.1"
+    testImplementation "androidx.test:core:1.5.0"
+    testImplementation "androidx.test.ext:junit:1.1.5"
+    testImplementation "androidx.compose.ui:ui-test-junit4:1.5.4"
+
 
 
     androidTestImplementation "androidx.work:work-testing:2.7.1"

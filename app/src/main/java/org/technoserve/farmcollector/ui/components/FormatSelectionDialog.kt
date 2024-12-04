@@ -17,6 +17,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.technoserve.farmcollector.R
 
+/**
+ * This function is used to display a dialog for selecting the file format
+ *
+ * @param onDismiss: A function to be called when the dialog is dismissed
+ * @param onFormatSelected: A function to be called when the format is selected
+ *
+ * Note: This dialog should be used within a Composable function that is called when the user selects the "Share" or "Export" option in the menu.
+ */
 @Composable
 fun FormatSelectionDialog(
     onDismiss: () -> Unit,

@@ -20,7 +20,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.technoserve.farmcollector.R
-
+/**
+ *  This function is used to display a warning dialog when the user tries to delete a farm
+ *  It shows a warning icon, a message, and two buttons: "Yes" and "No"
+ *  When the user clicks "Yes", the onProceedFn function is called to perform the deletion action
+ *  When the user clicks "No", the delete dialog is dismissed by setting showDeleteDialog to false
+ *  The containerColor and textColors are set to match the Material3 theme's background and error colors respectively
+ *  The modifier is set to adjust the padding and size of the dialog to better fit the layout and adhere to the design guidelines of the Material3 component library
+ *  The text and button texts are localized using the stringResource function to support different languages
+ *  Note: This is a simplified version of the DeleteAllDialogPresenter function. In a real-world application, you may want to add additional logic and features to handle
+ * deleting all resources associated with this dialog
+ */
 @Composable
 fun DeleteAllDialogPresenter(
     showDeleteDialog: MutableState<Boolean>,

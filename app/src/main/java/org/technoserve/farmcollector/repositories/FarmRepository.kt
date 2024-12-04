@@ -9,8 +9,15 @@ import org.technoserve.farmcollector.database.dao.FarmDAO
 import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.database.models.Farm
 
+
 /**
- *  this class represents FarmRepository that contains information about the FarmRepository a
+ *  This class provides methods to interact with the database
+ *  It uses the FarmDAO to perform operations
+ *  The methods are wrapped in try-catch blocks to handle potential exceptions
+ *  It uses Coroutines for asynchronous operations
+ *  It uses LiveData to notify observers about changes in the database
+ *  It uses the Dispatchers.IO dispatcher for IO-bound tasks (like database operations)
+ *
  */
 class FarmRepository(private val farmDAO: FarmDAO) {
 
@@ -79,6 +86,10 @@ class FarmRepository(private val farmDAO: FarmDAO) {
 
     fun deleteListSite(ids: List<Long>) {
         farmDAO.deleteListSite(ids)
+    }
+    // Method to restore a site (by inserting it back into the database)
+    suspend fun restoreSite(site: CollectionSite) {
+        farmDAO.restoreSite(site)
     }
 
     suspend fun isFarmDuplicateBoolean(farm: Farm): Boolean {

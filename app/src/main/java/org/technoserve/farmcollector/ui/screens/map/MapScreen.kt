@@ -52,6 +52,14 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.map.MapState
 import org.technoserve.farmcollector.database.helpers.map.ZoneClusterManager
 
+/**
+ * This screen shows the Google Map with various functionalities.
+ *
+ * @param state Current state of the map.
+ * @param setupClusterManager Function to create a ZoneClusterManager.
+ * @param calculateZoneViewCenter Function to calculate the center of the visible zones.
+ * @param onMapTypeChange Function to handle map type changes.
+ */
 @OptIn(MapsComposeExperimentalApi::class)
 @SuppressLint("PotentialBehaviorOverride")
 @Composable

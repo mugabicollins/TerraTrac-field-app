@@ -118,5 +118,35 @@ Current Version: 2.36 (2024-10-16)
 
 The project is under active development.
 
+## Regression Test List
+
+The regression test list is now available in the [Google Sheet](https://docs.google.com/spreadsheets/d/1X4InFUmJCyVf01pmEjwMyY8Gl45x1ODZGNvj7CFJCD4/edit?usp=sharing). This sheet contains the test cases and expected behaviors for all major features of the app. Testers can update their feedback directly in the sheet to indicate whether the feature works as expected.
+
+### How to Use the Regression Test List
+
+Once you make any updates or changes to the code, it is important to ensure that the new changes do not break any existing functionality. You can do this by referring to the regression test list in the Google Sheet, which helps you verify that everything is still working as expected.
+
+1. **Click on the link to open the Google Sheet.**
+2. **Create a new sheet** within the Google Sheet and name it with your tester name (e.g., "Tester: John Doe").
+3. **Review the test cases** in the sheet and identify the tests that apply to the updated functionality.
+4. **Execute the test cases** either manually or via automated tests (if applicable).
+5. **Fill in the columns** in your newly created sheet with your feedback:
+  - `Test Case`: The name of the test case.
+  - `Expected Behavior`: The expected behavior for the feature.
+  - `Behavior Found`: What behavior was observed during testing.
+  - `Status`: Whether the test passed or failed (Mark as `Pass` or `Fail`).
+  - `Comments`: Any additional comments or observations.
+6. **Update the status and comments** in the sheet directly after testing. This way, the whole team can track the feedback in real-time.
+
+### Testers' Feedback
+
+Testers can access the Google Sheet to enter their feedback after running the tests. This will help us track the stability of the app after each update and ensure that no functionality is broken.
+
+### Instructions:
+- After making any changes to the app (e.g., bug fixes, new features, refactoring), run the tests in the regression test list in the Google Sheet to confirm that the update did not introduce any issues or regressions.
+- You can update the test list if needed if new scenarios or features are added.
+
+By following this process, you ensure that your application remains stable and that any new changes do not break existing functionality.
+
 ---
 *TerraTrac is committed to improving agricultural management through technology.*

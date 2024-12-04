@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +47,10 @@ import java.util.Locale
 /**
  *
  *  This function is used to Display the home page of our application
+ *
+ *  @param navController: NavigationController to navigate between screens
+ *  @param languageViewModel: ViewModel for managing language settings
+ *  @param languages: List of supported languages for the application
  */
 
 @Composable
@@ -80,27 +86,57 @@ fun Home(
         Column(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.4f)
+               // .fillMaxHeight(0.4f)
+                .weight(0.4f)
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.app_icon),
-                contentDescription = null,
+            // Centering the app icon and text
+            Box(
                 modifier = Modifier
-                    .width(80.dp)
-                    .height(80.dp)
-                    .padding(bottom = 10.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.app_name),
-                modifier = Modifier
-                    .padding(top = 10.dp)
-                    .align(Alignment.CenterHorizontally),
-                fontWeight = FontWeight.Bold,
-                color = Turquoise, // Using the custom Turquoise color
-                style = TextStyle(fontSize = 24.sp)
-            )
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp) // Spacing between icon and text
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.app_icon),
+                        contentDescription = null,
+//                        modifier = Modifier
+//                            .width(80.dp)
+//                            .height(80.dp)
+                        modifier = Modifier
+                            .width(when (LocalConfiguration.current.screenWidthDp) {
+                                in 0..320 -> 60.dp // Small screens
+                                in 321..600 -> 80.dp // Medium screens
+                                else -> 100.dp // Large screens
+                            })
+                            .height(when (LocalConfiguration.current.screenWidthDp) {
+                                in 0..320 -> 60.dp
+                                in 321..600 -> 80.dp
+                                else -> 100.dp
+                            })
+                            .padding(bottom = 10.dp)
+                    )
+
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        fontWeight = FontWeight.Bold,
+                        color = Turquoise, // Using the custom Turquoise color
+                        // style = TextStyle(fontSize = 24.sp)
+                        style = TextStyle(
+                            fontSize = when (LocalConfiguration.current.screenWidthDp) {
+                                in 0..320 -> 20.sp
+                                in 321..600 -> 24.sp
+                                else -> 28.sp
+                            }
+                        )
+                    )
+                }
+            }
+
         }
 
         Box(
@@ -128,15 +164,31 @@ fun Home(
         Spacer(modifier = Modifier.fillMaxHeight(0.2f))
 
         Box(
+//            modifier = Modifier
+//                .fillMaxWidth(0.8f)
+//                .padding(20.dp)
             modifier = Modifier
                 .fillMaxWidth(0.8f)
-                .padding(20.dp)
+                .padding(when (LocalConfiguration.current.screenWidthDp) {
+                    in 0..320 -> 12.dp
+                    in 321..600 -> 16.dp
+                    else -> 20.dp
+                })
         ) {
             Text(
                 text = stringResource(id = R.string.app_intro),
+//                style = TextStyle(
+//                    fontWeight = FontWeight.Bold,
+//                    color = MaterialTheme.colorScheme.onBackground
+//                ),
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = when (LocalConfiguration.current.screenWidthDp) {
+                        in 0..320 -> 14.sp
+                        in 321..600 -> 16.sp
+                        else -> 18.sp
+                    }
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.align(Alignment.Center)
@@ -158,104 +210,23 @@ fun Home(
             Image(
                 painter = painterResource(id = R.drawable.tns_labs),
                 contentDescription = null,
+//                modifier = Modifier
+//                    .width(130.dp)
+//                    .height(20.dp)
                 modifier = Modifier
-                    .width(130.dp)
-                    .height(20.dp)
+                    .width(when (LocalConfiguration.current.screenWidthDp) {
+                        in 0..320 -> 100.dp
+                        in 321..600 -> 120.dp
+                        else -> 130.dp
+                    })
+                    .height(when (LocalConfiguration.current.screenWidthDp) {
+                        in 0..320 -> 15.dp
+                        in 321..600 -> 20.dp
+                        else -> 20.dp
+                    })
             )
         }
 
         Spacer(modifier = Modifier.height(5.dp))
     }
 }
-
-
-//import androidx.compose.ui.test.*
-//import androidx.compose.ui.test.junit4.createComposeRule
-//import androidx.navigation.testing.TestNavHostController
-//import androidx.test.core.app.ApplicationProvider
-//import org.junit.Assert.assertEquals
-//import org.junit.Before
-//import org.junit.Rule
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import org.mockito.Mockito.mock
-//import org.robolectric.RobolectricTestRunner
-//import org.robolectric.annotation.Config
-//import org.technoserve.farmcollector.database.models.Language
-//import org.technoserve.farmcollector.ui.screens.home.Home
-//import org.technoserve.farmcollector.viewmodels.LanguageViewModel
-//
-//@RunWith(RobolectricTestRunner::class)
-//@Config(sdk = [33])
-//class HomeKtTest {
-//
-//    @get:Rule
-//    val composeTestRule = createComposeRule()
-//
-//    private lateinit var navController: TestNavHostController
-//    private lateinit var languageViewModel: LanguageViewModel
-//    private val testLanguages = listOf(
-//        Language("en", "English"),
-//        Language("es", "Spanish")
-//    )
-//
-//    @Before
-//    fun setup() {
-//        // Use ApplicationProvider for a context in unit tests
-//        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-//        navController = TestNavHostController(context)
-//        languageViewModel = mock(LanguageViewModel::class.java)
-//    }
-//
-//    @Test
-//    fun homeScreen_displaysAppName() {
-//        composeTestRule.setContent {
-//            Home(
-//                navController = navController,
-//                languageViewModel = languageViewModel,
-//                languages = testLanguages
-//            )
-//        }
-//
-//        composeTestRule
-//            .onNodeWithText("TerraTrac") // Replace with the actual string if not resource-based
-//            .assertExists()
-//            .assertIsDisplayed()
-//    }
-//
-//    @Test
-//    fun homeScreen_displaysGetStartedButton() {
-//        composeTestRule.setContent {
-//            Home(
-//                navController = navController,
-//                languageViewModel = languageViewModel,
-//                languages = testLanguages
-//            )
-//        }
-//
-//        composeTestRule
-//            .onNodeWithText("Get Started")
-//            .assertExists()
-//            .assertIsDisplayed()
-//            .assertHasClickAction()
-//    }
-//
-//    @Test
-//    fun homeScreen_clickGetStartedNavigatesToSiteList() {
-//        composeTestRule.setContent {
-//            Home(
-//                navController = navController,
-//                languageViewModel = languageViewModel,
-//                languages = testLanguages
-//            )
-//        }
-//
-//        composeTestRule
-//            .onNodeWithText("Get Started") // Replace with actual string if not resource-based
-//            .performClick()
-//
-//        // Verify navigation occurred
-//        assertEquals("siteList", navController.currentDestination?.route)
-//    }
-//}
-

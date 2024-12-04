@@ -1,5 +1,12 @@
 package org.technoserve.farmcollector.utils
 
+/**
+ * Converts a given size to hectares based on the selected unit.
+ *
+ * @param size The size to be converted.
+ * @param selectedUnit The unit of the given size.
+ * @return The converted size in hectares.
+ */
 fun convertSize(size: Double, selectedUnit: String): Double {
     return when (selectedUnit) {
         "Ha" -> size // If already in hectares, return as is

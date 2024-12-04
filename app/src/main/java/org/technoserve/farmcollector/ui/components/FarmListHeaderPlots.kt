@@ -39,6 +39,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.technoserve.farmcollector.R
 
+/*
+ *  This function is used to display the header for the farm list with search, export, share, and import buttons
+ *  @param title: The title of the header
+ *  @param onBackClicked: A function to be called when the back button is clicked
+ *  @param onExportClicked: A function to be called when the export button is clicked
+ *  @param onShareClicked: A function to be called when the share button is clicked
+ *  @param onImportClicked: A function to be called when the import button is clicked
+ * @param onSearchQueryChanged : A function to be called when the search query is changed
+ * @param showExport: A function to be called when the export button is clicked and the export button is clicked
+ * @param showShar: A function to be called when the export button is clicked
+ * @param showSearch: A function to be called when the export button is clicked
+ * @param onRestoreClicked: A function to be called when the restore button is clicked and the restore button is clicked
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FarmListHeaderPlots(

@@ -7,6 +7,7 @@ import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -34,7 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import org.technoserve.farmcollector.viewmodels.AppUpdateViewModel
-import org.technoserve.farmcollector.viewmodels.ExitConfirmationDialog
+//import org.technoserve.farmcollector.viewmodels.ExitConfirmationDialog
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 import org.technoserve.farmcollector.viewmodels.UpdateAlert
@@ -55,7 +56,19 @@ import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
 import java.util.Locale
 
 
-// Constants for navigation routes
+/**
+ *
+ * Constants for navigation routes. These are used to define the different screens in the app.
+ *
+ * For example, if you have a "Site" model with an "id" field, you could define routes like:
+ *
+ * const val SITE_LIST = "siteList"
+ * const val FARM_LIST = "farmList/{siteId}"
+ * const val ADD_FARM = "addFarm/{siteId}"
+ * const val ADD_SITE = "addSite"
+ * const val UPDATE_FARM = "updateFarm/{farmId}"
+ *
+ */
 object Routes {
     const val HOME = "home"
     const val SITE_LIST = "siteList"
@@ -67,7 +80,11 @@ object Routes {
     const val SETTINGS = "settings"
 }
 
-
+/**
+ * MainActivity is the entry point for the Android app. It sets up the navigation graph,
+ * manages permissions, and initializes the language and map view models.
+ *
+ */
 class MainActivity : ComponentActivity() {
     private lateinit var locationHelper: LocationHelper
     private val viewModel: MapViewModel by viewModels()
@@ -114,12 +131,14 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val context = LocalContext.current
             var canExitApp by remember { mutableStateOf(false) }
+//            var showExitToast by remember { mutableStateOf(false) }
+
             val currentLanguage by languageViewModel.currentLanguage.collectAsState()
 
             val appUpdateViewModel: AppUpdateViewModel = viewModel()
             val updateAvailable by appUpdateViewModel.updateAvailable.collectAsState()
 
-            var showExitDialog by remember { mutableStateOf(false) }
+           //  var showExitDialog by remember { mutableStateOf(false) }
 
 
             // Initialize update check
@@ -128,10 +147,31 @@ class MainActivity : ComponentActivity() {
             }
 
 
-            // Handle back press
-            BackHandler {
-                showExitDialog = true
-            }
+//            // Handle back press
+//            BackHandler {
+//                if (canExitApp) {
+//                    // Exit the app
+//                    (context as? Activity)?.finish()
+//                } else {
+//                    showExitToast = true
+//                    canExitApp = true
+//                }
+//            }
+//
+//
+//            // Show exit toast with delay for reset
+//            if (showExitToast) {
+//                Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+//
+//                // Delay resetting `showExitToast` and `canExitApp`
+//                LaunchedEffect(showExitToast) {
+//                    kotlinx.coroutines.delay(2000) // 2 seconds delay
+//                    showExitToast = false
+//                    canExitApp = false
+//                }
+//            }
+
+
 
             // Update Alert
             UpdateAlert(
@@ -145,12 +185,12 @@ class MainActivity : ComponentActivity() {
                 }
             )
 
-            // Exit Confirmation
-            ExitConfirmationDialog(
-                showDialog = showExitDialog,
-                onDismiss = { showExitDialog = false },
-                onConfirm = { (context as? Activity)?.finish() }
-            )
+//            // Exit Confirmation
+//            ExitConfirmationDialog(
+//                showDialog = showExitDialog,
+//                onDismiss = { showExitDialog = false },
+//                onConfirm = { (context as? Activity)?.finish() }
+//            )
 
 
 
@@ -187,15 +227,48 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Routes.HOME,
                     ) {
+//                        composable(Routes.HOME) {
+//                            BackHandler(enabled = canExitApp) {
+//                                (context as? Activity)?.finish()
+//                            }
+//                            LaunchedEffect(Unit) {
+//                                canExitApp = true
+//                            }
+//                            Home(navController, languageViewModel, languages)
+//                        }
                         composable(Routes.HOME) {
-                            BackHandler(enabled = canExitApp) {
-                                (context as? Activity)?.finish()
+                            //val context = LocalContext.current
+                            // var canExitApp by remember { mutableStateOf(false) }
+                            var showExitToast by remember { mutableStateOf(false) }
+
+                            // Handle back press with confirmation
+                            BackHandler {
+                                if (canExitApp) {
+                                    // Exit the app
+                                    (context as? Activity)?.finish()
+                                } else {
+                                    showExitToast = true
+                                    canExitApp = true
+                                }
                             }
-                            LaunchedEffect(Unit) {
-                                canExitApp = true
+
+                            // Show exit toast and reset the state after a delay
+                            if (showExitToast) {
+                                // Show the toast
+                                Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+
+                                // Reset `showExitToast` and `canExitApp` after 2 seconds
+                                LaunchedEffect(Unit) {
+                                    kotlinx.coroutines.delay(2000) // 2 seconds delay
+                                    showExitToast = false
+                                    canExitApp = false
+                                }
                             }
+
+                            // Display Home Screen
                             Home(navController, languageViewModel, languages)
                         }
+
                         composable(Routes.SITE_LIST) {
                             LaunchedEffect(Unit) {
                                 canExitApp = false

@@ -156,3 +156,94 @@ class HomeKtTest{
 }
 
  */
+
+//import androidx.compose.ui.test.*
+//import androidx.compose.ui.test.junit4.createComposeRule
+//import androidx.navigation.testing.TestNavHostController
+//import androidx.test.core.app.ApplicationProvider
+//import org.junit.Assert.assertEquals
+//import org.junit.Before
+//import org.junit.Rule
+//import org.junit.Test
+//import org.junit.runner.RunWith
+//import org.mockito.Mockito.mock
+//import org.robolectric.RobolectricTestRunner
+//import org.robolectric.annotation.Config
+//import org.technoserve.farmcollector.database.models.Language
+//import org.technoserve.farmcollector.ui.screens.home.Home
+//import org.technoserve.farmcollector.viewmodels.LanguageViewModel
+//
+//@RunWith(RobolectricTestRunner::class)
+//@Config(sdk = [33])
+//class HomeKtTest {
+//
+//    @get:Rule
+//    val composeTestRule = createComposeRule()
+//
+//    private lateinit var navController: TestNavHostController
+//    private lateinit var languageViewModel: LanguageViewModel
+//    private val testLanguages = listOf(
+//        Language("en", "English"),
+//        Language("es", "Spanish")
+//    )
+//
+//    @Before
+//    fun setup() {
+//        // Use ApplicationProvider for a context in unit tests
+//        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+//        navController = TestNavHostController(context)
+//        languageViewModel = mock(LanguageViewModel::class.java)
+//    }
+//
+//    @Test
+//    fun homeScreen_displaysAppName() {
+//        composeTestRule.setContent {
+//            Home(
+//                navController = navController,
+//                languageViewModel = languageViewModel,
+//                languages = testLanguages
+//            )
+//        }
+//
+//        composeTestRule
+//            .onNodeWithText("TerraTrac") // Replace with the actual string if not resource-based
+//            .assertExists()
+//            .assertIsDisplayed()
+//    }
+//
+//    @Test
+//    fun homeScreen_displaysGetStartedButton() {
+//        composeTestRule.setContent {
+//            Home(
+//                navController = navController,
+//                languageViewModel = languageViewModel,
+//                languages = testLanguages
+//            )
+//        }
+//
+//        composeTestRule
+//            .onNodeWithText("Get Started")
+//            .assertExists()
+//            .assertIsDisplayed()
+//            .assertHasClickAction()
+//    }
+//
+//    @Test
+//    fun homeScreen_clickGetStartedNavigatesToSiteList() {
+//        composeTestRule.setContent {
+//            Home(
+//                navController = navController,
+//                languageViewModel = languageViewModel,
+//                languages = testLanguages
+//            )
+//        }
+//
+//        composeTestRule
+//            .onNodeWithText("Get Started") // Replace with actual string if not resource-based
+//            .performClick()
+//
+//        // Verify navigation occurred
+//        assertEquals("siteList", navController.currentDestination?.route)
+//    }
+//}
+

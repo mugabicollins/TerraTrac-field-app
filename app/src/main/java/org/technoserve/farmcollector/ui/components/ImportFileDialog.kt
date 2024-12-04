@@ -39,6 +39,13 @@ import kotlinx.coroutines.launch
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 
+/**
+ * This composable function creates an import file dialog for selecting a file type and invoking the file picker.
+ *
+ * @param siteId The ID of the collection site to which the imported data will be added.
+ * @param onDismiss A function to be called when the dialog is dismissed.
+ * @param navController The navigation controller to navigate to the refreshed farm list.
+ */
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun ImportFileDialog(

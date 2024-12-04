@@ -82,6 +82,7 @@ import org.technoserve.farmcollector.ui.components.FarmCard
 import org.technoserve.farmcollector.ui.components.FarmListHeaderPlots
 import org.technoserve.farmcollector.ui.components.FormatSelectionDialog
 import org.technoserve.farmcollector.ui.components.ImportFileDialog
+import org.technoserve.farmcollector.ui.components.RestoreDataAlert
 import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
 
 import org.technoserve.farmcollector.utils.createFile
@@ -94,14 +95,26 @@ import java.util.Locale
 
 
 var siteID = 0L
-
+/**
+ *
+ * The Action enum represents the available actions for farm management.
+ * Export represents exporting farms in a specific format (e.g., CSV, JSON).
+ * Share represents sharing farms with other users or devices.
+ */
 enum class Action {
     Export,
     Share,
 }
 
 /**
- *  This function is used to display the list of farm Plots
+ *
+ * The FarmList screen displays a list of farms. Users can add, edit, delete, and share farms.
+ * The screen includes a search bar, a tabbed view, and a floating action button for adding a new farm.
+ * The farms are displayed in a paginated manner, with a custom pagination control implemented using the CustomPaginationControls component.
+ * The screen also includes a floating action button for exporting farms in a specific format (e.g., CSV, JSON).
+ * When the user selects a farm, they can view its details, edit it, or delete it.
+ * The screen supports dark mode by using the MaterialTheme.isSystemInDarkTheme() function.
+ *
  */
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -148,6 +161,8 @@ fun FarmList(
     var finalMessage by remember { mutableStateOf("") }
     var showFinalMessage by remember { mutableStateOf(false) }
 
+    var showRestoreAlert by remember { mutableStateOf(false) }
+
 
     val isDarkTheme = isSystemInDarkTheme()
     val inputLabelColor = if (isDarkTheme) Color.LightGray else Color.DarkGray
@@ -169,7 +184,6 @@ fun FarmList(
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
-//                    if (createFile(context, uri)) {
                     if (createFile(
                            context, uri,listItems,
                                 exportFormat,
@@ -481,20 +495,21 @@ fun FarmList(
                 showShare = listItems.isNotEmpty(),
                 showSearch = listItems.isNotEmpty(),
                 onRestoreClicked = {
-                    farmViewModel.restoreData(
-                        deviceId = deviceId,
-                        phoneNumber = "",
-                        email = "",
-                        farmViewModel = farmViewModel
-                    ) { success ->
-                        if (success) {
-                            finalMessage = context.getString(R.string.data_restored_successfully)
-                            showFinalMessage = true
-                        } else {
-                            showFinalMessage = true
-                            showRestorePrompt = true
-                        }
-                    }
+//                    farmViewModel.restoreData(
+//                        deviceId = deviceId,
+//                        phoneNumber = "",
+//                        email = "",
+//                        farmViewModel = farmViewModel
+//                    ) { success ->
+//                        if (success) {
+//                            finalMessage = context.getString(R.string.data_restored_successfully)
+//                            showFinalMessage = true
+//                        } else {
+//                            showFinalMessage = true
+//                            showRestorePrompt = true
+//                        }
+//                    }
+                    showRestoreAlert = true
                 }
 
             )
@@ -528,6 +543,16 @@ fun FarmList(
                     .padding(paddingValues)
                     .fillMaxSize()
             ) {
+
+                // Restore Alert Dialog
+                // Show restore alert dialog
+                RestoreDataAlert(
+                    showDialog = showRestoreAlert,
+                    onDismiss = { showRestoreAlert = false },
+                    deviceId = deviceId,
+                    farmViewModel = farmViewModel
+                )
+
                 showDataContent()
             }
         }
@@ -551,22 +576,17 @@ fun FarmList(
                     .padding(top = 72.dp)
                     .fillMaxSize()
             ) {
-                // Display a completion message
                 val status = restoreStatus as RestoreStatus.Success
-                if (showFinalMessage) {
-                    // Show the toast
-                    Toast.makeText(
-                        context,
-                        context.getString(
-                            R.string.restoration_completed,
-                            status.addedCount,
-                            status.sitesCreated
-                        ),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                showFinalMessage = false
-                showRestorePrompt = false // Hide the restore prompt if restoration is successful
+                Toast.makeText(
+                    context,
+                    context.getString(
+                        R.string.restoration_completed,
+                        status.addedCount,
+                        status.sitesCreated
+                    ),
+                    Toast.LENGTH_LONG
+                ).show()
+                showRestorePrompt = false
             }
         }
 
@@ -588,7 +608,6 @@ fun FarmList(
                     ) {
 
                         if (showFinalMessage) {
-                            // Show the toast with the final message
                             Toast.makeText(
                                 context,
                                 context.getString(
@@ -677,7 +696,7 @@ fun FarmList(
                                 onClick = {
                                     if (phone.isNotBlank() || email.isNotBlank()) {
                                         showRestorePrompt =
-                                            false // Hide the restore prompt on retry
+                                            false
                                         farmViewModel.restoreData(
                                             deviceId = deviceId,
                                             phoneNumber = phone,
@@ -701,7 +720,6 @@ fun FarmList(
                         }
                     }
                 } else {
-
                     if (showFinalMessage) {
                         // Show the toast
                         Toast.makeText(
@@ -716,14 +734,13 @@ fun FarmList(
 
         null -> {
             if (isLoading.value) {
-                // Show loader while data is loading
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+
                 }
             } else {
                 Column(

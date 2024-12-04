@@ -9,6 +9,7 @@ import android.view.KeyEvent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +47,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -79,7 +81,11 @@ import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 import java.math.BigDecimal
 import java.util.UUID
 import java.util.regex.Pattern
-
+/**
+ *
+ * FarmForm.kt
+ *
+ */
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -332,7 +338,10 @@ fun FarmForm(
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -353,6 +362,11 @@ fun FarmForm(
             value = memberId,
             onValueChange = { memberId = it },
             label = { Text(stringResource(id = R.string.member_id), color = inputLabelColor) },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -392,7 +406,10 @@ fun FarmForm(
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             modifier = Modifier
                 .focusRequester(focusRequester1)
@@ -428,17 +445,20 @@ fun FarmForm(
                 errorCursorColor = Color.Red,
                 focusedIndicatorColor = inputBorder,
                 unfocusedIndicatorColor = inputBorder,
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
             ),
             modifier = Modifier
                 .focusRequester(focusRequester2)
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
         )
-
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TextField(
                 singleLine = true,
@@ -449,7 +469,6 @@ fun FarmForm(
                         scientificNotationPattern.matcher(inputValue).matches() -> {
                             truncateToDecimalPlaces(formatInput(inputValue), 9)
                         }
-
                         else -> inputValue
                     }
                     size = formattedValue
@@ -473,7 +492,6 @@ fun FarmForm(
                         isFormSubmitted && size.isBlank() -> {
                             Text(stringResource(R.string.error_farm_size_empty))
                         }
-
                         isFormSubmitted && !isValidSize -> {
                             Text(stringResource(R.string.error_farm_size_invalid))
                         }
@@ -486,44 +504,57 @@ fun FarmForm(
                     errorCursorColor = Color.Red,
                     focusedIndicatorColor = inputBorder,
                     unfocusedIndicatorColor = inputBorder,
-                    errorIndicatorColor = Color.Red
+                    errorIndicatorColor = Color.Red,
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
                     .focusRequester(focusRequester3)
-                    .weight(1f)
-                    .padding(end = 16.dp)
+                    .fillMaxWidth(0.5f)  // Explicitly set to half width
             )
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.weight(1f)
+            Box(
+                modifier = Modifier.weight(1f)  // Ensure the dropdown container takes half the width
             ) {
-                TextField(
-                    readOnly = true,
-                    value = selectedUnit,
-                    onValueChange = { },
-                    label = { Text(stringResource(R.string.unit)) },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expanded
-                        )
-                    },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier.menuAnchor()
-                )
-                ExposedDropdownMenu(
+                ExposedDropdownMenuBox(
                     expanded = expanded,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                    onDismissRequest = { expanded = false }
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
-                    items.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(text = selectionOption) },
-                            onClick = {
-                                updateSelectedUnit(selectionOption)
-                                expanded = false
-                            }
-                        )
+                    TextField(
+                        readOnly = true,
+                        value = selectedUnit,
+                        onValueChange = { },
+                        label = { Text(stringResource(R.string.unit)) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expanded
+                            )
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(
+                                focusedContainerColor = MaterialTheme.colorScheme.background,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                                disabledContainerColor = MaterialTheme.colorScheme.background,
+                        ),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        items.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                text = { Text(text = selectionOption) },
+                                onClick = {
+                                    updateSelectedUnit(selectionOption)
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -580,6 +611,9 @@ fun FarmForm(
                     isError = !isValid && latitude.split(".").last().length < 6,
                     colors = TextFieldDefaults.colors(
                         errorLeadingIconColor = Color.Red,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background,
                     ),
                     modifier = Modifier
                         .weight(1f)
@@ -624,6 +658,9 @@ fun FarmForm(
                     isError = !isValid && longitude.split(".").last().length < 6,
                     colors = TextFieldDefaults.colors(
                         errorLeadingIconColor = Color.Red,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background,
                     ),
                     modifier = Modifier
                         .weight(1f)
@@ -733,4 +770,9 @@ fun FarmForm(
             locationHelper.cleanup()
         }
     }
+}
+
+@Composable
+fun isTablet(): Boolean {
+    return LocalConfiguration.current.screenWidthDp > 600
 }

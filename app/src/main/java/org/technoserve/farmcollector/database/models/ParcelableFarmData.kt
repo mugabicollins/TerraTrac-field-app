@@ -2,7 +2,13 @@ package org.technoserve.farmcollector.database.models
 
 import android.os.Parcel
 import android.os.Parcelable
-
+/*
+ * Parcelable class representing a pair of a Farm and a String representing the view.
+ * Used to pass data between Activities or Fragments.
+ *
+ * @property farm Farm the Farm associated with this data.
+ * @property view String representing the view associated with this data.
+ */
 data class ParcelableFarmData(val farm: Farm, val view: String) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readParcelable(Farm::class.java.classLoader)!!,
