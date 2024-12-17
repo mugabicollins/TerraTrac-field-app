@@ -2,6 +2,7 @@
 
 ## Overview
 
+TerraTrac is an open-source Android mobile application available on the Google Play Store, designed to assist buyers in complying with the European Union Deforestation Regulation (EUDR). The app enables users such as buying agents, employees, and factory managers to register and manage farms from which they source commodities.
 This mobile app is  one of the key components of the broad architecture for the DPI-Digital Public Infrastructure for EUDR compliance.
 
 ### Key Features
