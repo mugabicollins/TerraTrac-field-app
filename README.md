@@ -86,7 +86,7 @@ The application follows Clean Architecture pattern with the following key compon
 
 The objective of this document is to provide a draft, high-level description of the major components of the  new Linux Foundation Agstack project for “Digital Public Infrastructure for EUDR compliance. 
 
-The DPI for EUDR Compliance - DRAFT architecture is available in the [GitHub repository](https://github.com/agstack/TerraTrac-field-app).
+The DPI for EUDR Compliance - DRAFT architecture is available in the [GitHub repository](https://github.com/agstack/TerraTrac-field-app/blob/dev/app/docs/EUDR%20DPI%20-%20DRAFT%20architecture.pdf).
 
 
 ## Contributing
@@ -128,7 +128,7 @@ The project is under active development.
 
 ## Regression Test List
 
-The regression test list is now available in the [GitHub repository](https://github.com/agstack/TerraTrac-field-app). This sheet contains the test cases and expected behaviors for all major features of the app. Testers can update their feedback directly in the sheet to indicate whether the feature works as expected.
+The regression test list is now available in the [GitHub repository](https://github.com/agstack/TerraTrac-field-app/blob/dev/app/docs/Regression%20Test%20List%20for%20TerraTrac%20Mobile%20Application%20v3.0.xlsx). This sheet contains the test cases and expected behaviors for all major features of the app. Testers can update their feedback directly in the sheet to indicate whether the feature works as expected.
 
 ### How to Use the Regression Test List
 
