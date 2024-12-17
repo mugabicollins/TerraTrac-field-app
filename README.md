@@ -1,7 +1,8 @@
 # TerraTrac Mobile Application
 
 ## Overview
-TerraTrac is an open-source Android mobile application available on the Google Play Store, designed to assist buyers in complying with the European Union Deforestation Regulation (EUDR). The app enables users such as buying agents, employees, and factory managers to register and manage farms from which they source commodities.
+
+This mobile app is  one of the key components of the broad architecture for the DPI-Digital Public Infrastructure for EUDR compliance.
 
 ### Key Features
 
@@ -81,6 +82,13 @@ The application follows Clean Architecture pattern with the following key compon
   - Location Service
   - Sync Service
 
+### DPI for EUDR Compliance - DRAFT architecture
+
+The objective of this document is to provide a draft, high-level description of the major components of the  new Linux Foundation Agstack project for “Digital Public Infrastructure for EUDR compliance. 
+
+The DPI for EUDR Compliance - DRAFT architecture is available in the [GitHub repository](https://github.com/agstack/TerraTrac-field-app).
+
+
 ## Contributing
 
 We welcome contributions to TerraTrac! Please follow these steps:
@@ -120,7 +128,7 @@ The project is under active development.
 
 ## Regression Test List
 
-The regression test list is now available in the [Google Sheet](https://docs.google.com/spreadsheets/d/1X4InFUmJCyVf01pmEjwMyY8Gl45x1ODZGNvj7CFJCD4/edit?usp=sharing). This sheet contains the test cases and expected behaviors for all major features of the app. Testers can update their feedback directly in the sheet to indicate whether the feature works as expected.
+The regression test list is now available in the [GitHub repository](https://github.com/agstack/TerraTrac-field-app). This sheet contains the test cases and expected behaviors for all major features of the app. Testers can update their feedback directly in the sheet to indicate whether the feature works as expected.
 
 ### How to Use the Regression Test List
 
