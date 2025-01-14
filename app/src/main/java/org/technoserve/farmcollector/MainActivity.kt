@@ -6,7 +6,9 @@ import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -50,6 +52,7 @@ import org.technoserve.farmcollector.ui.screens.settings.ScreenWithSidebar
 import org.technoserve.farmcollector.ui.screens.map.SetPolygon
 import org.technoserve.farmcollector.ui.screens.settings.SettingsScreen
 import org.technoserve.farmcollector.ui.screens.farms.UpdateFarmForm
+import org.technoserve.farmcollector.ui.screens.map.WebViewPage
 import org.technoserve.farmcollector.ui.theme.FarmCollectorTheme
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
@@ -80,6 +83,8 @@ object Routes {
     const val SETTINGS = "settings"
 }
 
+var loadURL = "file:///android_asset/leaflet_map.html"
+
 /**
  * MainActivity is the entry point for the Android app. It sets up the navigation graph,
  * manages permissions, and initializes the language and map view models.
@@ -103,6 +108,12 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        // Enable WebView debugging
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
 
         locationHelper = LocationHelper(this)
 
@@ -320,6 +331,18 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
+//                        composable(Routes.SET_POLYGON,
+//                            arguments = listOf(
+//                                navArgument("coordinates") { type = NavType.StringType },
+//                                navArgument("accuracyArray") { type = NavType.StringType }
+//                            )
+//                        ) { backStackEntry ->
+//                            LaunchedEffect(Unit) {
+//                                canExitApp = false
+//                            }
+//                            SetPolygon(navController, viewModel)
+//                        }
+
                         composable(Routes.SET_POLYGON,
                             arguments = listOf(
                                 navArgument("coordinates") { type = NavType.StringType },
@@ -329,8 +352,10 @@ class MainActivity : ComponentActivity() {
                             LaunchedEffect(Unit) {
                                 canExitApp = false
                             }
-                            SetPolygon(navController, viewModel)
+                            WebViewPage(loadURL) //OFFLINE
                         }
+
+
                         composable(Routes.SETTINGS) {
                             LaunchedEffect(Unit) {
                                 canExitApp = false

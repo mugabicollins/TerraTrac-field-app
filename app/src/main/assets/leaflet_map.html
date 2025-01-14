@@ -555,6 +555,8 @@
     document.addEventListener("DOMContentLoaded", function () {
       initMap();
 
+      loadSavedPlot();
+
       // Map view controls
       document.getElementById("streetView").addEventListener("click", () => {
         map.removeLayer(window.satelliteLayer);
@@ -682,6 +684,9 @@
           accuracy: currentAccuracy,
         };
 
+         // Save to local storage for simplicity (or send to a backend)
+        localStorage.setItem("savedPlot", JSON.stringify(plotData));
+
         // Reset buttons after saving
         const startButton = document.getElementById("startCapture");
         const saveButton = document.getElementById("savePlot");
@@ -701,6 +706,36 @@
           )}, ${centroid.lng.toFixed(6)}`
         );
       });
+
+      function loadSavedPlot() {
+    const savedPlot = localStorage.getItem("savedPlot");
+    if (savedPlot) {
+        const plotData = JSON.parse(savedPlot);
+
+        // Restore the points array
+        points = plotData.points.map((point) => L.latLng(point.lat, point.lng));
+
+        // Draw the polygon and polyline
+        polygon = L.polygon(points, { color: "blue" }).addTo(map);
+        polyline = L.polyline(points, { color: "blue" }).addTo(map);
+
+        // Zoom to fit the polygon
+        map.fitBounds(polygon.getBounds());
+
+        // Display plot info
+        document.getElementById(
+            "plotInfo"
+        ).textContent = `Plot Size: ${plotData.area.toFixed(2)} hectares`;
+        document.getElementById(
+            "warning"
+        ).textContent = `Centroid: ${plotData.centroid.lat.toFixed(
+            6
+        )}, ${plotData.centroid.lng.toFixed(6)}`;
+    }
+}
+
+
+
     });
 </script>
 </body>
