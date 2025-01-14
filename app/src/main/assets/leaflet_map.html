@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Farm Plot Map</title>
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"
+            rel="stylesheet"
+    />
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+            rel="stylesheet"
+    />
+    <style>
+        html,
+        body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+        }
+        #map {
+          height: 100%;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 1;
+        }
+        .controls {
+          position: absolute;
+          bottom: 10px;
+          left: 10px;
+          z-index: 1000;
+          background-color: rgba(255, 255, 255, 0.9);
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .map-types {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          z-index: 1000;
+          background-color: rgba(255, 255, 255, 0.9);
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .info-panel {
+          position: absolute;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1000;
+          background-color: rgba(255, 255, 255, 0.9);
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          text-align: center;
+          min-width: 200px;
+        }
+
+        button {
+          margin: 5px;
+          padding: 8px 12px;
+          background-color: #4caf50;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        button:disabled {
+          background-color: #cccccc;
+          cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+          background-color: #45a049;
+        }
+
+        .accuracy {
+          color: #666;
+          font-size: 0.9em;
+          margin-top: 5px;
+        }
+
+        .warning {
+          color: #ff4444;
+          font-weight: bold;
+        }
+
+        #mapTypesDropdown {
+          border: none;
+          border-radius: 4px;
+          padding: 10px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-content {
+          display: none;
+          position: absolute;
+          top: 50px;
+          right: 0;
+          background-color: white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          border-radius: 4px;
+          z-index: 1000;
+          flex-direction: column;
+          padding: 5px 0;
+        }
+
+        .dropdown-content button {
+          border: none;
+          padding: 10px;
+          text-align: left;
+          width: 100%;
+          cursor: pointer;
+        }
+
+        .dropdown-content button:hover {
+          background: #f0f0f0;
+        }
+
+        #customAlert {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 1000;
+          background-color: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #customAlert p {
+          margin: 0 0 20px;
+          font-size: 16px;
+          color: #333;
+        }
+
+        #customAlert button {
+          background-color: #4caf50;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 10px 20px;
+          cursor: pointer;
+        }
+
+        #overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div class="controls" style="display: flex; align-items: center; gap: 10px">
+    <button
+            id="startCapture"
+            style="
+          background-color: #4caf50;
+          border: none;
+          border-radius: 4px;
+          padding: 10px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        "
+    >
+        <i class="fas fa-play"></i>
+    </button>
+    <button
+            id="savePlot"
+            style="
+          display: none;
+          background-color: #4caf50;
+          border: none;
+          border-radius: 4px;
+          padding: 10px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        "
+    >
+        <i class="fas fa-save"></i>
+    </button>
+    <button
+            id="addPoint"
+            title="Add Point"
+            style="
+          background-color: #4caf50;
+          border: none;
+          border-radius: 4px;
+          padding: 10px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        "
+    >
+        <i class="fa fa-plus" aria-hidden="true"></i>
+    </button>
+    <button
+            id="deletePoint"
+            title="Delete Last Point"
+            style="
+          background-color: #4caf50;
+          border: none;
+          border-radius: 4px;
+          padding: 10px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        "
+    >
+        <i class="fas fa-undo"></i>
+    </button>
+    <button
+            id="clearMap"
+            title="Clear Map"
+            style="
+          background-color: #4caf50;
+          border: none;
+          border-radius: 4px;
+          padding: 10px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        "
+    >
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+
+<div class="map-types">
+    <button id="mapTypesDropdown" class="dropdown-toggle">
+        <i class="fas fa-layer-group"></i>
+    </button>
+    <div id="dropdownContent" class="dropdown-content">
+        <button id="streetView">Street View</button>
+        <button id="satelliteView">Satellite View</button>
+        <button id="terrainView">Terrain View</button>
+    </div>
+</div>
+
+<div class="info-panel">
+    <div id="plotInfo">Plot Size: 0 hectares</div>
+    <div id="accuracy" class="accuracy">
+        Location Accuracy: Calculating...
+    </div>
+    <div id="warning" class="warning"></div>
+</div>
+
+<div id="customAlert" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+    <p id="alertMessage" style="margin: 0 0 20px; font-size: 16px; color: #333; text-align: center;">Please start capture first</p>
+    <div style="display: flex; justify-content: center;">
+        <button id="alertOkButton" style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">OK</button>
+    </div>
+</div>
+<div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+    let map,
+      polygon,
+      points = [],
+      polyline,
+      isCapturing = false;
+    let currentAccuracy = 0;
+    let locationMarker = null;
+    let watchId = null;
+
+    function showAlert(message) {
+      const alertBox = document.getElementById("customAlert");
+      const overlay = document.getElementById("overlay");
+      const alertMessage = document.getElementById("alertMessage");
+      const okButton = document.getElementById("alertOkButton");
+
+      // Set the custom message
+      alertMessage.textContent = message;
+
+      // Show the alert and overlay
+      alertBox.style.display = "block";
+      overlay.style.display = "block";
+
+      // Close the alert when OK is clicked
+      okButton.onclick = function () {
+        alertBox.style.display = "none";
+        overlay.style.display = "none";
+      };
+    }
+
+
+
+    document
+      .getElementById("mapTypesDropdown")
+      .addEventListener("click", function () {
+        const dropdown = document.getElementById("dropdownContent");
+        dropdown.style.display =
+          dropdown.style.display === "block" ? "none" : "block";
+      });
+
+    // Close dropdown when clicking outside
+    window.addEventListener("click", function (event) {
+      const dropdown = document.getElementById("dropdownContent");
+      if (!event.target.matches("#mapTypesDropdown")) {
+        dropdown.style.display = "none";
+      }
+    });
+
+    function initMap() {
+      // Initialize map without a specific center
+      map = L.map("map", {
+        zoom: 12, // Start with a zoomed-out view
+        attributionControl: true,
+      });
+
+      // Default street view layer
+      window.streetLayer = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution: "© OpenStreetMap contributors",
+        }
+      ).addTo(map);
+
+      // Satellite view layer
+      window.satelliteLayer = L.tileLayer(
+        "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+        {
+          maxZoom: 19,
+          attribution: "© Google Satellite",
+        }
+      );
+
+      // Terrain view layer
+      window.terrainLayer = L.tileLayer(
+        "https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+        {
+          maxZoom: 19,
+          attribution: "© Google Maps",
+        }
+      );
+
+      // Add layer controls
+      const baseLayers = {
+        Street: window.streetLayer,
+        Satellite: window.satelliteLayer,
+        Terrain: window.terrainLayer,
+      };
+      L.control.layers(baseLayers).addTo(map);
+
+      // Get current location with better centering
+      if ("geolocation" in navigator) {
+        // Add loading indicator
+        map.spin = true; // If you're using leaflet.spin plugin
+
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            // First center the map
+            map.setView([lat, lon], 13, {
+              animate: true,
+              duration: 1, // 1 second animation
+            });
+
+            // Remove loading indicator if using
+            map.spin = false;
+
+            // Reverse geocode to get country name
+            fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+            )
+              .then((response) => response.json())
+              .then((data) => {
+                const country = data.address.country || "Unknown Location";
+                const city =
+                  data.address.city ||
+                  data.address.town ||
+                  data.address.village ||
+                  "";
+
+                // Add marker with more detailed location info
+                L.marker([lat, lon])
+                  .addTo(map)
+                  .bindPopup(
+                    `
+          <b>Your Location:</b><br>
+          ${city ? city + ", " : ""}${country}<br>
+          <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
+           <small>Accuracy: ${accuracy.toFixed(1)} meters </small>
+
+        `
+                  )
+                  .openPopup();
+              })
+              .catch((error) => {
+                console.error("Error getting location info:", error);
+                L.marker([lat, lon])
+                  .addTo(map)
+                  .bindPopup(`Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}`)
+                  .openPopup();
+              });
+          },
+          function (error) {
+            map.spin = false; // Remove loading indicator if using
+            console.error("Error getting location:", error);
+            // Set a default view if location access is denied
+            map.setView([0, 0], 2);
+            alert(
+              "Unable to get your location. Please enable location services."
+            );
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser");
+        // Set a default view if geolocation is not supported
+        map.setView([0, 0], 2);
+      }
+
+      startLocationTracking();
+    }
+
+    // Start tracking user location
+    function startLocationTracking() {
+      if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(
+          updateLocation,
+          handleLocationError,
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 5000,
+          }
+        );
+      }
+    }
+
+    // Add these variables at the top with other global variables
+    let currentLatitude = null;
+    let currentLongitude = null;
+
+    // Modify the updateLocation function to store current position
+    function updateLocation(position) {
+      const { latitude, longitude, accuracy } = position.coords;
+      currentAccuracy = accuracy;
+      currentLatitude = latitude; // Store current latitude
+      currentLongitude = longitude; // Store current longitude
+
+      document.getElementById(
+        "accuracy"
+      ).textContent = `Location Accuracy: ${accuracy.toFixed(1)} meters`;
+
+      if (locationMarker) {
+        map.removeLayer(locationMarker);
+      }
+
+      // locationMarker = L.marker([latitude, longitude])
+      //   .addTo(map)
+      //   .bindPopup("Your location<br>Accuracy: " + accuracy.toFixed(1) + "m")
+      //   .openPopup();
+
+      map.setView([latitude, longitude]);
+    }
+
+    function handleLocationError(error) {
+      console.error("Geolocation error:", error);
+      document.getElementById("accuracy").textContent =
+        "Location accuracy: Unable to determine";
+    }
+
+    // Calculate area of polygon in hectares
+    function calculateArea(coords) {
+      if (coords.length < 3) return 0;
+
+      let area = 0;
+      const R = 6371000; // Earth's radius in meters
+
+      for (let i = 0; i < coords.length; i++) {
+        const j = (i + 1) % coords.length;
+        const p1 = coords[i];
+        const p2 = coords[j];
+        const φ1 = (p1.lat * Math.PI) / 180;
+        const φ2 = (p2.lat * Math.PI) / 180;
+        const λ1 = (p1.lng * Math.PI) / 180;
+        const λ2 = (p2.lng * Math.PI) / 180;
+
+        area += (λ2 - λ1) * (2 + Math.sin(φ1) + Math.sin(φ2));
+      }
+
+      area = Math.abs((area * R * R) / 2);
+      return area / 10000; // Convert to hectares
+    }
+
+    // Calculate centroid of polygon
+    function calculateCentroid(coords) {
+      if (coords.length === 0) return null;
+
+      let x = 0,
+        y = 0;
+      for (const coord of coords) {
+        x += coord.lat;
+        y += coord.lng;
+      }
+      return {
+        lat: x / coords.length,
+        lng: y / coords.length,
+      };
+    }
+
+    // Update plot information
+    function updatePlotInfo() {
+      if (points.length < 3) {
+        document.getElementById("plotInfo").textContent =
+          "Plot Size: 0 hectares";
+        document.getElementById("warning").textContent = "";
+        return;
+      }
+
+      const area = calculateArea(points);
+      document.getElementById(
+        "plotInfo"
+      ).textContent = `Plot Size: ${area.toFixed(2)} hectares`;
+
+      if (area > 4) {
+        document.getElementById("warning").textContent =
+          "Plot is larger than 4 hectares - polygon capture required";
+      } else {
+        document.getElementById("warning").textContent =
+          "Polygon capture optional for plots under 4 hectares";
+      }
+    }
+
+    // Initialize the map
+    document.addEventListener("DOMContentLoaded", function () {
+      initMap();
+
+      // Map view controls
+      document.getElementById("streetView").addEventListener("click", () => {
+        map.removeLayer(window.satelliteLayer);
+        map.removeLayer(window.terrainLayer);
+        window.streetLayer.addTo(map);
+      });
+
+      document
+        .getElementById("satelliteView")
+        .addEventListener("click", () => {
+          map.removeLayer(window.streetLayer);
+          map.removeLayer(window.terrainLayer);
+          window.satelliteLayer.addTo(map);
+        });
+
+      document.getElementById("terrainView").addEventListener("click", () => {
+        map.removeLayer(window.streetLayer);
+        map.removeLayer(window.satelliteLayer);
+        window.terrainLayer.addTo(map);
+      });
+
+      // Polygon capture controls
+      document
+        .getElementById("startCapture")
+        .addEventListener("click", () => {
+          isCapturing = !isCapturing;
+
+          const startButton = document.getElementById("startCapture");
+          const saveButton = document.getElementById("savePlot");
+
+          if (isCapturing) {
+            points = [];
+            if (polygon) map.removeLayer(polygon);
+            if (polyline) map.removeLayer(polyline);
+            polygon = L.polygon([]).addTo(map);
+            polyline = L.polyline([]).addTo(map);
+
+            // Set Start/Stop button to Stop state
+            startButton.innerHTML = '<i class="fas fa-stop"></i>';
+            startButton.style.backgroundColor = "#ff4444";
+          } else {
+            // Hide Start/Stop button and show Save button
+            startButton.style.display = "none";
+            saveButton.style.display = "block";
+          }
+        });
+
+      // Modify the addPoint click handler
+      document.getElementById("addPoint").addEventListener("click", () => {
+        if (!isCapturing) {
+          // alert("Please start capture first");
+          // Example usage
+          showAlert("Please start capture first");
+          return;
+        }
+
+        if (currentLatitude === null || currentLongitude === null) {
+          alert(
+            "Waiting for location data. Please make sure location services are enabled."
+          );
+          return;
+        }
+
+        // Create a point using current location
+        const currentLocation = L.latLng(currentLatitude, currentLongitude);
+        points.push(currentLocation);
+        L.marker(currentLocation).addTo(map);
+        polyline.setLatLngs(points);
+        polygon.setLatLngs([points]);
+        updatePlotInfo();
+
+        // Optional: Add a small animation or feedback
+        const feedbackDiv = document.getElementById("accuracy");
+        feedbackDiv.textContent = `Point added at current location (Accuracy: ${currentAccuracy.toFixed(
+          1
+        )}m)`;
+        setTimeout(() => {
+          feedbackDiv.textContent = `Location Accuracy: ${currentAccuracy.toFixed(
+            1
+          )} meters`;
+        }, 2000);
+      });
+
+      document.getElementById("deletePoint").addEventListener("click", () => {
+        if (points.length > 0) {
+          points.pop();
+          polyline.setLatLngs(points);
+          polygon.setLatLngs([points]);
+          map.eachLayer((layer) => {
+            if (layer instanceof L.Marker && layer !== locationMarker) {
+              map.removeLayer(layer);
+            }
+          });
+          points.forEach((point) => L.marker(point).addTo(map));
+          updatePlotInfo();
+        }
+      });
+
+      document.getElementById("clearMap").addEventListener("click", () => {
+        points = [];
+        map.eachLayer((layer) => {
+          if (layer instanceof L.Marker && layer !== locationMarker) {
+            map.removeLayer(layer);
+          }
+        });
+        if (polygon) map.removeLayer(polygon);
+        if (polyline) map.removeLayer(polyline);
+        updatePlotInfo();
+      });
+
+      // Save plot functionality
+      document.getElementById("savePlot").addEventListener("click", () => {
+        if (points.length < 3) {
+          alert("Please capture at least 3 points to form a valid polygon");
+          return;
+        }
+
+        const area = calculateArea(points);
+        const centroid = calculateCentroid(points);
+
+        const plotData = {
+          area: area,
+          centroid: centroid,
+          points: points,
+          accuracy: currentAccuracy,
+        };
+
+        // Reset buttons after saving
+        const startButton = document.getElementById("startCapture");
+        const saveButton = document.getElementById("savePlot");
+
+        saveButton.style.display = "none"; // Hide Save button
+        startButton.style.display = "block"; // Show Start button again
+        startButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset to Start Capture state
+        startButton.style.backgroundColor = "#4CAF50";
+
+        console.log("Plot data:", plotData);
+        // Here you would typically send this data to your backend
+        alert(
+          `Plot saved successfully!\nArea: ${area.toFixed(
+            2
+          )} hectares\nCentroid: ${centroid.lat.toFixed(
+            6
+          )}, ${centroid.lng.toFixed(6)}`
+        );
+      });
+    });
+</script>
+</body>
+</html>
