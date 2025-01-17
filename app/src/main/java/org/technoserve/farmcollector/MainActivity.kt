@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,12 +37,14 @@ import androidx.navigation.compose.rememberNavController
 //import androidx.navigation.navArgument
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.gson.Gson
 import org.technoserve.farmcollector.viewmodels.AppUpdateViewModel
 //import org.technoserve.farmcollector.viewmodels.ExitConfirmationDialog
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 import org.technoserve.farmcollector.viewmodels.UpdateAlert
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
+import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import org.technoserve.farmcollector.ui.screens.farms.AddFarm
 import org.technoserve.farmcollector.ui.screens.collectionsites.AddSite
@@ -76,7 +79,7 @@ object Routes {
     const val HOME = "home"
     const val SITE_LIST = "siteList"
     const val FARM_LIST = "farmList/{siteId}"
-    const val ADD_FARM = "addFarm/{siteId}"
+    const val ADD_FARM = "addFarm/{siteId}/{plotDataJson}"
     const val ADD_SITE = "addSite"
     const val UPDATE_FARM = "updateFarm/{farmId}"
     const val SET_POLYGON = "setPolygon"
@@ -102,6 +105,11 @@ class MainActivity : ComponentActivity() {
     private val sharedPref by lazy {
         getSharedPreferences("FarmCollector", MODE_PRIVATE)
     }
+
+    private var webView: WebView? = null // Shared WebView instance
+
+    lateinit var navController: NavHostController
+
 
 
     @SuppressLint("InlinedApi")
@@ -298,18 +306,33 @@ class MainActivity : ComponentActivity() {
                                     FarmList(
                                         navController = navController,
                                         siteId = siteId.toLong(),
+                                        webView = webView,
                                     )
                                 }
                             }
                         }
-                        composable(Routes.ADD_FARM) { backStackEntry ->
-                            val siteId = backStackEntry.arguments?.getString("siteId")
-                            LaunchedEffect(Unit) {
-                                canExitApp = false
-                            }
-                            if (siteId != null) {
-                                AddFarm(navController = navController, siteId = siteId.toLong())
-                            }
+//                        composable(Routes.ADD_FARM) { backStackEntry ->
+//                            val siteId = backStackEntry.arguments?.getString("siteId")
+//                            LaunchedEffect(Unit) {
+//                                canExitApp = false
+//                            }
+//                            if (siteId != null) {
+//                                AddFarm(navController = navController, siteId = siteId.toLong(), webView = webView )
+//                            }
+//                        }
+
+                        composable(
+                            route = "addFarm/{siteId}/{plotDataJson}",
+                            arguments = listOf(
+                                navArgument("siteId") { type = NavType.LongType },
+                                navArgument("plotDataJson") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val siteId = backStackEntry.arguments?.getLong("siteId") ?: 0L
+                            val plotDataJson = backStackEntry.arguments?.getString("plotDataJson") ?: ""
+                            val plotData = Gson().fromJson(plotDataJson, Farm::class.java)
+
+                            AddFarm(navController = navController, siteId = siteId, webView = webView )
                         }
                         composable(Routes.ADD_SITE) {
                             LaunchedEffect(Unit) {
@@ -352,7 +375,11 @@ class MainActivity : ComponentActivity() {
                             LaunchedEffect(Unit) {
                                 canExitApp = false
                             }
-                            WebViewPage(loadURL) //OFFLINE
+//                            WebViewPage(loadURL) //OFFLINE
+                            WebViewPage(loadURL,
+                            onWebViewCreated = { createdWebView ->
+                                webView = createdWebView // Save the WebView instance
+                            }) //OFFLINE
                         }
 
 

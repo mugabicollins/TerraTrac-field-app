@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.view.ViewGroup
 import android.webkit.GeolocationPermissions
 import android.webkit.WebChromeClient
@@ -15,6 +16,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.viewinterop.AndroidView
+import org.technoserve.farmcollector.database.helpers.map.JavaScriptInterface
 import java.io.File
 import java.net.URLConnection
 
@@ -34,9 +37,10 @@ import java.net.URLConnection
  *
  */
 
+@RequiresApi(Build.VERSION_CODES.M)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewPage(url: String) {
+fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
     var webView: WebView? = null
@@ -66,6 +70,7 @@ fun WebViewPage(url: String) {
                     allowContentAccess = true
                     loadWithOverviewMode = true
                     useWideViewPort = true
+                    allowFileAccessFromFileURLs = true
 
                     // Cache settings
                     cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // Use cached resources when available
@@ -80,6 +85,14 @@ fun WebViewPage(url: String) {
                         callback.invoke(origin, true, false)
                     }
                 }
+
+                // Attach JavaScript interface with form data lambdas
+                addJavascriptInterface(
+                    JavaScriptInterface(
+                        context = context
+                    ),
+                    "Android"
+                )
 
                 webViewClient = object : WebViewClient() {
                     override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
@@ -115,7 +128,8 @@ fun WebViewPage(url: String) {
                         loadUrl(url)
                     }
                 }
-                webView = this
+                //webView = this
+                onWebViewCreated(this) // Pass the WebView instance
             }
         },
         modifier = Modifier
@@ -132,6 +146,7 @@ fun WebViewPage(url: String) {
 }
 
 // Utility function to check network availability
+@RequiresApi(Build.VERSION_CODES.M)
 private fun isNetworkAvailable(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val network = connectivityManager.activeNetwork

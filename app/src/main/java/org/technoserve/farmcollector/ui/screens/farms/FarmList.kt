@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -64,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.technoserve.farmcollector.R
@@ -124,6 +127,7 @@ enum class Action {
 fun FarmList(
     navController: NavController,
     siteId: Long,
+    webView: WebView?
 ) {
     siteID = siteId
     val context = LocalContext.current
@@ -519,12 +523,37 @@ fun FarmList(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
+                var farmData by remember { mutableStateOf<Farm?>(null) }
+                // Function to fetch plot data from WebView
+                fun fetchPlotDataFromMap() {
+                    webView?.evaluateJavascript(
+                        """
+            if (typeof Android.getPlotData === 'function') {
+                Android.getPlotData();
+            }
+            """.trimIndent()
+                    ) { result ->
+                        // Parse the result from the map
+                        if (result != null && result != "null") {
+                            val gson = Gson()
+                            val data = gson.fromJson(result, Farm::class.java)
+                            farmData = data
+                            Log.d("PlotDetailsForm", "Plot Data loaded: $data")
+                        } else {
+                            Log.e("PlotDetailsForm", "Failed to fetch plot data from map")
+                        }
+                    }
+                }
+                // Fetch data when the form loads
+                LaunchedEffect(Unit) {
+                    fetchPlotDataFromMap()
+                }
                 FloatingActionButton(
                     onClick = {
                         val sharedPref =
                             context.getSharedPreferences("FarmCollector", Context.MODE_PRIVATE)
                         sharedPref.edit().remove("plot_size").remove("selectedUnit").apply()
-                        navController.navigate("addFarm/${siteId}")
+                        navController.navigate("addFarm/${siteId}/${Uri.encode(Gson().toJson(farmData))}")
                     },
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.onSurface,
