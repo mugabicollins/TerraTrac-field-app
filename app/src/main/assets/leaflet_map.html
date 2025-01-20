@@ -32,34 +32,17 @@
           right: 0;
           z-index: 1;
         }
-        /* .controls {
-                position: absolute;
-                bottom: 10px;
-                left: 10px;
-                z-index: 1000;
-                background-color: rgba(255, 255, 255, 0.9);
-                padding: 10px;
-                border-radius: 5px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                width: 100%;
-              } */
-
         .controls {
-          position: fixed; /* Ensure it stays fixed relative to the viewport */
-          bottom: 0; /* Stick to the bottom of the screen */
-          left: 0; /* Align to the left edge */
+          position: fixed;
+          bottom: 0;
+          left: 0;
           z-index: 1000;
-          background-color: rgba(
-            255,
-            255,
-            255,
-            0.9
-          ); /* Semi-transparent background */
+          background-color: rgba(255, 255, 255, 0.9);
           padding: 10px;
-          border-radius: 0; /* Remove any rounding for full-width appearance */
-          box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Optional: Shadow at the top edge */
-          width: 100vw; /* Full viewport width */
-          height: auto; /* Ensure it adjusts based on content */
+          border-radius: 0;
+          box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+          width: 100vw;
+          height: auto;
         }
 
         .map-types {
@@ -73,44 +56,36 @@
           border-radius: 5px;
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        /* .info-panel {
-                position: absolute;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 1000;
-                background-color: rgba(255, 255, 255, 0.9);
-                padding: 10px;
-                border-radius: 5px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                text-align: center;
-                min-width: 200px;
-              } */
-
         .info-panel {
-          position: fixed; /* Use fixed to ensure it stays centered even on scroll */
-          top: 20px; /* Distance from the top */
-          left: 50%; /* Center horizontally */
-          transform: translateX(-50%); /* Adjust for centering */
-          z-index: 1000; /* Ensure it appears above other elements */
-          background-color: rgba(
-            255,
-            255,
-            255,
-            0.9
-          ); /* Semi-transparent background */
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1000;
+          background-color: rgba(255, 255, 255, 0.9);
           padding: 10px;
           border-radius: 5px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add subtle shadow for better visibility */
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
           text-align: center;
           min-width: 200px;
-          max-width: 90%; /* Ensure it doesn't exceed the viewport width */
-          box-sizing: border-box; /* Include padding in width calculation */
+          max-width: 90%;
+          box-sizing: border-box;
         }
 
         /* Add spacing to ensure it doesn't overlap with other elements */
         .info-panel + * {
-          margin-top: 10px; /* Add a gap between the info panel and any elements directly below it */
+          margin-top: 10px;
+        }
+
+        #accuracy {
+          font-size: 14px;
+          color: #333;
+          background-color: #f8f9fa;
+          padding: 8px 12px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          display: inline-block;
+          transition: opacity 0.5s ease-in-out;
         }
 
         button {
@@ -163,9 +138,9 @@
           z-index: 1;
           border-radius: 4px;
           flex-direction: column;
-          padding: 0; /* Remove padding from dropdown container */
-          box-sizing: border-box; /* Ensure padding and border are included in size */
-          width: 150px; /* Set a specific width for consistency */
+          padding: 0;
+          box-sizing: border-box;
+          width: 150px;
         }
 
         .dropdown-content button {
@@ -177,9 +152,9 @@
           text-align: left;
           display: flex;
           align-items: center;
-          width: 100%; /* Ensure button width matches dropdown container */
+          width: 100%;
           cursor: pointer;
-          box-sizing: border-box; /* Include padding/border in width */
+          box-sizing: border-box;
         }
 
         .dropdown-toggle {
@@ -242,6 +217,8 @@
           background: rgba(0, 0, 0, 0.5);
           z-index: 999;
         }
+
+
     </style>
 </head>
 <body>
@@ -256,10 +233,10 @@
           padding: 10px;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          flex: 1; /* Allow the button to grow and fill available space */
-          max-width: 200px; /* Optional: Limit button width */
-          color: #ffffff; /* Ensure text/icon is visible */
-          font-size: 18px; /* Increase icon size */
+          flex: 1;
+          max-width: 200px;
+          color: #ffffff;
+          font-size: 18px;
         "
     >
         <i class="fas fa-play"></i>
@@ -274,10 +251,10 @@
           padding: 10px;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          flex: 1; /* Allow the button to grow and fill available space */
-          max-width: 200px; /* Optional: Limit button width */
-          color: #ffffff; /* Ensure text/icon is visible */
-          font-size: 18px; /* Increase icon size */
+          flex: 1;
+          max-width: 200px;
+          color: #ffffff;
+          font-size: 18px;
         "
     >
         <i class="fas fa-save"></i>
@@ -292,10 +269,10 @@
           padding: 10px;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          flex: 1; /* Allow the button to grow and fill available space */
-          max-width: 200px; /* Optional: Limit button width */
-          color: #ffffff; /* Ensure text/icon is visible */
-          font-size: 18px; /* Increase icon size */
+          flex: 1;
+          max-width: 200px;
+          color: #ffffff;
+          font-size: 18px;
         "
     >
         <i class="fa fa-plus" aria-hidden="true"></i>
@@ -310,10 +287,10 @@
           padding: 10px;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          flex: 1; /* Allow the button to grow and fill available space */
-          max-width: 200px; /* Optional: Limit button width */
-          color: #ffffff; /* Ensure text/icon is visible */
-          font-size: 18px; /* Increase icon size */
+          flex: 1;
+          max-width: 200px;
+          color: #ffffff;
+          font-size: 18px;
         "
     >
         <i class="fas fa-undo"></i>
@@ -328,10 +305,10 @@
           padding: 10px;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          flex: 1; /* Allow the button to grow and fill available space */
-          max-width: 200px; /* Optional: Limit button width */
-          color: #ffffff; /* Ensure text/icon is visible */
-          font-size: 18px; /* Increase icon size */
+          flex: 1;
+          max-width: 200px;
+          color: #ffffff;
+          font-size: 18px;
           margin-right: 20px;
         "
     >
@@ -361,6 +338,9 @@
     <div id="accuracy" class="accuracy">Accuracy: Calculating...</div>
     <div id="warning" class="warning"></div>
 </div>
+
+<!-- <div id="accuracy" style="font-size: 14px; color: #555; margin-top: 10px;"></div> -->
+
 
 <div
         id="customAlert"
@@ -511,7 +491,7 @@
       // Get current location with better centering
       if ("geolocation" in navigator) {
         // Add loading indicator
-        map.spin = true; // If you're using leaflet.spin plugin
+        map.spin = true;
 
         navigator.geolocation.getCurrentPosition(
           function (position) {
@@ -525,7 +505,7 @@
               duration: 1, // 1 second animation
             });
 
-            // Remove loading indicator if using
+            // Remove loading indicator
             map.spin = false;
 
             // Reverse geocode to get country name
@@ -546,12 +526,12 @@
                   .addTo(map)
                   .bindPopup(
                     `
-        <b>Your Location:</b><br>
-        ${city ? city + ", " : ""}${country}<br>
-        <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
-         <small>Accuracy: ${accuracy.toFixed(1)} meters </small>
+      <b>Your Location:</b><br>
+      ${city ? city + ", " : ""}${country}<br>
+      <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
+       <small>Accuracy: ${accuracy.toFixed(1)} meters </small>
 
-      `
+    `
                   )
                   .openPopup();
               })
@@ -740,7 +720,7 @@
 
             // Set Start/Stop button to Stop state
             startButton.innerHTML = '<i class="fas fa-stop"></i>';
-            startButton.style.backgroundColor = "#ff4444";
+            startButton.style.backgroundColor = "#000000";
           } else {
             // Hide Start/Stop button and show Save button
             startButton.style.display = "none";
@@ -778,11 +758,21 @@
         feedbackDiv.textContent = `Point added at current location (Accuracy: ${currentAccuracy.toFixed(
           1
         )}m)`;
+
+        // Optional: Add a fade-in animation
+        feedbackDiv.style.transition = "opacity 0.5s";
+        feedbackDiv.style.opacity = 1;
+
         setTimeout(() => {
           feedbackDiv.textContent = `Accuracy: ${currentAccuracy.toFixed(
             1
           )} meters`;
         }, 2000);
+
+        // Optional: Add a fade-out effect after 5 seconds
+        setTimeout(() => {
+          feedbackDiv.style.opacity = 0;
+        }, 5000);
       });
 
       document.getElementById("deletePoint").addEventListener("click", () => {
@@ -824,7 +814,7 @@
 
         // Create plot data with only the map-captured fields filled
         const plotData = {
-          siteId: "1",
+          siteId: "2",
           remoteId: "e262ae0e-dcf9-41a4-8418-49971478e6e2",
           farmerPhoto: "photo",
           farmerName: "test farmer",
@@ -836,18 +826,15 @@
           latitude: centroid.lat,
           longitude: centroid.lng,
           coordinates: points.map((point) => [point.lat, point.lng]),
-          accuracyArray: [accuracyArray],
+          accuracyArray: accuracyArray,
           createdAt: "2025-01-17T00:00:00Z",
-          updatedAt: "2025-01-17T01:00:00Z"
+          updatedAt: "2025-01-17T01:00:00Z",
         };
 
         console.log("Incomplete Plot Data to send to Android:", plotData);
 
         // Send incomplete data to Android for editing
-        if (
-          typeof Android !== "undefined" &&
-          Android.receivePlotData
-        ) {
+        if (typeof Android !== "undefined" && Android.receivePlotData) {
           Android.receivePlotData(JSON.stringify(plotData));
         } else {
           console.error("Android interface not available");
@@ -880,6 +867,38 @@
         );
       });
 
+       function getPlotData() {
+        // Collect the plot data
+          if (points.length < 3) {
+          alert("Please capture at least 3 points to form a valid polygon");
+          return;
+        }
+
+        const area = calculateArea(points);
+        const centroid = calculateCentroid(points);
+
+        // Create plot data with only the map-captured fields filled
+        const plotData = {
+          siteId: "2",
+          remoteId: "e262ae0e-dcf9-41a4-8418-49971478e6e2",
+          farmerPhoto: "photo",
+          farmerName: "test farmer",
+          memberId: "300",
+          village: "test village",
+          district: "test district",
+          purchases: "2.50",
+          size: area,
+          latitude: centroid.lat,
+          longitude: centroid.lng,
+          coordinates: points.map((point) => [point.lat, point.lng]),
+          accuracyArray: accuracyArray,
+          createdAt: "2025-01-17T00:00:00Z",
+          updatedAt: "2025-01-17T01:00:00Z",
+        };
+
+        console.log("Get Plot Data to send to Android:", plotData);
+        return JSON.stringify(plotData);
+    }
     });
 </script>
 </body>

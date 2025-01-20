@@ -104,7 +104,7 @@ fun FarmForm(
     var district by rememberSaveable { mutableStateOf("") }
     var latitude by rememberSaveable { mutableStateOf("") }
     var longitude by rememberSaveable { mutableStateOf("") }
-    var accuracyArray by rememberSaveable { mutableStateOf(listOf<Float>()) }
+    //var accuracyArray by rememberSaveable { mutableStateOf(listOf<Float>()) }
     val items = listOf("Ha", "Acres", "Sqm", "Timad", "Fichesa", "Manzana", "Tarea")
     var expanded by remember { mutableStateOf(false) }
     val sharedPref = context.getSharedPreferences("FarmCollector", Context.MODE_PRIVATE)
@@ -112,7 +112,8 @@ fun FarmForm(
         factory = FarmViewModelFactory(context.applicationContext as Application)
     )
     val mapViewModel: MapViewModel = viewModel()
-    var size by rememberSaveable { mutableStateOf(readStoredValue(sharedPref)) }
+//    var size by rememberSaveable { mutableStateOf(readStoredValue(sharedPref)) }
+    var size by remember { mutableStateOf("") }
     var selectedUnit by rememberSaveable {
         mutableStateOf(
             sharedPref.getString(
@@ -140,15 +141,20 @@ fun FarmForm(
             locationState = state
         }
     }
+    // Load the plot size from SharedPreferences
+    LaunchedEffect(Unit) {
+        val sharedPref = context.getSharedPreferences("plot_size", Context.MODE_PRIVATE)
+        size = sharedPref.getString("plot_size", "") ?: ""
+    }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                size = sharedPref.getString("plot_size", "") ?: ""
+//                size = sharedPref.getString("plot_size", "") ?: ""
                 selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
                 with(sharedPref.edit()) {
-                    remove("plot_size")
+//                    remove("plot_size")
                     remove("selectedUnit")
                     apply()
                 }
@@ -201,8 +207,8 @@ fun FarmForm(
         val coordinatesSize =
             coordinatesData?.size ?: 0
         val finalAccuracyArray = when {
-            accuracyArray.isEmpty() -> emptyList()
-            coordinatesSize == 0 -> listOf(accuracyArray[0])
+            accuracyArrayData?.isEmpty() == true -> emptyList()
+            coordinatesSize == 0 -> listOf(accuracyArrayData?.get(0))
             else -> {
                 val result = accuracyArrayData!!.toMutableList()
                 if (coordinatesSize > 1) {
@@ -706,7 +712,8 @@ fun FarmForm(
                 onLocationResult = { newLatitude, newLongitude, accuracy ->
                     latitude = newLatitude
                     longitude = newLongitude
-                    accuracyArray = accuracyArray + accuracy.toFloat()
+                    //accuracyArray = accuracyArray + accuracy.toFloat()
+                    accuracyArrayData
 
                 }
             )

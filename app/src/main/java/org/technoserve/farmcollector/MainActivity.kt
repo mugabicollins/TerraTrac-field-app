@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -38,12 +39,20 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.delay
+import org.json.JSONObject
 import org.technoserve.farmcollector.viewmodels.AppUpdateViewModel
 //import org.technoserve.farmcollector.viewmodels.ExitConfirmationDialog
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 import org.technoserve.farmcollector.viewmodels.UpdateAlert
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
+import org.technoserve.farmcollector.database.mappers.CoordinatesDeserializer
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import org.technoserve.farmcollector.ui.screens.farms.AddFarm
@@ -59,7 +68,11 @@ import org.technoserve.farmcollector.ui.screens.map.WebViewPage
 import org.technoserve.farmcollector.ui.theme.FarmCollectorTheme
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
+import java.io.Serializable
+import java.lang.reflect.Type
+import java.time.Instant
 import java.util.Locale
+import java.util.UUID
 
 
 /**
@@ -108,7 +121,7 @@ class MainActivity : ComponentActivity() {
 
     private var webView: WebView? = null // Shared WebView instance
 
-    lateinit var navController: NavHostController
+   // lateinit var navController: NavHostController
 
 
 
@@ -274,11 +287,15 @@ class MainActivity : ComponentActivity() {
                             // Show exit toast and reset the state after a delay
                             if (showExitToast) {
                                 // Show the toast
-                                Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Press back again to exit",
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
                                 // Reset `showExitToast` and `canExitApp` after 2 seconds
                                 LaunchedEffect(Unit) {
-                                    kotlinx.coroutines.delay(2000) // 2 seconds delay
+                                    delay(2000) // 2 seconds delay
                                     showExitToast = false
                                     canExitApp = false
                                 }
@@ -305,8 +322,7 @@ class MainActivity : ComponentActivity() {
                                 ScreenWithSidebar(navController) {
                                     FarmList(
                                         navController = navController,
-                                        siteId = siteId.toLong(),
-                                        webView = webView,
+                                        siteId = siteId.toLong()
                                     )
                                 }
                             }
@@ -321,19 +337,124 @@ class MainActivity : ComponentActivity() {
 //                            }
 //                        }
 
+
+//                        composable(
+//                            route = "addFarm/{siteId}",
+//                            arguments = listOf(
+//                                navArgument("siteId") { type = NavType.LongType }
+//                            )
+//                        ) { backStackEntry ->
+//                            val siteId = backStackEntry.arguments?.getLong("siteId") ?: 0L
+//                            LaunchedEffect(Unit) {
+//                                canExitApp = false
+//                            }
+//                            AddFarm(navController = navController, siteId = siteId, plotData = null)
+//                        }
+
+//                        composable(
+//                            route = "addFarm/{siteId}/{plotDataJson}",
+//                            arguments = listOf(
+//                                navArgument("siteId") { type = NavType.LongType },
+//                                navArgument("plotDataJson") { type = NavType.StringType }
+//                            )
+//                        ) { backStackEntry ->
+//                            val siteId = backStackEntry.arguments?.getLong("siteId") ?: 0L
+//                            val plotDataJson = backStackEntry.arguments?.getString("plotDataJson") ?: ""
+//
+//                            val plotData = try {
+//                                val jsonObject = JSONObject(plotDataJson)
+//
+//                                // Extract and parse coordinates using the provided function
+//                                val coordinatesArray = jsonObject.getJSONArray("coordinates").toString()
+//                                val parsedCoordinates = parseCoordinates(coordinatesArray)
+//
+//                                // Map the rest of the fields manually
+//                                Farm(
+//                                    siteId = jsonObject.getLong("siteId"),
+//                                    remoteId = UUID.fromString(jsonObject.getString("remoteId")),
+//                                    farmerPhoto = jsonObject.getString("farmerPhoto"),
+//                                    farmerName = jsonObject.getString("farmerName"),
+//                                    memberId = jsonObject.getString("memberId"),
+//                                    village = jsonObject.getString("village"),
+//                                    district = jsonObject.getString("district"),
+//                                    purchases = jsonObject.optString("purchases")?.toFloatOrNull(),
+//                                    size = jsonObject.getDouble("size").toFloat(),
+//                                    latitude = jsonObject.getString("latitude"),
+//                                    longitude = jsonObject.getString("longitude"),
+//                                    coordinates = parsedCoordinates,
+//                                    accuracyArray = jsonObject.optJSONArray("accuracyArray")?.let { array ->
+//                                        List(array.length()) { i -> array.getDouble(i).toFloat() }
+//                                    },
+//                                    createdAt = Instant.parse(jsonObject.getString("createdAt")).toEpochMilli(),
+//                                    updatedAt = Instant.parse(jsonObject.getString("updatedAt")).toEpochMilli(),
+//                                    synced = false,
+//                                    scheduledForSync = false,
+//                                    needsUpdate = false
+//                                )
+//                            } catch (e: Exception) {
+//                                Log.e("Navigation", "Error parsing plot data: ${e.message}")
+//                                null
+//                            }
+//
+//                            LaunchedEffect(Unit) {
+//                                canExitApp = false
+//                            }
+//
+//                            if (plotData != null) {
+//                                AddFarm(
+//                                    navController = navController,
+//                                    siteId = siteId,
+//                                    plotData = plotData
+//                                )
+//                            }
+//                            else{
+//                                AddFarm(
+//                                    navController = navController,
+//                                    siteId = siteId,
+//                                    plotData = null
+//                                )
+//                            }
+//                        }
+
                         composable(
-                            route = "addFarm/{siteId}/{plotDataJson}",
+                            route = "addFarm/{siteId}?plotDataJson={plotDataJson}",
                             arguments = listOf(
                                 navArgument("siteId") { type = NavType.LongType },
-                                navArgument("plotDataJson") { type = NavType.StringType }
+                                navArgument("plotDataJson") {
+                                    type =
+                                        NavType.StringType
+                                    nullable = true
+                                }
                             )
                         ) { backStackEntry ->
                             val siteId = backStackEntry.arguments?.getLong("siteId") ?: 0L
-                            val plotDataJson = backStackEntry.arguments?.getString("plotDataJson") ?: ""
-                            val plotData = Gson().fromJson(plotDataJson, Farm::class.java)
+                            val plotDataJson = backStackEntry.arguments?.getString("plotDataJson") ?:""
+                            Log.d("Navigation", "Received siteId: $siteId, plotDataJson: $plotDataJson")
+                            Log.d("Navigation", "Received siteId: $siteId, plotDataJson: $plotDataJson")
 
-                            AddFarm(navController = navController, siteId = siteId, webView = webView )
+                            val plotData: Farm? = if (plotDataJson.isNotEmpty()) {
+                                try {
+                                    val gson = Gson()
+                                    gson.fromJson(plotDataJson, Farm::class.java)
+                                } catch (e: Exception) {
+                                    Log.e("Navigation", "Error deserializing plot data: ${e.message}")
+                                    null
+                                }
+                            } else null
+
+                            AddFarm(navController = navController, siteId = siteId, plotData = plotData)
                         }
+
+
+
+
+
+
+
+
+
+
+
                         composable(Routes.ADD_SITE) {
                             LaunchedEffect(Unit) {
                                 canExitApp = false
@@ -379,7 +500,9 @@ class MainActivity : ComponentActivity() {
                             WebViewPage(loadURL,
                             onWebViewCreated = { createdWebView ->
                                 webView = createdWebView // Save the WebView instance
-                            }) //OFFLINE
+                            },
+                                navController
+                                ) //OFFLINE
                         }
 
 
@@ -411,6 +534,53 @@ class MainActivity : ComponentActivity() {
 
         // Update the locale using the LanguageViewModel
         languageViewModel.selectLanguage(preferredLanguage, this)
+    }
+
+    fun parseCoordinates(coordinatesString: String): List<Pair<Double, Double>> {
+        val result = mutableListOf<Pair<Double, Double>>()
+        val cleanedString = coordinatesString.trim().removeSurrounding("\"", "").replace(" ", "")
+
+        if (cleanedString.isNotEmpty()) {
+            // Check if the coordinates are in polygon or point format
+            val isPolygon = cleanedString.startsWith("[[") && cleanedString.endsWith("]]")
+            val isPoint = cleanedString.startsWith("[") && cleanedString.endsWith("]") && !isPolygon
+
+            if (isPolygon) {
+                // Handle Polygon Format
+                val pairs =
+                    cleanedString
+                        .removePrefix("[[")
+                        .removeSuffix("]]")
+                        .split("],[")
+                        .map { it.split(",") }
+                for (pair in pairs) {
+                    if (pair.size == 2) {
+                        try {
+                            val lat = pair[1].toDouble()
+                            val lon = pair[0].toDouble()
+                            result.add(Pair(lat, lon))
+                        } catch (e: NumberFormatException) {
+                            println("Error parsing polygon coordinate pair: ${pair.joinToString(",")}")
+                        }
+                    }
+                }
+            } else if (isPoint) {
+                // Handle Point Format
+                val coords = cleanedString.removePrefix("[").removeSuffix("]").split(", ")
+                if (coords.size == 2) {
+                    try {
+                        val lat = coords[1].toDouble()
+                        val lon = coords[0].toDouble()
+                        result.add(Pair(lat, lon))
+                    } catch (e: NumberFormatException) {
+                        println("Error parsing point coordinate pair: ${coords.joinToString(",")}")
+                    }
+                }
+            } else {
+                println("Unrecognized coordinates format: $coordinatesString")
+            }
+        }
+        return result
     }
 
     override fun onDestroy() {

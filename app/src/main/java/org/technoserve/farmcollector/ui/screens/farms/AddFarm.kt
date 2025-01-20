@@ -54,47 +54,97 @@ import java.util.UUID
  * @param siteId the id of the collection site to which the farm belongs
  * @param coordinatesData the initial coordinates of the farm's location
  */
+//@Composable
+//fun AddFarm(navController: NavController, siteId: Long, webView: WebView?) {
+////    var coordinatesData: List<Pair<Double, Double>>? = null
+////    var accuracyArrayData: List<Float?>? = null
+////    if (navController.currentBackStackEntry!!.savedStateHandle.contains("coordinates")) {
+////        val parcelableCoordinates = navController.currentBackStackEntry!!
+////            .savedStateHandle
+////            .get<List<ParcelablePair>>("coordinates")
+////        coordinatesData = parcelableCoordinates?.map { Pair(it.first, it.second) }
+////        accuracyArrayData =
+////            navController.currentBackStackEntry!!.savedStateHandle.get<List<Float?>>("accuracyArray")
+////    }
+//
+//    var farmData by remember { mutableStateOf<Farm?>(null) } // For data from the map
+//
+//
+//    // Function to fetch plot data from WebView
+//    fun fetchPlotDataFromMap() {
+//        webView?.evaluateJavascript(
+//            """
+//            if (typeof Android.getPlotData === 'function') {
+//                Android.getPlotData();
+//            }
+//            """.trimIndent()
+//        ) { result ->
+//            // Parse the result from the map
+//            if (result != null && result != "null") {
+//                val gson = Gson()
+//                val data = gson.fromJson(result, Farm::class.java)
+//                farmData = data
+//                Log.d("PlotDetailsForm", "Plot Data loaded: $data")
+//            } else {
+//                Log.e("PlotDetailsForm", "Failed to fetch plot data from map")
+//            }
+//        }
+//    }
+//
+//    // Fetch data when the form loads
+//    LaunchedEffect(Unit) {
+//        fetchPlotDataFromMap()
+//    }
+//
+//
+//    var coordinatesData: List<Pair<Double, Double>>? = null
+//    var accuracyArrayData: List<Float?>? = null
+//
+//    coordinatesData = farmData?.coordinates as List<Pair<Double, Double>>?
+//    accuracyArrayData = farmData?.accuracyArray
+//
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .fillMaxWidth()
+//    ) {
+//        FarmListHeader(
+//            title = stringResource(id = R.string.add_farm),
+//            onSearchQueryChanged = {},
+//            onBackClicked = { navController.popBackStack() },
+//            showSearch = false,
+//            showRestore = false,
+//            onRestoreClicked = {}
+//        )
+//        Spacer(modifier = Modifier.height(16.dp))
+//        FarmForm(navController, siteId, coordinatesData, accuracyArrayData)
+//
+//    }
+//}
+
 @Composable
-fun AddFarm(navController: NavController, siteId: Long, webView: WebView?) {
-    var coordinatesData: List<Pair<Double, Double>>? = null
-    var accuracyArrayData: List<Float?>? = null
-    if (navController.currentBackStackEntry!!.savedStateHandle.contains("coordinates")) {
-        val parcelableCoordinates = navController.currentBackStackEntry!!
-            .savedStateHandle
-            .get<List<ParcelablePair>>("coordinates")
-        coordinatesData = parcelableCoordinates?.map { Pair(it.first, it.second) }
-        accuracyArrayData =
-            navController.currentBackStackEntry!!.savedStateHandle.get<List<Float?>>("accuracyArray")
-    }
+fun AddFarm(
+    navController: NavController,
+    siteId: Long,
+    plotData: Farm?
+) {
 
-    var farmData by remember { mutableStateOf<Farm?>(null) } // For data from the map
+    Log.d("Farm Data on add farm ", "Farm Data on add farm: $plotData")
+    // State to hold farm data
+    var farmData by remember { mutableStateOf(plotData) }
 
-    // Function to fetch plot data from WebView
-    fun fetchPlotDataFromMap() {
-        webView?.evaluateJavascript(
-            """
-            if (typeof Android.getPlotData === 'function') {
-                Android.getPlotData();
-            }
-            """.trimIndent()
-        ) { result ->
-            // Parse the result from the map
-            if (result != null && result != "null") {
-                val gson = Gson()
-                val data = gson.fromJson(result, Farm::class.java)
-                farmData = data
-                Log.d("PlotDetailsForm", "Plot Data loaded: $data")
-            } else {
-                Log.e("PlotDetailsForm", "Failed to fetch plot data from map")
-            }
-        }
-    }
+    // Extract coordinates and accuracy array from farmData
+    val coordinatesData = farmData?.coordinates as List<Pair<Double, Double>>?
+    val accuracyArrayData = farmData?.accuracyArray
 
-    // Fetch data when the form loads
-    LaunchedEffect(Unit) {
-        fetchPlotDataFromMap()
-    }
+    // Log the coordinates and accuracy array
+    Log.d("Coordinates Data", "Coordinates Data: $coordinatesData")
+    Log.d("Accuracy Array Data", "Accuracy Array Data: $accuracyArrayData")
 
+    // save the plot size to shared preferences
+    val sharedPref = LocalContext.current.getSharedPreferences("plot_size", Context.MODE_PRIVATE)
+    sharedPref.edit().putString("plot_size", farmData?.size.toString()).apply()
 
     Column(
         modifier = Modifier
@@ -113,6 +163,7 @@ fun AddFarm(navController: NavController, siteId: Long, webView: WebView?) {
         FarmForm(navController, siteId, coordinatesData, accuracyArrayData)
     }
 }
+
 
 // Helper function to truncate a string representation of a number to a specific number of decimal places
 fun truncateToDecimalPlaces(value: String, decimalPlaces: Int): String {

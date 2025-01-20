@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import org.technoserve.farmcollector.database.helpers.map.JavaScriptInterface
 import java.io.File
 import java.net.URLConnection
@@ -40,7 +41,7 @@ import java.net.URLConnection
 @RequiresApi(Build.VERSION_CODES.M)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit) {
+fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: NavController) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
     var webView: WebView? = null
@@ -89,7 +90,8 @@ fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit) {
                 // Attach JavaScript interface with form data lambdas
                 addJavascriptInterface(
                     JavaScriptInterface(
-                        context = context
+                        context = context,
+                        navController = navController
                     ),
                     "Android"
                 )

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -67,6 +68,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.technoserve.farmcollector.R
@@ -92,6 +95,7 @@ import org.technoserve.farmcollector.utils.createFile
 import org.technoserve.farmcollector.utils.createFileForSharing
 import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 import java.io.File
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -127,7 +131,6 @@ enum class Action {
 fun FarmList(
     navController: NavController,
     siteId: Long,
-    webView: WebView?
 ) {
     siteID = siteId
     val context = LocalContext.current
@@ -173,6 +176,8 @@ fun FarmList(
     val inputTextColor = if (isDarkTheme) Color.White else Color.Black
     val inputBorder = if (isDarkTheme) Color.LightGray else Color.DarkGray
 
+    // Class-level variable to store the latest plot data
+    var latestPlotData: String? = null
 
     LaunchedEffect(Unit) {
         deviceId = DeviceIdUtil.getDeviceId(context)
@@ -314,6 +319,21 @@ fun FarmList(
             showDeleteDialog.value = false
         }
     }
+
+
+
+    @JavascriptInterface
+    fun receivePlotData(plotDataJson: String) {
+        Log.d("JavaScriptInterface", "Received Plot Data: $plotDataJson")
+        // Store the received plot data
+        latestPlotData = plotDataJson
+    }
+
+    // Function to clear plot data
+    fun clearPlotData() {
+        latestPlotData = null
+    }
+
 
     // Function to show data or no data message
     @Composable
@@ -499,20 +519,6 @@ fun FarmList(
                 showShare = listItems.isNotEmpty(),
                 showSearch = listItems.isNotEmpty(),
                 onRestoreClicked = {
-//                    farmViewModel.restoreData(
-//                        deviceId = deviceId,
-//                        phoneNumber = "",
-//                        email = "",
-//                        farmViewModel = farmViewModel
-//                    ) { success ->
-//                        if (success) {
-//                            finalMessage = context.getString(R.string.data_restored_successfully)
-//                            showFinalMessage = true
-//                        } else {
-//                            showFinalMessage = true
-//                            showRestorePrompt = true
-//                        }
-//                    }
                     showRestoreAlert = true
                 }
 
@@ -523,37 +529,21 @@ fun FarmList(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                var farmData by remember { mutableStateOf<Farm?>(null) }
-                // Function to fetch plot data from WebView
-                fun fetchPlotDataFromMap() {
-                    webView?.evaluateJavascript(
-                        """
-            if (typeof Android.getPlotData === 'function') {
-                Android.getPlotData();
-            }
-            """.trimIndent()
-                    ) { result ->
-                        // Parse the result from the map
-                        if (result != null && result != "null") {
-                            val gson = Gson()
-                            val data = gson.fromJson(result, Farm::class.java)
-                            farmData = data
-                            Log.d("PlotDetailsForm", "Plot Data loaded: $data")
-                        } else {
-                            Log.e("PlotDetailsForm", "Failed to fetch plot data from map")
-                        }
-                    }
-                }
-                // Fetch data when the form loads
-                LaunchedEffect(Unit) {
-                    fetchPlotDataFromMap()
-                }
                 FloatingActionButton(
                     onClick = {
                         val sharedPref =
                             context.getSharedPreferences("FarmCollector", Context.MODE_PRIVATE)
                         sharedPref.edit().remove("plot_size").remove("selectedUnit").apply()
-                        navController.navigate("addFarm/${siteId}/${Uri.encode(Gson().toJson(farmData))}")
+                        if (latestPlotData != null) {
+                            val encodedPlotData = Uri.encode(latestPlotData)
+                           // navController.navigate("addFarm/${siteId}/${encodedPlotData}")
+                            navController.navigate("addFarm/$siteId/${URLEncoder.encode(latestPlotData, "UTF-8")}")
+
+                            // Clear the plot data after navigation if needed
+                            clearPlotData()
+                        } else {
+                            navController.navigate("addFarm/${siteId}")
+                        }
                     },
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.onSurface,
