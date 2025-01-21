@@ -37,6 +37,7 @@ class HomeController extends GetxController {
   LatLng? rectangleStart;
   LatLng? rectangleEnd;
   RxBool isDrawingLine = false.obs;
+  RxBool enableSideMenu = false.obs;
   late AnimationController animationController;
   late Animation<double> animation;
   var cameraPosition = Rxn<LatLng>(const LatLng(51.5, -0.09));
@@ -143,7 +144,6 @@ class HomeController extends GetxController {
 
     List<LatLng> finalShapePoints = List.from(shapePoints)..add(shapePoints[0]);
 
-    // String geoId = "GeoID_${geoIdCounter++}";
 
     drawnPolygons.add(
       Polygon(
@@ -173,36 +173,9 @@ class HomeController extends GetxController {
     isDrawingLine.value = false;
     update();
   }
-
-  void showShapeDetails(String geoId, List<LatLng> coordinates, context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Shape Details"),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Geo ID: $geoId"),
-              const SizedBox(height: 8),
-              const Text("Coordinates:"),
-              ...coordinates.map(
-                (point) => Text(
-                  "Lat: ${point.latitude}, Lng: ${point.longitude}",
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Close"),
-          ),
-        ],
-      ),
-    );
+  void startDrawing() {
+    isDrawPolygon.value = true;
+    shapePoints.clear();
   }
 
   void showError(String message, context) {
@@ -293,6 +266,19 @@ class HomeController extends GetxController {
     mapController.move(center, zoom);
   }
 
+  void onRadiusChanged(double value) {
+    radius.value = value;
+    if (tapLocation != null) {
+      circleMarkers.value = [
+        CircleMarker(
+          point: tapLocation!,
+          color: Colors.blue.withOpacity(0.5),
+          radius: radius.value,
+        ),
+      ];
+    }
+    update();
+  }
   // Other properties and methods...
   void addPolygon(List<LatLng> points, {Color borderColor = Colors.yellow}) {
     // Add the polygon to the list
@@ -318,7 +304,19 @@ class HomeController extends GetxController {
   void clearPolygons() {
     drawnPolygons.clear();
   }
+  void incrementValue() {
+    int currentValue = int.tryParse(thresholdController.text) ?? 0;
+    thresholdController.text = (currentValue + 1).toString();
+  }
 
+  void decrementValue() {
+    int currentValue = int.tryParse(thresholdController.text) ?? 0;
+    thresholdController.text = (currentValue - 1).toString();
+  }
+  void markPostionLatLng(LatLng point) {
+    if (!isMarkPostion.value) return;
+    markPosition.add(point);
+  }
   RxBool searchEnable=false.obs;
 
 
@@ -366,7 +364,7 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<dynamic> saveFieldByGeoId(String geoId) async {
+  Future<dynamic> saveFieldByGeoIdTerraPipe(String geoId) async {
     isFieldSaveLoading.value = true;
     String? piplineToken = await SharedPreference.instance.getPiplineToken();
 
@@ -374,9 +372,11 @@ class HomeController extends GetxController {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $piplineToken'
     };
+
     var data = json.encode({
       "geo_id": geoId,
     });
+
     try {
       var response = await dio.request(
         'https://be.terrapipe.io/geo-id',
@@ -387,6 +387,7 @@ class HomeController extends GetxController {
         data: data,
       );
 
+      print("here is the field sSubmit To TerraPipe  ::::: >>>>> ${response.data}");
       if (response.statusCode == 200) {
         Get.back();
         showSnackBar(
@@ -416,6 +417,119 @@ class HomeController extends GetxController {
         message: e.toString(),
       );
       return {'error': e.toString()};
+    }
+  }
+
+  Future savePolygonTeraTrac() async {
+    isPolygonLoading.value = true;
+    const baseUrl = 'https://api-ar.agstack.org';
+    final url = Uri.parse('$baseUrl/register-field-boundary');
+    String? apiKey = await SharedPreference.instance.getSecretKeyLocalDb('api_key');
+    String? clientSecret = await SharedPreference.instance.getSecretKeyLocalDb('client_secret');
+
+    final headers = {
+      'API-KEYS-AUTHENTICATION': '1',
+      'API-KEY': apiKey ?? '',
+      'CLIENT-SECRET': clientSecret ?? '',
+      'AUTOMATED-FIELD': '0',
+    };
+
+    print("here is the save response ${drawnPolygons}");
+    String wkt = convertPolygonToWKT(drawnPolygons);
+    print("hehehehehe${wkt}");
+    String? s2Index = s2IndexController.text.isNotEmpty ? s2IndexController.text : null;
+    String? threshold = thresholdController.text.isNotEmpty ? thresholdController.text : null;
+
+    final body = {
+      'wkt': wkt,
+      if (s2Index != null) 's2_index': s2Index,
+      if (threshold != null) 'threshold': int.tryParse(threshold) ?? threshold,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(body),
+      );
+      print('polygonReponseBody: ${response.body}');
+      if (response.statusCode == 200) {
+        print('polygonReponseBody: ${response.body}');
+        isPolygonLoading.value = false;
+        // Extract Geo Id from the response
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final geoId = responseData['Geo Id'] ?? 'Unknown Geo Id';
+        tempGeoId.value = geoId;
+        await saveFieldByGeoIdTerraPipe(geoId);
+        // Show success dialog with Geo Id and copy button
+        Get.dialog(
+          AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text(
+              'Success',
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'You have successfully added the polygon!',
+                  style: TextStyle(color: Colors.black),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Geo Id: $geoId',
+                  style: const TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: geoId));
+                  Get.back();
+                  showSnackBar(
+                    color: Colors.green,
+                    title: "Copied",
+                    message: "Geo Id has been copied to clipboard!",
+                  );
+                },
+                child: const Text(
+                  'Copy',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                },
+                child: const Text(
+                  'OK',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        print('polygonReponseBody: ${response.body}');
+        var result=jsonDecode(response.body);
+        showSnackBar(
+          color: Colors.red,
+          title: "Exception",
+          message: result['message'],
+        );
+        isPolygonLoading.value = false;
+      }
+    } catch (e) {
+      isPolygonLoading.value = false;
+      print('Exception Occurred: $e');
     }
   }
 

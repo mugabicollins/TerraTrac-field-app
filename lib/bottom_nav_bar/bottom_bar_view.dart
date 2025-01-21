@@ -5,6 +5,7 @@ import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 import 'package:terrapipe/utilts/app_colors.dart';
 import '../local_db_helper/shared_preference.dart';
 import '../views/asset_registery/asset_registry_view.dart';
+import '../views/home_page/home_controller.dart';
 import '../views/home_page/home_screen.dart';
 import '../views/saved_fields/saved_field_controller.dart';
 import '../views/saved_fields/saved_field_view.dart';
@@ -23,6 +24,7 @@ class _BottomBarViewState extends State<BottomBarView> {
   var bottomSelectedIndex = 0;
   PageController bottomController = PageController(initialPage: 0);
   SavedFieldController savedFieldController = Get.put(SavedFieldController());
+  final HomeController homeController = Get.put(HomeController());
   var bottomIcons = [
     {'icon': 'assets/icons/bottombaricons/home.png', 'name': "Home"},
 
@@ -84,7 +86,6 @@ class _BottomBarViewState extends State<BottomBarView> {
       systemNavigationBarColor: AppColor.white,
     ));
     return PopScope(
-
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
         if (didPop) {
@@ -113,12 +114,20 @@ class _BottomBarViewState extends State<BottomBarView> {
             borderRadius: BorderRadius.circular(100),
             child: FloatingActionButton(
               onPressed: () async {
-                bottomController.jumpToPage(1);
-                bottomSelectedIndex = 1;
-                setState(() {});
+                if(homeController.enableSideMenu.value){
+                  homeController.enableSideMenu.value=false;
+                  homeController.update();
+                }else{
+                  homeController.enableSideMenu.value=true;
+                  homeController.update();
+                }
+
+                // bottomController.jumpToPage(1);
+                // bottomSelectedIndex = 1;
+                // setState(() {});
               },
               backgroundColor: AppColor.primaryColor,
-              child: const Icon(Icons.add_location_alt),
+              child: const Icon(Icons.add),
             ),
           ),
         ),

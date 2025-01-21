@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:terrapipe/utilities/app_text_style.dart';
 import 'package:terrapipe/utilts/app_colors.dart';
+import 'package:terrapipe/views/home_page/home_controller.dart';
 import 'package:terrapipe/widgets/custom_button.dart';
 import 'package:terrapipe/widgets/custom_text_field.dart';
 import '../../asset_registery/asset_registery_controller.dart';
 
 class PolygonBottomSheet extends StatelessWidget {
   PolygonBottomSheet({super.key});
-  final AssetRegistryController homeController = Get.find();
+  final HomeController homeController = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {

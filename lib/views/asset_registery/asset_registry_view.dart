@@ -145,7 +145,6 @@ class _AssetRegistryViewState extends State<AssetRegistryView> with SingleTicker
                             .reverse(); // Close the menu after selecting the bubble
                       },
                     ),
-
                     Bubble(
                       title: "Circle",
                       iconColor: AppColor.white,
@@ -188,7 +187,6 @@ class _AssetRegistryViewState extends State<AssetRegistryView> with SingleTicker
                         controller.animationController.reverse();
                       },
                     ),
-
                     /// delete
                     Bubble(
                       title: "Delete",
