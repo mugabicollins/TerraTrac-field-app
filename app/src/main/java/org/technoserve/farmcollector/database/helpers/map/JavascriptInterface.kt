@@ -34,162 +34,8 @@ class JavaScriptInterface(
     private val navController: NavController
 ) {
 
-//    @JavascriptInterface
-//    fun receivePlotData(plotDataJson: String) {
-//        try {
-//            Log.d("JavaScriptInterface", "Received Plot Data: $plotDataJson")
-//
-////            // Parse the JSON string into a Farm object
-////            val gson = GsonBuilder()
-////                .registerTypeAdapter(
-////                    object : TypeToken<Pair<Double?, Double?>>() {}.type,
-////                    PairDeserializer()
-////                )
-////                .create()
-////            val farmData = gson.fromJson(plotDataJson, Farm::class.java)
-//
-//            // Initialize farm data with default values
-//            val farmData = Farm(
-//                siteId = 0,
-//                remoteId = UUID.fromString("e262ae0e-dcf9-41a4-8418-49971478e6e2"),
-//                farmerPhoto = "",
-//                farmerName = "",
-//                memberId = "",
-//                village = "",
-//                district = "",
-//                purchases = 0.0f,
-//                size = 0.0f,
-//                latitude = "0.0",
-//                longitude = "0.0",
-//                coordinates = emptyList(),
-//                accuracyArray = emptyList(),
-//                createdAt = System.currentTimeMillis(),
-//                updatedAt = System.currentTimeMillis(),
-//            )
-//
-//
-//
-//
-//            Log.d("JavaScriptInterface", "Parsed Farm Data: $farmData")
-//
-////            // Validate critical fields
-////            if (farmData.siteId.isNullOrEmpty() || farmData.farmerName.isNullOrEmpty()) {
-////                Log.w("JavaScriptInterface", "Critical fields are missing in the received data.")
-////            }
-//
-//            // Navigate to the AddFarm composable, passing plotDataJson as a parameter
-//            (context as? MainActivity)?.let { activity ->
-//                activity.runOnUiThread {
-//                    val encodedPlotData = Uri.encode(plotDataJson)
-//                    Log.d("JavaScriptInterface", "Encoded Plot Data: $encodedPlotData")
-//
-//                    // Build the navigation route
-//                    navController.navigate("addFarm/${farmData.siteId ?: "0"}/$farmData")
-//                }
-//            } ?: run {
-//                Log.e("JavaScriptInterface", "Context is not MainActivity, unable to navigate.")
-//            }
-//        } catch (e: Exception) {
-//            Log.e("JavaScriptInterface", "Error processing received plot data: ${e.message}", e)
-//        }
-//
-//
-////        (context as? MainActivity)?.lifecycleScope?.launch {
-////            val farmDao = AppDatabase.getInstance(context).farmsDAO()
-////
-////            // Combine form data with plot data
-////            val farm = Farm(
-////                siteId = farmData.siteId,
-////                remoteId= farmData.remoteId,
-////                farmerPhoto= farmData.farmerPhoto,
-////                farmerName= farmData.farmerName,
-////                memberId = farmData.memberId,
-////                village = farmData.village,
-////                district = farmData.district,
-////                purchases = farmData.purchases,
-////                size = farmData.size,
-////                latitude = farmData.latitude,
-////                longitude= farmData.longitude,
-////                coordinates = farmData.coordinates,
-////                accuracyArray= farmData.accuracyArray,
-////                createdAt = Instant.now().millis,
-////                updatedAt = Instant.now().millis
-////            )
-////
-////            // Save to the database
-////            farmDao.insert(farm)
-////            Log.d("JavaScriptInterface", "Plot Data with Form Details saved to database.")
-////        }
-//    }
 
-//    @JavascriptInterface
-//    fun receivePlotData(plotDataJson: String) {
-//
-//        Log.d("JavaScriptInterface", "Received Plot Data: $plotDataJson")
-//
-//
-//        try {
-//            val gson = GsonBuilder()
-//                .registerTypeAdapter(
-//                    object : TypeToken<List<Pair<Double?, Double?>>>() {}.type,
-//                    JsonDeserializer { json, _, _ ->
-//                        val coordinates = mutableListOf<Pair<Double?, Double?>>()
-//                        val jsonArray = json.asJsonArray
-//                        for (coordArray in jsonArray) {
-//                            val pair = coordArray.asJsonArray
-//                            coordinates.add(
-//                                Pair(
-//                                    pair[0].asDouble,  // Latitude
-//                                    pair[1].asDouble   // Longitude
-//                                )
-//                            )
-//                        }
-//                        coordinates
-//                    }
-//                )
-//                .create()
-//
-//
-//
-//            val farmData = gson.fromJson(plotDataJson, Farm::class.java)
-//            Log.d("JavaScriptInterface", "Parsed Plot Data: $farmData")
-//
-//            // Navigate to the AddFarm composable on the main thread
-//            Handler(Looper.getMainLooper()).post {
-//                // navController.navigate("addFarm/${farmData.siteId ?: "0"}/$farmData")
-//                navController.navigate("addFarm/${1L}/${farmData}")
-//            }
-//
-//            // Store the received plot data for later use
-//            // latestPlotData = plotDataJson
-//
-//        } catch (e: Exception) {
-//            Log.e("JavaScriptInterface", "Error parsing plot data: ${e.message}", e)
-//        }
-//
-//
-//
-////            // Initialize farm data with default values
-////            val farmData = Farm(
-////                siteId = 0,
-////                remoteId = UUID.fromString("e262ae0e-dcf9-41a4-8418-49971478e6e2"),
-////                farmerPhoto = "",
-////                farmerName = "",
-////                memberId = "",
-////                village = "",
-////                district = "",
-////                purchases = 0.0f,
-////                size = 0.0f,
-////                latitude = "0.0",
-////                longitude = "0.0",
-////                coordinates = emptyList(),
-////                accuracyArray = emptyList(),
-////                createdAt = System.currentTimeMillis(),
-////                updatedAt = System.currentTimeMillis(),
-////            )
-//
-//
-//    }
+
 
     fun parseCoordinates(coordinatesString: String): List<Pair<Double, Double>> {
         val result = mutableListOf<Pair<Double, Double>>()
@@ -310,8 +156,41 @@ class JavaScriptInterface(
         return Gson().toJson(AppDatabase.getInstance(context).farmsDAO().getAllFarms())
     }
 
-    @JavascriptInterface
-    fun getSelecedPlot(id: Long): String {
-        return Gson().toJson(AppDatabase.getInstance(context).farmsDAO().getFarmById(id))
+    fun parseCoordinatesVisualize(coordinatesString: String): List<Pair<Double, Double>> {
+        if (coordinatesString.isEmpty()) return emptyList()
+
+        // Regex to extract (lat, lng) pairs
+        val regex = "\\(([^,]+), ([^\\)]+)\\)".toRegex()
+        val matches = regex.findAll(coordinatesString)
+
+        // Convert matches to List<Pair<Double, Double>>
+        return matches.map { match ->
+            val lat = match.groupValues[1].toDouble()
+            val lng = match.groupValues[2].toDouble()
+            Pair(lat, lng)
+        }.toList()
     }
+
+    @JavascriptInterface
+    fun getSelectedPlot(id: Long): String {
+        val farm = AppDatabase.getInstance(context).farmsDAO().getFarm(id)
+        Log.d("Selected farm", "getSelectedPlot: $farm")
+
+        if (farm != null) {
+            // Parse coordinates if stored as a string
+            val parsedCoordinates = parseCoordinatesVisualize(farm.coordinates.toString())
+
+            Log.d("Selected Coordinates", "getSelectedPlot: $parsedCoordinates")
+
+            // Create a new farm object with parsed coordinates
+            val updatedFarm = farm.copy(coordinates = parsedCoordinates)
+
+            // Return JSON representation
+            return Gson().toJson(updatedFarm)
+        } else {
+            return "{}" // Return an empty JSON object if no farm is found
+        }
+    }
+
+
 }

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plot Visualization</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+        }
+
+        #header {
+          text-align: center;
+          padding: 10px;
+          background-color: #f4f4f4;
+          border-bottom: 1px solid #ddd;
+        }
+
+        #map {
+          height: 90vh;
+          width: 100%;
+        }
+
+        #status {
+          text-align: center;
+          padding: 10px;
+          background-color: #e7f5e9;
+          border-top: 1px solid #ddd;
+          color: #333;
+          font-weight: bold;
+        }
+
+        #status.error {
+          background-color: #fbeaea;
+          color: #a94442;
+        }
+    </style>
+</head>
+<body>
+<div id="header">
+    <h1>Plot Visualization</h1>
+</div>
+<div id="map"></div>
+<div id="status">Loading map...</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const plotId = urlParams.get("plotId");
+        if (plotId && typeof Android !== "undefined" && Android.getSelectedPlot) {
+            console.log("Android interface is available.");
+            console.log("Plot ID from URL:", plotId);
+            const plotJson = Android.getSelectedPlot(parseInt(plotId)); // Use the dynamic ID
+            console.log("Plot data:", plotJson);
+            if (typeof visualizeData === "function") {
+                visualizeData(plotJson);
+            } else {
+                console.error("visualizeData is not defined.");
+            }
+        } else {
+            console.error("Android interface is not available.");
+        }
+    });
+    function visualizeData(data) {
+  const statusElement = document.getElementById("status");
+  console.log("Data received:", data);
+
+  try {
+    // Parse the data if it is not already in JSON format
+    const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+    console.log("Parsed data:", parsedData);
+
+    // Initialize the map centered on the provided latitude and longitude
+    const map = L.map("map").setView(
+      [parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)],
+      13
+    );
+
+    // Add a tile layer to the map
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    // Handle coordinates
+    if (parsedData.coordinates && parsedData.coordinates.length > 0) {
+      // Transform coordinates from {first, second} to [lat, lng]
+      const latlngs = parsedData.coordinates.map(coord => [
+        coord.first, // Latitude
+        coord.second // Longitude
+      ]);
+      console.log("Transformed Coordinates:", latlngs);
+
+      // Draw the polygon on the map
+      const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
+
+      // Bind a popup to the polygon to display plot metadata
+      polygon.bindPopup(`
+        <b>Farm Information</b><br>
+        Site ID: ${parsedData.siteId}<br>
+        Farmer: ${parsedData.farmerName}<br>
+        Village: ${parsedData.village}<br>
+        District: ${parsedData.district}<br>
+        Size: ${parsedData.size.toFixed(2)} sq units<br>
+        Accuracy: ${
+          Array.isArray(parsedData.accuracyArray)
+            ? parsedData.accuracyArray.join(", ")
+            : "N/A"
+        }
+      `);
+    } else {
+      console.warn("Coordinates are missing or empty. Displaying centroid only.");
+    }
+
+    // Add a marker at the centroid (latitude and longitude)
+    L.marker([parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)])
+      .addTo(map)
+      .bindPopup(`
+        <b>Centroid</b><br>
+        Latitude: ${parseFloat(parsedData.latitude).toFixed(5)}<br>
+        Longitude: ${parseFloat(parsedData.longitude).toFixed(5)}
+      `);
+
+    // Log the farm details for debugging
+    console.log("Farm Details:");
+    console.log(`Site ID: ${parsedData.siteId}`);
+    console.log(`Farmer Name: ${parsedData.farmerName}`);
+    console.log(
+      `Coordinates: ${
+        parsedData.coordinates && parsedData.coordinates.length > 0
+          ? JSON.stringify(parsedData.coordinates)
+          : "None"
+      }`
+    );
+
+    // Update the status to indicate the map was loaded successfully
+    statusElement.textContent = "Map loaded successfully!";
+    statusElement.classList.remove("error");
+  } catch (error) {
+    // Handle and display errors
+    statusElement.textContent = `Error loading map: ${error.message}`;
+    statusElement.classList.add("error");
+    console.error("Error visualizing data:", error);
+  }
+}
+
+
+
+
+</script>
+</body>
+</html>

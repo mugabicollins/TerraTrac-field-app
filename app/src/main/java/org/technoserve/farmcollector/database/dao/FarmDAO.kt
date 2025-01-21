@@ -156,5 +156,8 @@ interface FarmDAO {
     @Query("SELECT * FROM CollectionSites LIMIT :limit OFFSET :offset")
     fun getCollectionSites(offset: Int, limit: Int): List<CollectionSite>
 
+    @Query("SELECT * FROM farms WHERE id = :id")
+    fun getFarm(id: Long): Farm?
+
 
 }

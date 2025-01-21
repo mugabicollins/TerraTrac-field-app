@@ -64,6 +64,7 @@ import org.technoserve.farmcollector.ui.screens.settings.ScreenWithSidebar
 import org.technoserve.farmcollector.ui.screens.map.SetPolygon
 import org.technoserve.farmcollector.ui.screens.settings.SettingsScreen
 import org.technoserve.farmcollector.ui.screens.farms.UpdateFarmForm
+import org.technoserve.farmcollector.ui.screens.map.PlotVisualizationApp
 import org.technoserve.farmcollector.ui.screens.map.WebViewPage
 import org.technoserve.farmcollector.ui.theme.FarmCollectorTheme
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
@@ -496,13 +497,13 @@ class MainActivity : ComponentActivity() {
                             LaunchedEffect(Unit) {
                                 canExitApp = false
                             }
-//                            WebViewPage(loadURL) //OFFLINE
-                            WebViewPage(loadURL,
-                            onWebViewCreated = { createdWebView ->
-                                webView = createdWebView // Save the WebView instance
-                            },
-                                navController
-                                ) //OFFLINE
+//                            WebViewPage(loadURL,
+//                            onWebViewCreated = { createdWebView ->
+//                                webView = createdWebView // Save the WebView instance
+//                            },
+//                                navController
+//                                )
+                            PlotVisualizationApp(navController, viewModel)
                         }
 
 
