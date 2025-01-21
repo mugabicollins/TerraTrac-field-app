@@ -327,7 +327,7 @@ fun WebViewWithVisualization(dataJson: String,farmId:Long, navController: NavCon
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PlotVisualizationApp(navController: NavController,
-                         viewModel: MapViewModel,) {
+                         viewModel: MapViewModel,siteId:Long) {
     val farmData =
         navController.previousBackStackEntry?.arguments?.getParcelable<ParcelableFarmData>("farmData")
     // cast farmData string to Farm object
@@ -430,7 +430,7 @@ fun PlotVisualizationApp(navController: NavController,
                 )
             } else {
                 WebViewPage(
-                    url = "file:///android_asset/leaflet_map.html",
+                    url = "file:///android_asset/leaflet_map.html?siteId=${siteId}",
                     onWebViewCreated = { webView ->
                         webView.evaluateJavascript(
                             "if (typeof visualizeData === 'function') { visualizeData([]); } else { console.error('visualizeData is not defined'); }",

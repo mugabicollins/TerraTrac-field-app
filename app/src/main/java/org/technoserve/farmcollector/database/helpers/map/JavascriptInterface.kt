@@ -1,30 +1,16 @@
 package org.technoserve.farmcollector.database.helpers.map
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.launch
 import org.joda.time.Instant
 import org.json.JSONObject
-import org.technoserve.farmcollector.MainActivity
 import org.technoserve.farmcollector.database.AppDatabase
-import org.technoserve.farmcollector.database.mappers.CoordinatesDeserializer
 import org.technoserve.farmcollector.database.models.Farm
-import org.technoserve.farmcollector.ui.screens.farms.addFarm
-import java.lang.reflect.Type
 import java.net.URLEncoder
 import java.util.UUID
 
@@ -33,10 +19,6 @@ class JavaScriptInterface(
     private val context: Context,
     private val navController: NavController
 ) {
-
-
-
-
     fun parseCoordinates(coordinatesString: String): List<Pair<Double, Double>> {
         val result = mutableListOf<Pair<Double, Double>>()
         val cleanedString = coordinatesString.trim().removeSurrounding("\"", "").replace(" ", "")
@@ -102,7 +84,7 @@ class JavaScriptInterface(
             // Map the parsed data to the Farm object
             val farmData = Farm(
                 siteId = jsonObject.getLong("siteId"),
-                remoteId = UUID.fromString(jsonObject.getString("remoteId")),
+                remoteId = jsonObject.optString("remoteId").takeIf { it.isNotBlank() }?.let { UUID.fromString(it) } ?: UUID.randomUUID(),
                 farmerPhoto = jsonObject.getString("farmerPhoto"),
                 farmerName = jsonObject.getString("farmerName"),
                 memberId = jsonObject.getString("memberId"),
@@ -116,8 +98,8 @@ class JavaScriptInterface(
                 accuracyArray = jsonObject.optJSONArray("accuracyArray")?.let { array ->
                     List(array.length()) { i -> array.getDouble(i).toFloat() }
                 },
-                createdAt = Instant.parse(jsonObject.getString("createdAt")).millis,
-                updatedAt = Instant.parse(jsonObject.getString("updatedAt")).millis,
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis() ,
                 synced = false,
                 scheduledForSync = false,
                 needsUpdate = false

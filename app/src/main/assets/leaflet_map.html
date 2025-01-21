@@ -399,6 +399,8 @@
 ></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-tilelayer-pouchdb-cached"></script>
+
 <script>
     let map,
       polygon,
@@ -409,6 +411,13 @@
     let accuracyArray = [];
     let locationMarker = null;
     let watchId = null;
+
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').then(() => {
+        console.log('Service Worker registered for offline map caching');
+      });
+    }
 
     function showAlert(message) {
       const alertBox = document.getElementById("customAlert");
@@ -449,7 +458,7 @@
     function initMap() {
       // Initialize map without a specific center
       map = L.map("map", {
-        zoom: 12, // Start with a zoomed-out view
+        zoom: 18, // Start with a zoomed-out view
         attributionControl: true,
       });
 
@@ -679,6 +688,8 @@
 
     // Initialize the map
     document.addEventListener("DOMContentLoaded", function () {
+     const urlParams = new URLSearchParams(window.location.search);
+     const siteId = urlParams.get("siteId");
       initMap();
 
       // Map view controls
@@ -814,8 +825,8 @@
 
         // Create plot data with only the map-captured fields filled
         const plotData = {
-          siteId: "2",
-          remoteId: "e262ae0e-dcf9-41a4-8418-49971478e6e2",
+          siteId: siteId,
+          remoteId: "",
           farmerPhoto: "photo",
           farmerName: "test farmer",
           memberId: "300",
@@ -892,8 +903,8 @@
           longitude: centroid.lng,
           coordinates: points.map((point) => [point.lat, point.lng]),
           accuracyArray: accuracyArray,
-          createdAt: "2025-01-17T00:00:00Z",
-          updatedAt: "2025-01-17T01:00:00Z",
+          createdAt: "",
+          updatedAt: "",
         };
 
         console.log("Get Plot Data to send to Android:", plotData);

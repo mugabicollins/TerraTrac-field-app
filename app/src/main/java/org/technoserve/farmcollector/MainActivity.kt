@@ -66,6 +66,7 @@ import org.technoserve.farmcollector.ui.screens.settings.SettingsScreen
 import org.technoserve.farmcollector.ui.screens.farms.UpdateFarmForm
 import org.technoserve.farmcollector.ui.screens.map.PlotVisualizationApp
 import org.technoserve.farmcollector.ui.screens.map.WebViewPage
+import org.technoserve.farmcollector.ui.screens.map.cacheMapInBackground
 import org.technoserve.farmcollector.ui.theme.FarmCollectorTheme
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 import org.technoserve.farmcollector.viewmodels.LanguageViewModelFactory
@@ -96,7 +97,7 @@ object Routes {
     const val ADD_FARM = "addFarm/{siteId}/{plotDataJson}"
     const val ADD_SITE = "addSite"
     const val UPDATE_FARM = "updateFarm/{farmId}"
-    const val SET_POLYGON = "setPolygon"
+    const val SET_POLYGON = "setPolygon/{siteId}"
     const val SETTINGS = "settings"
 }
 
@@ -130,6 +131,17 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Preload the map in the background
+        cacheMapInBackground(
+            context = this,
+            mapUrl = "file:///android_asset/leaflet_map.html"
+        )
+        // Preload the map in the background
+        cacheMapInBackground(
+            context = this,
+            mapUrl = "file:///android_asset/index.html"
+        )
 
 
         // Enable WebView debugging
@@ -328,94 +340,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-//                        composable(Routes.ADD_FARM) { backStackEntry ->
-//                            val siteId = backStackEntry.arguments?.getString("siteId")
-//                            LaunchedEffect(Unit) {
-//                                canExitApp = false
-//                            }
-//                            if (siteId != null) {
-//                                AddFarm(navController = navController, siteId = siteId.toLong(), webView = webView )
-//                            }
-//                        }
 
-
-//                        composable(
-//                            route = "addFarm/{siteId}",
-//                            arguments = listOf(
-//                                navArgument("siteId") { type = NavType.LongType }
-//                            )
-//                        ) { backStackEntry ->
-//                            val siteId = backStackEntry.arguments?.getLong("siteId") ?: 0L
-//                            LaunchedEffect(Unit) {
-//                                canExitApp = false
-//                            }
-//                            AddFarm(navController = navController, siteId = siteId, plotData = null)
-//                        }
-
-//                        composable(
-//                            route = "addFarm/{siteId}/{plotDataJson}",
-//                            arguments = listOf(
-//                                navArgument("siteId") { type = NavType.LongType },
-//                                navArgument("plotDataJson") { type = NavType.StringType }
-//                            )
-//                        ) { backStackEntry ->
-//                            val siteId = backStackEntry.arguments?.getLong("siteId") ?: 0L
-//                            val plotDataJson = backStackEntry.arguments?.getString("plotDataJson") ?: ""
-//
-//                            val plotData = try {
-//                                val jsonObject = JSONObject(plotDataJson)
-//
-//                                // Extract and parse coordinates using the provided function
-//                                val coordinatesArray = jsonObject.getJSONArray("coordinates").toString()
-//                                val parsedCoordinates = parseCoordinates(coordinatesArray)
-//
-//                                // Map the rest of the fields manually
-//                                Farm(
-//                                    siteId = jsonObject.getLong("siteId"),
-//                                    remoteId = UUID.fromString(jsonObject.getString("remoteId")),
-//                                    farmerPhoto = jsonObject.getString("farmerPhoto"),
-//                                    farmerName = jsonObject.getString("farmerName"),
-//                                    memberId = jsonObject.getString("memberId"),
-//                                    village = jsonObject.getString("village"),
-//                                    district = jsonObject.getString("district"),
-//                                    purchases = jsonObject.optString("purchases")?.toFloatOrNull(),
-//                                    size = jsonObject.getDouble("size").toFloat(),
-//                                    latitude = jsonObject.getString("latitude"),
-//                                    longitude = jsonObject.getString("longitude"),
-//                                    coordinates = parsedCoordinates,
-//                                    accuracyArray = jsonObject.optJSONArray("accuracyArray")?.let { array ->
-//                                        List(array.length()) { i -> array.getDouble(i).toFloat() }
-//                                    },
-//                                    createdAt = Instant.parse(jsonObject.getString("createdAt")).toEpochMilli(),
-//                                    updatedAt = Instant.parse(jsonObject.getString("updatedAt")).toEpochMilli(),
-//                                    synced = false,
-//                                    scheduledForSync = false,
-//                                    needsUpdate = false
-//                                )
-//                            } catch (e: Exception) {
-//                                Log.e("Navigation", "Error parsing plot data: ${e.message}")
-//                                null
-//                            }
-//
-//                            LaunchedEffect(Unit) {
-//                                canExitApp = false
-//                            }
-//
-//                            if (plotData != null) {
-//                                AddFarm(
-//                                    navController = navController,
-//                                    siteId = siteId,
-//                                    plotData = plotData
-//                                )
-//                            }
-//                            else{
-//                                AddFarm(
-//                                    navController = navController,
-//                                    siteId = siteId,
-//                                    plotData = null
-//                                )
-//                            }
-//                        }
 
                         composable(
                             route = "addFarm/{siteId}?plotDataJson={plotDataJson}",
@@ -490,20 +415,16 @@ class MainActivity : ComponentActivity() {
 
                         composable(Routes.SET_POLYGON,
                             arguments = listOf(
+                                navArgument("siteId") { type = NavType.LongType },
                                 navArgument("coordinates") { type = NavType.StringType },
                                 navArgument("accuracyArray") { type = NavType.StringType }
                             )
                         ) { backStackEntry ->
+                            val siteId = backStackEntry.arguments?.getLong("siteId") ?: 0L
                             LaunchedEffect(Unit) {
                                 canExitApp = false
                             }
-//                            WebViewPage(loadURL,
-//                            onWebViewCreated = { createdWebView ->
-//                                webView = createdWebView // Save the WebView instance
-//                            },
-//                                navController
-//                                )
-                            PlotVisualizationApp(navController, viewModel)
+                            PlotVisualizationApp(navController, viewModel,siteId)
                         }
 
 

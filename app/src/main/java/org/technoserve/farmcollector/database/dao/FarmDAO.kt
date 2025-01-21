@@ -159,5 +159,4 @@ interface FarmDAO {
     @Query("SELECT * FROM farms WHERE id = :id")
     fun getFarm(id: Long): Farm?
 
-
 }

@@ -432,7 +432,7 @@ fun FarmList(
                                                     ParcelableFarmData(item, "view")
                                                 )
                                             }
-                                            navController.navigate(route = "setPolygon")
+                                            navController.navigate(route = "setPolygon/${siteId}")
                                         },
                                         onDeleteClick = {
                                             selectedIds.add(item.id)
