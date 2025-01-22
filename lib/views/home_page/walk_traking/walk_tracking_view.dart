@@ -1,12 +1,19 @@
 import 'dart:async';
-
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:terrapipe/utilts/app_colors.dart';
 import 'package:terrapipe/utilts/helper_functions.dart';
+import 'package:terrapipe/views/home_page/home_controller.dart';
+import 'package:terrapipe/widgets/bounce_loader.dart';
+import '../../../utilities/app_text_style.dart';
+import '../../../widgets/custom_button.dart';
+import '../../../widgets/custom_text_field.dart';
+import '../../home_page/components/polygon_bottom_sheet.dart';
 
 class WalkTrackingPage extends StatefulWidget {
   const WalkTrackingPage({super.key});
@@ -16,15 +23,17 @@ class WalkTrackingPage extends StatefulWidget {
 }
 
 class _WalkTrackingPageState extends State<WalkTrackingPage> {
-  List<LatLng> polylinePoints = [];
-  List<LatLng> polygonPoints = [];
   List<Marker> markers = [];
   LatLng? currentPosition;
   bool isTracking = false;
-  bool isAddPointVisible = false; 
+  bool isAddPointVisible = false;
   MapController mapController = MapController();
+  final HomeController homeController = Get.put(HomeController());
+
+  // final HomeController assetRegistryController = Get.put(HomeController());
   double? area;
   final Geodesy geodesy = Geodesy();
+
   void navigateToCurrentLocation() {
     if (currentPosition != null) {
       mapController.move(currentPosition!, 22.0);
@@ -35,21 +44,6 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
   void initState() {
     super.initState();
     _getCurrentPosition();
-  }
-
-  /// Calculate the area of the polygon when tracking is stopped
-  int assignGeoId(List<LatLng> points) {
-    if (points.length < 3) {
-      throw ArgumentError(
-          "At least 3 points are required to form a valid polygon.");
-    }
-
-    String pointsString =
-        points.map((p) => "${p.latitude},${p.longitude}").join(';');
-    int geoId = pointsString.hashCode.abs();
-
-
-    return geoId;
   }
 
   /// Get the current position of the user
@@ -84,23 +78,18 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
   void addPoint() {
     if (currentPosition != null) {
       setState(() {
-        polylinePoints.add(currentPosition!);
-
+        homeController.shapePoints.add(currentPosition!);
         markers.add(createMarker(currentPosition!));
-        polygonPoints.add(currentPosition!);
       });
     }
   }
 
   /// Undo the last point
   void undoPoint() {
-    if (polylinePoints.isNotEmpty &&
-        markers.isNotEmpty &&
-        polygonPoints.isNotEmpty) {
+    if (homeController.shapePoints.isNotEmpty && markers.isNotEmpty) {
       setState(() {
-        polylinePoints.removeLast();
+        homeController.shapePoints.removeLast();
         markers.removeLast();
-        polygonPoints.removeLast();
       });
     }
   }
@@ -108,9 +97,192 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
   /// Save the points and draw the polygon
   void savePolygon() {
     setState(() {
-      if (polygonPoints.length >= 3) {
-        polylinePoints =
-            List.from(polygonPoints); // Draw the line connecting points
+      if (homeController.shapePoints.length >= 3) {
+        homeController.shapePoints.value =
+            List.from(homeController.shapePoints);
+        print("here is the polypoint ${homeController.shapePoints}");
+        Get.bottomSheet(
+            backgroundColor: AppColor.white,
+            isScrollControlled: true,
+            Container(
+              padding: const EdgeInsets.all(12),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  // spacing: 10,
+                  children: [
+                    const Center(
+                      child: Text("Field Actions",
+                          style: AppTextStyles.labelLarge),
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.03,
+                    ),
+                    const Text(
+                      "Resolution level (optional):",
+                      style: AppTextStyles.labelMedium,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.01,
+                    ),
+                    CustomTextFormField(
+                      controller: homeController.resolutionLevelController,
+                      hintText: "level",
+                      fillColor: Colors.white,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.02,
+                    ),
+                    const Text(
+                      "threshold (optional):",
+                      style: AppTextStyles.labelMedium,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.01,
+                    ),
+                    CustomTextFormField(
+                      controller: homeController.thresholdController,
+                      hintText: "threshold",
+                      fillColor: Colors.white,
+                      suffixIconWidget: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        // spacing: 0,
+                        children: [
+                          GestureDetector(
+                            onTap: homeController.incrementValue,
+                            child: const Icon(
+                              Icons.arrow_drop_up,
+                              size: 20,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: homeController.decrementValue,
+                            child: const Icon(
+                              Icons.arrow_drop_down,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.02,
+                    ),
+                    const Text(
+                      "Domain (optional):",
+                      style: AppTextStyles.labelMedium,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.01,
+                    ),
+                    CustomDropdown<String>(
+                      hintText: 'Select Domain',
+                      items: homeController.domainList,
+                      initialItem: homeController.domainList[0],
+                      decoration: CustomDropdownDecoration(
+                          closedBorder: Border.all(
+                            color: Colors.black,
+                          ),
+                          expandedBorder: Border.all(
+                            color: Colors.black38,
+                          )),
+                      disabledDecoration: CustomDropdownDisabledDecoration(
+                        border: Border.all(
+                          color: Colors.black,
+                        ),
+                      ),
+                      onChanged: (value) {},
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.02,
+                    ),
+                    const Text(
+                      "Boundary Type:",
+                      style: AppTextStyles.labelMedium,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.01,
+                    ),
+                    CustomDropdown<String>(
+                      hintText: 'Select Boundary Type',
+                      items: homeController.boundaryTypeList,
+                      initialItem: homeController.boundaryTypeList[0],
+                      decoration: CustomDropdownDecoration(
+                          closedBorder: Border.all(
+                            color: Colors.black,
+                          ),
+                          expandedBorder: Border.all(
+                            color: Colors.black38,
+                          )),
+                      disabledDecoration: CustomDropdownDisabledDecoration(
+                        border: Border.all(
+                          color: Colors.black,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        // log('changing value to: $value');
+                      },
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.02,
+                    ),
+                    const Text(
+                      "S2_index (optional):",
+                      style: AppTextStyles.labelMedium,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.01,
+                    ),
+                    CustomTextFormField(
+                      controller: homeController.s2IndexController,
+                      hintText: "S2_index",
+                      fillColor: Colors.white,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.05,
+                    ),
+                    Row(
+                      // spacing: 10,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        CustomButton(
+                          label: 'Cancel',
+                          width: Get.width / 2.5,
+                          height: 45,
+                          onTap: () {
+                            Get.back();
+                          },
+                          color: AppColor.white,
+                          borderColor: AppColor.primaryColor,
+                          textStyle: const TextStyle(
+                              color: AppColor.primaryColor,
+                              fontWeight: FontWeight.bold),
+                          textColor: AppColor.primaryColor,
+                        ),
+                        CustomButton(
+                          label: 'Register Field',
+                          height: 45,
+                          width: Get.width / 2.5,
+                          borderColor: AppColor.primaryColor,
+                          onTap: () async {
+                            Get.back();
+                            await homeController.savePolygonTeraTrac();
+                          },
+                          textStyle: TextStyle(
+                              color: AppColor.white,
+                              fontWeight: FontWeight.w700),
+                          color: AppColor.primaryColor,
+                          textColor: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )); // Draw the line connecting points
       } else {
         // Show a message if not enough points for a polygon
         ScaffoldMessenger.of(context).showSnackBar(
@@ -130,23 +302,21 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
     setState(() {
       isTracking = true;
       isAddPointVisible = true;
-      polygonPoints.clear();
-      polylinePoints.clear();
+      homeController.shapePoints.clear();
+      // polylinePoints.clear();
       markers.clear();
     });
 
     positionStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
     ).listen((Position position) {
       LatLng newPosition = LatLng(position.latitude, position.longitude);
-
-      // Check the distance between the last point and the new position
-
       setState(() {
         currentPosition = newPosition;
       });
     });
-
     // Add the first point immediately
     if (currentPosition != null) {
       addPoint();
@@ -157,45 +327,16 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
   void stopTracking() {
     setState(() {
       isTracking = false;
-      isAddPointVisible =
-          false; // Hide the "Add Point" button when tracking stops
-      savePolygon(); // Save the polygon when finished
-      positionStream?.cancel(); // Stop the position stream
-
-      // Calculate the area of the polygon and generate geoId
-      int geoId = assignGeoId(polygonPoints);
-
-      // Show a dialog displaying the geoId
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Generated GeoID"),
-            content: Text("The GeoID for the polygon is: $geoId"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
-
-      // Optionally show the area in a snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("GeoID: $geoId has been generated."),
-        ),
-      );
+      isAddPointVisible = false;
+      positionStream?.cancel();
     });
   }
 
   @override
   void dispose() {
-    positionStream?.cancel(); // Cancel the stream to avoid memory leaks
+    positionStream?.cancel();
+    homeController.shapePoints.clear();
+    markers.clear();
     super.dispose();
   }
 
@@ -203,12 +344,12 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        elevation: 0.5,
         title: const Text(
           "Walk Tracking",
           style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
+              color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         leading: IconButton(
           onPressed: () {
@@ -216,132 +357,156 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
           },
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
-        backgroundColor: AppColor.primaryColor,
+        backgroundColor: AppColor.white,
       ),
-      body: Stack(
-        children: [
-          FlutterMap(
-            mapController: mapController,
-            options: MapOptions(
-              center: currentPosition ?? const LatLng(0, 0),
-              zoom: 20.0,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate:
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                subdomains: ['a', 'b', 'c'],
+      body: ModalProgressHUD(
+        inAsyncCall: homeController.isPolygonLoading.isTrue,
+        color: Colors.white,
+        opacity: 0.95,
+        progressIndicator: BounceAbleLoader(
+          loadingColor: Colors.black,
+          textColor: Colors.black,
+          title: "Saving Details",
+        ),
+        child: Stack(
+          children: [
+            FlutterMap(
+              mapController: mapController,
+              options: MapOptions(
+                center: currentPosition ?? const LatLng(0, 0),
+                zoom: 20.0,
               ),
-              PolylineLayer(
-                polylines: [
-                  Polyline(
-                    points: polylinePoints,
-                    color: Colors.blue,
-                    strokeWidth: 4.0,
-                  ),
-                ],
-              ),
-              MarkerLayer(markers: markers),
-              PolygonLayer(
-                polygons: [
-                  Polygon(
-                    points: polygonPoints,
-                    color: Colors.blue.withOpacity(0.3),
-                    borderColor: Colors.blue,
-                    borderStrokeWidth: 2,
-                    isDotted: true,
-                    isFilled: true,
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: Column(
               children: [
-                // Start/Stop Button
-                FloatingActionButton(
-                  onPressed: () {
-                    if (isTracking) {
-                      stopTracking();
-                      showSnackBar(
-                          title: "Stops",
-                          message: "Tracking Stops",
-                          color: Colors.redAccent);
-                    } else {
-                      startTracking();
-                      showSnackBar(
-                          title: "Start",
-                          message: "Tracking Started",
-                          color: Colors.green);
-                    }
-                  },
-                  child: Icon(isTracking ? Icons.stop : Icons.play_arrow),
+                TileLayer(
+                  urlTemplate:
+                      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  subdomains: ['a', 'b', 'c'],
                 ),
-                const SizedBox(height: 10),
-                // Add Point Button (Visible only when tracking is started)
-                if (isAddPointVisible)
-                  Column(
-                    children: [
-                      FloatingActionButton(
-                        onPressed: addPoint,
-                        backgroundColor: Colors.blue,
-                        child: const Icon(
-                          Icons.add,
-                          color: Colors.white,
+                Obx(
+                  () => PolygonLayer(
+                    polygons: [
+                      if (homeController.shapePoints.isNotEmpty)
+                        Polygon(
+                          points: [
+                            ...homeController.shapePoints,
+                            homeController.shapePoints[0]
+                          ],
+                          borderColor: homeController.selectedColor,
+                          borderStrokeWidth: 2.0,
+                          isDotted: false,
+                          color: homeController.selectedColor.withOpacity(0.3),
+                          isFilled: false,
                         ),
-                      ),
-                      const SizedBox(height: 10),
                     ],
-                  ),
-                // Undo Button
-                if (isAddPointVisible)
-                  Column(
-                    children: [
-                      FloatingActionButton(
-                        onPressed: undoPoint,
-                        backgroundColor: Colors.red,
-                        child: const Icon(
-                          Icons.undo,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                // Save Button (to save the points as polygon)
-                if (isAddPointVisible)
-                  Column(
-                    children: [
-                      FloatingActionButton(
-                        onPressed: savePolygon,
-                        backgroundColor: Colors.green,
-                        child: const Icon(
-                          Icons.save,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                // Button to navigate to current location
-                FloatingActionButton(
-                  onPressed: navigateToCurrentLocation,
-                  backgroundColor: Colors.green,
-                  child: const Icon(
-                    Icons.my_location,
-                    color: Colors.white,
                   ),
                 ),
+                MarkerLayer(markers: markers),
               ],
             ),
-          ),
-        ],
+            Positioned(
+              left: 20,
+              right: 20,
+              top: Get.height * 0.03,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  /// Undo Button
+                  if (isAddPointVisible)
+                    ElevatedButton.icon(
+                      onPressed: undoPoint,
+                      icon:  Icon(
+                        Icons.undo,
+                        size: 18,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColor.red),
+                      label: const Text(
+                        "Undo",
+                        style: TextStyle(fontSize: 10),
+                      ),
+                    ),
+
+                  /// Add Point Button (Visible only when tracking is started)
+                  if (isAddPointVisible)
+                    ElevatedButton.icon(
+                      onPressed: addPoint,
+                      icon: Icon(
+                        Icons.location_on,
+                        color: AppColor.white,
+                      ),
+                      label: Text("Mark Point",
+                          style: TextStyle(color: AppColor.white)),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColor.green),
+                    ),
+                  // Save Button (to save the points as polygon)
+                  if (isAddPointVisible)
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        homeController.finishShape(context);
+                        homeController.shapePoints.length >= 3
+                            ? Get.bottomSheet(
+                                backgroundColor: AppColor.white,
+                                isScrollControlled: true,
+                                PolygonBottomSheet(),
+                              )
+                            : const SizedBox();
+                      },
+                      icon: Icon(
+                        Icons.save,
+                        color: AppColor.white,
+                      ),
+                      label:
+                          Text("Save", style: TextStyle(color: AppColor.white)),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColor.green),
+                    ),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: Column(
+                children: [
+                  /// Start/Stop Button
+                  FloatingActionButton(
+                    onPressed: () {
+                      if (isTracking) {
+                        stopTracking();
+                        showSnackBar(
+                            title: "Stops",
+                            message: "Tracking Stops",
+                            color: Colors.redAccent);
+                      } else {
+                        startTracking();
+                        showSnackBar(
+                            title: "Start",
+                            message: "Tracking Started",
+                            color: Colors.green);
+                      }
+                    },
+                    child: Icon(isTracking ? Icons.stop : Icons.play_arrow),
+                  ),
+                  const SizedBox(height: 10),
+
+                  /// Button to navigate to current location
+                  FloatingActionButton(
+                    onPressed: navigateToCurrentLocation,
+                    backgroundColor: Colors.green,
+                    child: const Icon(
+                      Icons.my_location,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

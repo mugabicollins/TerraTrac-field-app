@@ -4,9 +4,9 @@ import 'package:geodesy/geodesy.dart';
 import 'package:get/get.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:terrapipe/utilts/app_colors.dart';
+import 'package:terrapipe/views/home_page/walk_traking/walk_tracking_view.dart';
 import 'package:terrapipe/widgets/bounce_loader.dart';
 import 'package:terrapipe/widgets/custom_text_field.dart';
-import '../asset_registery/walk_traking/walk_tracking_view.dart';
 import 'components/polygon_bottom_sheet.dart';
 import 'components/search_bottom_sheet.dart';
 import 'home_controller.dart';
@@ -574,7 +574,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   onPressed: () {
                                     controller.enableSideMenu.value=false;
                                     controller.update();
-                                    Get.to(() => const WalkTrackingPage());
+                                    Get.to(() =>  WalkTrackingPage());
                                   },
                                 ),
                                 SizedBox(height: Get.height*0.01,),

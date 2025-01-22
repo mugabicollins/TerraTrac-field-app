@@ -8,10 +8,12 @@ import 'package:latlong2/latlong.dart';
 import 'package:terrapipe/local_db_helper/shared_preference.dart';
 import 'package:terrapipe/utilts/helper_functions.dart';
 import 'package:terrapipe/views/saved_fields/components/save_field_map.dart';
+import 'package:terrapipe/widgets/dialogs/session_out_dialog.dart';
 
 class SavedFieldController extends GetxController {
   late final MapController mapController;
   RxList<Polygon> drawnPolygons = <Polygon>[].obs;
+
   // List<MapController> ListMapController = [];
   final Dio dio = Dio();
   var fieldList = <List<String>>[].obs;
@@ -25,14 +27,16 @@ class SavedFieldController extends GetxController {
     mapController = MapController();
   }
 
-  List<MapController> mapControllers = []; // Declare the list of map controllers
-
+  List<MapController> mapControllers =
+      []; // Declare the list of map controllers
 
   void initializeBoundsList(int length) {
     while (boundsList.length < length) {
-      boundsList.add(LatLngBounds(LatLng(0, 0), LatLng(0, 0))); // Initialize with a default value
+      boundsList.add(LatLngBounds(
+          LatLng(0, 0), LatLng(0, 0))); // Initialize with a default value
     }
   }
+
 // Initialize the domain list
   Future<void> fetchGeoId() async {
     const url = 'https://be.terrapipe.io/geo-id';
@@ -48,23 +52,27 @@ class SavedFieldController extends GetxController {
           headers: headers,
         ),
       );
-      print("here is the data ${response.data}");
+      print("here is the saved fields data::: ${response.data['message']}");
       if (response.statusCode == 200) {
         var jsonData = response.data;
-        if (jsonData['geo_ids'] is List) {
-          fieldList.value = (jsonData['geo_ids'] as List)
-              .map((e) => List<String>.from(e))
-              .toList();
-          initializeBoundsList(fieldList.length);
+        if (response.data['message'] != "Expired Token") {
+          if (jsonData['geo_ids'] is List) {
+            fieldList.value = (jsonData['geo_ids'] as List)
+                .map((e) => List<String>.from(e))
+                .toList();
+            initializeBoundsList(fieldList.length);
 
-          for (int index = 0; index < fieldList.length; index++) {
-            await fetchFieldShapeByGeoId(fieldList[index].first, index);
+            for (int index = 0; index < fieldList.length; index++) {
+              await fetchFieldShapeByGeoId(fieldList[index].first, index);
+            }
+            isFetchFieldLoading.value = false;
+            update();
+          } else {
+            isFetchFieldLoading.value = false;
+            update();
           }
-          isFetchFieldLoading.value = false;
-          update();
         } else {
-          isFetchFieldLoading.value = false;
-          update();
+          Get.dialog(SessionExpireDialog(), barrierDismissible: false);
         }
       } else {
         isFetchFieldLoading.value = false;
@@ -124,7 +132,6 @@ class SavedFieldController extends GetxController {
       update();
     }
   }
-
 
   RxBool loading = false.obs;
 
@@ -223,7 +230,6 @@ class SavedFieldController extends GetxController {
     mapController.move(center, zoom);
   }
 
-
   /// Calculate LatLngBounds from a list of LatLng points
   LatLngBounds calculateBounds(List<LatLng> points) {
     double south = points.first.latitude;
@@ -251,7 +257,8 @@ class SavedFieldController extends GetxController {
 
       // Calculate center and zoom based on the bounds
       LatLng center = bounds.center;
-      double zoom = 16.0; // Default zoom level, you can adjust this based on your needs
+      double zoom =
+          16.0; // Default zoom level, you can adjust this based on your needs
 
       // Optionally, you can calculate the zoom level dynamically based on the bounds
       // For example, use an algorithm to fit the map to the bounds
@@ -259,7 +266,8 @@ class SavedFieldController extends GetxController {
       return MapOptions(
         initialCenter: center,
         initialZoom: zoom,
-        interactiveFlags: InteractiveFlag.none, // or adjust based on your requirement
+        interactiveFlags:
+            InteractiveFlag.none, // or adjust based on your requirement
       );
     } else {
       // Default MapOptions in case boundsList doesn't have the required index

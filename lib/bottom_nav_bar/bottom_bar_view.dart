@@ -213,7 +213,7 @@ class _BottomBarViewState extends State<BottomBarView> {
           controller: bottomController,
           children: const [
             HomeScreen(),
-            AssetRegistryView(),
+            SizedBox(),
             SavedFieldView(),
           ],
         ),
