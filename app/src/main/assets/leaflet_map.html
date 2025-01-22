@@ -45,17 +45,6 @@
           height: auto;
         }
 
-        .map-types {
-          position: absolute;
-          display: inline-block;
-          top: 10px;
-          right: 10px;
-          z-index: 1000;
-          background-color: rgba(255, 255, 255, 0.9);
-          padding: 5px;
-          border-radius: 5px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
         .info-panel {
           position: fixed;
           top: 20px;
@@ -118,67 +107,6 @@
           font-weight: bold;
         }
 
-        #mapTypesDropdown {
-          border: none;
-          border-radius: 4px;
-          background-color: #000000;
-          padding: 10px;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .dropdown-content {
-          display: none;
-          position: absolute;
-          top: 100%;
-          right: 0;
-          color: #000000;
-          background-color: #cccccc;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-          z-index: 1;
-          border-radius: 4px;
-          flex-direction: column;
-          padding: 0;
-          box-sizing: border-box;
-          width: 150px;
-        }
-
-        .dropdown-content button {
-          background: none;
-          border: none;
-          padding: 10px;
-          color: #000000;
-          background-color: #cccccc;
-          text-align: left;
-          display: flex;
-          align-items: center;
-          width: 100%;
-          cursor: pointer;
-          box-sizing: border-box;
-        }
-
-        .dropdown-toggle {
-          margin-left: auto;
-          background: none;
-          border: none;
-          font-size: 20px;
-          cursor: pointer;
-          padding: 0;
-        }
-
-        .dropdown-content button:hover {
-          background: #f0f0f0;
-        }
-
-        .dropdown-content button i {
-          margin-right: 8px;
-          font-size: 16px;
-        }
-
-        .map-types:hover .dropdown-content {
-          display: block;
-        }
-
         #customAlert {
           display: none;
           position: fixed;
@@ -217,8 +145,6 @@
           background: rgba(0, 0, 0, 0.5);
           z-index: 999;
         }
-
-
     </style>
 </head>
 <body>
@@ -316,31 +242,11 @@
     </button>
 </div>
 
-<div class="map-types">
-    <button id="mapTypesDropdown" class="dropdown-toggle">
-        <i class="fas fa-layer-group"></i>
-    </button>
-    <div id="dropdownContent" class="dropdown-content">
-        <button id="streetView">
-            <i class="fas fa-street-view"></i> Street View
-        </button>
-        <button id="satelliteView">
-            <i class="fas fa-satellite"></i> Satellite View
-        </button>
-        <button id="terrainView">
-            <i class="fas fa-mountain"></i> Terrain View
-        </button>
-    </div>
-</div>
-
 <div class="info-panel">
     <div id="plotInfo">Plot Size: 0 hectares</div>
     <div id="accuracy" class="accuracy">Accuracy: Calculating...</div>
     <div id="warning" class="warning"></div>
 </div>
-
-<!-- <div id="accuracy" style="font-size: 14px; color: #555; margin-top: 10px;"></div> -->
-
 
 <div
         id="customAlert"
@@ -412,10 +318,9 @@
     let locationMarker = null;
     let watchId = null;
 
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js').then(() => {
-        console.log('Service Worker registered for offline map caching');
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./service-worker.js").then(() => {
+        console.log("Service Worker registered for offline map caching");
       });
     }
 
@@ -438,22 +343,6 @@
         overlay.style.display = "none";
       };
     }
-
-    document
-      .getElementById("mapTypesDropdown")
-      .addEventListener("click", function () {
-        const dropdown = document.getElementById("dropdownContent");
-        dropdown.style.display =
-          dropdown.style.display === "block" ? "none" : "block";
-      });
-
-    // Close dropdown when clicking outside
-    window.addEventListener("click", function (event) {
-      const dropdown = document.getElementById("dropdownContent");
-      if (!event.target.matches("#mapTypesDropdown")) {
-        dropdown.style.display = "none";
-      }
-    });
 
     function initMap() {
       // Initialize map without a specific center
@@ -489,6 +378,9 @@
         }
       );
 
+      // Add terrain layer as the default layer
+      window.terrainLayer.addTo(map);
+
       // Add layer controls
       const baseLayers = {
         Street: window.streetLayer,
@@ -509,7 +401,7 @@
             const accuracy = position.coords.accuracy;
 
             // First center the map
-            map.setView([lat, lon], 13, {
+            map.setView([lat, lon], 18, {
               animate: true,
               duration: 1, // 1 second animation
             });
@@ -535,12 +427,12 @@
                   .addTo(map)
                   .bindPopup(
                     `
-      <b>Your Location:</b><br>
-      ${city ? city + ", " : ""}${country}<br>
-      <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
-       <small>Accuracy: ${accuracy.toFixed(1)} meters </small>
+    <b>Your Location:</b><br>
+    ${city ? city + ", " : ""}${country}<br>
+    <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
+     <small>Accuracy: ${accuracy.toFixed(1)} meters </small>
 
-    `
+  `
                   )
                   .openPopup();
               })
@@ -609,11 +501,6 @@
       if (locationMarker) {
         map.removeLayer(locationMarker);
       }
-
-      // locationMarker = L.marker([latitude, longitude])
-      //   .addTo(map)
-      //   .bindPopup("Your location<br>Accuracy: " + accuracy.toFixed(1) + "m")
-      //   .openPopup();
 
       map.setView([latitude, longitude]);
     }
@@ -688,30 +575,9 @@
 
     // Initialize the map
     document.addEventListener("DOMContentLoaded", function () {
-     const urlParams = new URLSearchParams(window.location.search);
-     const siteId = urlParams.get("siteId");
+      const urlParams = new URLSearchParams(window.location.search);
+      const siteId = urlParams.get("siteId");
       initMap();
-
-      // Map view controls
-      document.getElementById("streetView").addEventListener("click", () => {
-        map.removeLayer(window.satelliteLayer);
-        map.removeLayer(window.terrainLayer);
-        window.streetLayer.addTo(map);
-      });
-
-      document
-        .getElementById("satelliteView")
-        .addEventListener("click", () => {
-          map.removeLayer(window.streetLayer);
-          map.removeLayer(window.terrainLayer);
-          window.satelliteLayer.addTo(map);
-        });
-
-      document.getElementById("terrainView").addEventListener("click", () => {
-        map.removeLayer(window.streetLayer);
-        map.removeLayer(window.satelliteLayer);
-        window.terrainLayer.addTo(map);
-      });
 
       // Polygon capture controls
       document

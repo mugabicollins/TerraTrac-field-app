@@ -32,22 +32,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,9 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -76,15 +65,10 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.helpers.map.JavaScriptInterface
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
 import org.technoserve.farmcollector.database.models.ParcelableFarmData
-import org.technoserve.farmcollector.database.models.ParcelablePair
-import org.technoserve.farmcollector.ui.components.InvalidPolygonDialog
 import org.technoserve.farmcollector.ui.composes.AreaDialog
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
-import org.technoserve.farmcollector.ui.screens.farms.isLocationEnabled
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import org.technoserve.farmcollector.utils.convertSize
-import org.technoserve.farmcollector.utils.hasLocationPermission
-import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.io.File
 import java.net.URLConnection
@@ -98,7 +82,12 @@ import java.net.URLEncoder
 @RequiresApi(Build.VERSION_CODES.M)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: NavController,viewModel: MapViewModel) {
+fun WebViewPage(
+    url: String,
+    onWebViewCreated: (WebView) -> Unit,
+    navController: NavController,
+    viewModel: MapViewModel
+) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
     var webView: WebView? = null
@@ -117,18 +106,18 @@ fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: 
 
     val gson = Gson()
     val farmDataJson = gson.toJson(plotData)
-    if(farmDataJson == null){
+    if (farmDataJson == null) {
         Log.d("JavaScriptInterface", "Farm Data Json is null")
         navController.navigate("addFarm/${plotData?.siteId}")
     }
-    val encodedFarmDataJson = URLEncoder.encode(farmDataJson, "UTF-8") // Encode J SON to avoid special character issues'
+    val encodedFarmDataJson =
+        URLEncoder.encode(farmDataJson, "UTF-8") // Encode J SON to avoid special character issues'
 
     val calculatedArea: Double = plotData?.size?.toDouble() ?: 0.0
 
     val enteredArea = sharedPref.getString("plot_size", "0.0")?.toDoubleOrNull() ?: 0.0
     val selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
     val enteredAreaConverted = convertSize(enteredArea, selectedUnit)
-
 
 
     // Display AreaDialog when triggered
@@ -180,7 +169,8 @@ fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: 
                     allowFileAccessFromFileURLs = true
 
                     // Cache settings
-                    cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // Use cached resources when available
+                    cacheMode =
+                        WebSettings.LOAD_CACHE_ELSE_NETWORK // Use cached resources when available
                     databaseEnabled = true
                 }
 
@@ -257,7 +247,8 @@ fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: 
 // Utility function to check network availability
 @RequiresApi(Build.VERSION_CODES.M)
 private fun isNetworkAvailable(context: Context): Boolean {
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val network = connectivityManager.activeNetwork
     val capabilities = connectivityManager.getNetworkCapabilities(network)
     return capabilities != null &&
@@ -288,7 +279,12 @@ private fun getCachedResponse(context: Context, url: String): WebResourceRespons
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewWithVisualization(dataJson: String,farmId:Long, navController: NavController,mapViewModel: MapViewModel) {
+fun WebViewWithVisualization(
+    dataJson: String,
+    farmId: Long,
+    navController: NavController,
+    mapViewModel: MapViewModel
+) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
     var webView: WebView? = null
@@ -329,11 +325,13 @@ fun WebViewWithVisualization(dataJson: String,farmId:Long, navController: NavCon
                     }
                 }
 
-                addJavascriptInterface(JavaScriptInterface(
-                    context,
-                    navController = navController,
-                    mapViewModel
-                ), "Android")
+                addJavascriptInterface(
+                    JavaScriptInterface(
+                        context,
+                        navController = navController,
+                        mapViewModel
+                    ), "Android"
+                )
 
                 webViewClient = object : WebViewClient() {
                     override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
@@ -377,12 +375,14 @@ fun WebViewWithVisualization(dataJson: String,farmId:Long, navController: NavCon
 }
 
 
-
+@SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.M)
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PlotVisualizationApp(navController: NavController,
-                         viewModel: MapViewModel,siteId:Long) {
+fun PlotVisualizationApp(
+    navController: NavController,
+    viewModel: MapViewModel, siteId: Long
+) {
     val farmData =
         navController.previousBackStackEntry?.arguments?.getParcelable<ParcelableFarmData>("farmData")
     // cast farmData string to Farm object
@@ -429,7 +429,7 @@ fun PlotVisualizationApp(navController: NavController,
     }
 
 // Then start continuous location updates
-    locationHelper.requestLocationUpdates( onLocationUpdate = { location ->
+    locationHelper.requestLocationUpdates(onLocationUpdate = { location ->
         location?.let {
             accuracy = it.accuracy.toString()
         } ?: run {
@@ -457,23 +457,22 @@ fun PlotVisualizationApp(navController: NavController,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
     ) {
+        // Top Section: Map Visualization
         Column(
             modifier =
             Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(
-                    if (viewSelectFarm) {
-                        0.65f
-                    } else if (accuracy.isNotEmpty()) {
-                        .99f
-                    } else {
-                        .93f
-                    },
+                    when {
+                        viewSelectFarm -> 0.65f
+                        accuracy.isNotEmpty() -> 0.99f
+                        else -> 0.93f
+                    }
                 ),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Log.d("INFO Visualization","${farmInfo?.coordinates}")
+            Log.d("INFO Visualization", "${farmInfo?.coordinates}")
             // Leaflet map
             val farmId = farmInfo?.id
             val farmJson = Gson().toJson(farmInfo)
@@ -500,36 +499,34 @@ fun PlotVisualizationApp(navController: NavController,
 
         }
 
+
+        // Bottom Section: Farm Details
         Column(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxWidth()
-                .fillMaxHeight(),
+                .fillMaxHeight()
         ) {
             FlowRow(
-                modifier =
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(bottom = 10.dp),
-                horizontalArrangement = if (viewSelectFarm) Arrangement.Center else Arrangement.Start,
+                    .fillMaxHeight(),
+                horizontalArrangement = if (viewSelectFarm) Arrangement.Center else Arrangement.Start
             ) {
-
                 if (viewSelectFarm) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.background)
-//                            .padding(16.dp)
+                            .padding(horizontal = 4.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        if (farmInfo != null) {
+                        farmInfo?.let {
                             // Farm Information Card
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(bottom = 16.dp),
+                                    .padding(vertical = 4.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.elevatedCardColors(
@@ -539,13 +536,13 @@ fun PlotVisualizationApp(navController: NavController,
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp)
+                                        .padding(8.dp)
                                 ) {
                                     // Farm Info Title
                                     Text(
                                         text = stringResource(id = R.string.farm_info),
                                         style = MaterialTheme.typography.headlineSmall.copy(
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.Bold
                                         ),
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -558,9 +555,7 @@ fun PlotVisualizationApp(navController: NavController,
                                             .fillMaxWidth()
                                             .height(1.dp)
                                             .background(
-                                                MaterialTheme.colorScheme.onSurface.copy(
-                                                    alpha = 0.12f
-                                                )
+                                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                                             )
                                     )
 
@@ -568,10 +563,8 @@ fun PlotVisualizationApp(navController: NavController,
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(top = 8.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                            .padding(4.dp)
                                     ) {
-                                        // Each farm detail as a row with responsive layout
                                         ResponsiveFarmDetailRow(
                                             label = stringResource(id = R.string.farm_name),
                                             value = farmInfo.farmerName
@@ -581,38 +574,43 @@ fun PlotVisualizationApp(navController: NavController,
                                             value = farmInfo.memberId.ifEmpty { "N/A" }
                                         )
                                         ResponsiveFarmDetailRow(
-                                            label = stringResource(id = R.string.village),
-                                            value = farmInfo.village
-                                        )
-                                        ResponsiveFarmDetailRow(
                                             label = stringResource(id = R.string.district),
                                             value = farmInfo.district
                                         )
                                         ResponsiveFarmDetailRow(
-                                            label = stringResource(id = R.string.latitude),
-                                            value = farmInfo.latitude.toString()
+                                            label = stringResource(id = R.string.village),
+                                            value = farmInfo.village
                                         )
                                         ResponsiveFarmDetailRow(
                                             label = stringResource(id = R.string.longitude),
-                                            value = farmInfo.longitude.toString()
+                                            value = farmInfo.longitude.toDoubleOrNull()
+                                                ?.let { String.format("%.6f", it) } ?: "N/A"
+                                        )
+                                        ResponsiveFarmDetailRow(
+                                            label = stringResource(id = R.string.latitude),
+                                            value = farmInfo.latitude.toDoubleOrNull()
+                                                ?.let { String.format("%.6f", it) } ?: "N/A"
                                         )
                                         ResponsiveFarmDetailRow(
                                             label = stringResource(id = R.string.size),
                                             value = "${
                                                 truncateToDecimalPlaces(
                                                     formatInput(farmInfo.size.toString()),
-                                                    9
+                                                    4
                                                 )
                                             } ${stringResource(id = R.string.ha)}"
                                         )
+
                                     }
                                 }
                             }
 
-                            // Action Buttons with Responsive Layout
+
+                            // Action Buttons
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp),
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 // Close Button
@@ -623,7 +621,7 @@ fun PlotVisualizationApp(navController: NavController,
                                     },
                                     modifier = Modifier
                                         .weight(1f)
-                                        .heightIn(min = 48.dp),
+                                        .heightIn(min = 24.dp),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
                                     Text(
@@ -637,11 +635,11 @@ fun PlotVisualizationApp(navController: NavController,
                                 // Update Button
                                 Button(
                                     onClick = {
-                                        navController.navigate("updateFarm/${farmInfo?.id}")
+                                        navController.navigate("updateFarm/${farmInfo.id}")
                                     },
                                     modifier = Modifier
                                         .weight(1f)
-                                        .heightIn(min = 48.dp),
+                                        .heightIn(min = 24.dp),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
                                     Text(
@@ -657,5 +655,7 @@ fun PlotVisualizationApp(navController: NavController,
                 }
             }
         }
+
+
     }
 }

@@ -143,12 +143,6 @@ fun FarmForm(
         }
     }
 
-//    // Load the plot size from SharedPreferences
-//    LaunchedEffect(Unit) {
-//        val sharedPref = context.getSharedPreferences("plot_size", Context.MODE_PRIVATE)
-//        size = sharedPref.getString("plot_size", "") ?: ""
-//        Log.d("Saved Size", "Saved Size: $size")
-//    }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
