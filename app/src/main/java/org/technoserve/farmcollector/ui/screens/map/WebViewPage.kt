@@ -52,6 +52,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,14 +78,17 @@ import org.technoserve.farmcollector.database.helpers.map.LocationHelper
 import org.technoserve.farmcollector.database.models.ParcelableFarmData
 import org.technoserve.farmcollector.database.models.ParcelablePair
 import org.technoserve.farmcollector.ui.components.InvalidPolygonDialog
+import org.technoserve.farmcollector.ui.composes.AreaDialog
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
 import org.technoserve.farmcollector.ui.screens.farms.isLocationEnabled
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
+import org.technoserve.farmcollector.utils.convertSize
 import org.technoserve.farmcollector.utils.hasLocationPermission
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.io.File
 import java.net.URLConnection
+import java.net.URLEncoder
 
 /**
  * Implementation of caching mechanism for performance
@@ -94,16 +98,65 @@ import java.net.URLConnection
 @RequiresApi(Build.VERSION_CODES.M)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: NavController) {
+fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: NavController,viewModel: MapViewModel) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
     var webView: WebView? = null
+    val sharedPref = context.getSharedPreferences("FarmCollector", Context.MODE_PRIVATE)
+
+    // Observe dialog state
+    val showDialog by viewModel.showDialog.collectAsState()
+
+    val plotData by viewModel.plotData.collectAsState()
 
     // Define cache directory
     val cachePath = File(context.cacheDir, "webview-cache")
     if (!cachePath.exists()) {
         cachePath.mkdirs()
     }
+
+    val gson = Gson()
+    val farmDataJson = gson.toJson(plotData)
+    if(farmDataJson == null){
+        Log.d("JavaScriptInterface", "Farm Data Json is null")
+        navController.navigate("addFarm/${plotData?.siteId}")
+    }
+    val encodedFarmDataJson = URLEncoder.encode(farmDataJson, "UTF-8") // Encode J SON to avoid special character issues'
+
+    val calculatedArea: Double = plotData?.size?.toDouble() ?: 0.0
+
+    val enteredArea = sharedPref.getString("plot_size", "0.0")?.toDoubleOrNull() ?: 0.0
+    val selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
+    val enteredAreaConverted = convertSize(enteredArea, selectedUnit)
+
+
+
+    // Display AreaDialog when triggered
+    if (showDialog) {
+        AreaDialog(
+            showDialog = true,
+            onDismiss = { viewModel.dismissDialog() },
+            onConfirm = { chosenArea ->
+                val chosenSize =
+                    when (chosenArea) {
+                        CALCULATED_AREA_OPTION -> calculatedArea.toString()
+                        ENTERED_AREA_OPTION -> enteredAreaConverted.toString()
+                        else -> throw IllegalArgumentException("Unknown area option: $chosenArea")
+                    }
+                val truncatedSize = truncateToDecimalPlaces(formatInput(chosenSize), 9)
+                sharedPref.edit().putString("plot_size", truncatedSize).apply()
+                if (sharedPref.contains("selectedUnit")) {
+                    sharedPref.edit().remove("selectedUnit").apply()
+                }
+                navController.navigate("addFarm/${plotData?.siteId}?plotDataJson=$encodedFarmDataJson")
+                viewModel.dismissDialog() // Close the dialog
+                //navController.navigateUp()
+            },
+            calculatedArea = calculatedArea,
+            enteredArea = enteredAreaConverted
+        )
+    }
+
 
     AndroidView(
         factory = {
@@ -144,7 +197,8 @@ fun WebViewPage(url: String, onWebViewCreated: (WebView) -> Unit,navController: 
                 addJavascriptInterface(
                     JavaScriptInterface(
                         context = context,
-                        navController = navController
+                        navController = navController,
+                        viewModel
                     ),
                     "Android"
                 )
@@ -234,7 +288,7 @@ private fun getCachedResponse(context: Context, url: String): WebResourceRespons
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewWithVisualization(dataJson: String,farmId:Long, navController: NavController) {
+fun WebViewWithVisualization(dataJson: String,farmId:Long, navController: NavController,mapViewModel: MapViewModel) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
     var webView: WebView? = null
@@ -277,7 +331,8 @@ fun WebViewWithVisualization(dataJson: String,farmId:Long, navController: NavCon
 
                 addJavascriptInterface(JavaScriptInterface(
                     context,
-                    navController = navController
+                    navController = navController,
+                    mapViewModel
                 ), "Android")
 
                 webViewClient = object : WebViewClient() {
@@ -410,7 +465,7 @@ fun PlotVisualizationApp(navController: NavController,
                     if (viewSelectFarm) {
                         0.65f
                     } else if (accuracy.isNotEmpty()) {
-                        .87f
+                        .99f
                     } else {
                         .93f
                     },
@@ -426,7 +481,8 @@ fun PlotVisualizationApp(navController: NavController,
                 WebViewWithVisualization(
                     dataJson = farmJson,
                     farmId = farmId!!,
-                    navController = navController
+                    navController = navController,
+                    mapViewModel = viewModel
                 )
             } else {
                 WebViewPage(
@@ -437,7 +493,8 @@ fun PlotVisualizationApp(navController: NavController,
                             null
                         )
                     },
-                    navController = navController
+                    navController = navController,
+                    viewModel
                 )
             }
 
@@ -450,22 +507,6 @@ fun PlotVisualizationApp(navController: NavController,
                 .fillMaxWidth()
                 .fillMaxHeight(),
         ) {
-            if (!viewSelectFarm && accuracy.isNotEmpty()) {
-//                Column(
-//                    modifier =
-//                    Modifier
-//                        .fillMaxWidth()
-//                        .height(40.dp)
-//                        .padding(horizontal = 14.dp),
-//                ) {
-//                    Text(
-//                        modifier = Modifier.padding(horizontal = 2.dp),
-//                        color = Color.Black,
-//                        text = stringResource(id = R.string.accuracy) + ": $accuracy m",
-//                    )
-//                }
-            }
-
             FlowRow(
                 modifier =
                 Modifier

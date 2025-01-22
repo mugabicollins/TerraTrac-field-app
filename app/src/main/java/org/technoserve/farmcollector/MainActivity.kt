@@ -121,12 +121,6 @@ class MainActivity : ComponentActivity() {
         getSharedPreferences("FarmCollector", MODE_PRIVATE)
     }
 
-    private var webView: WebView? = null // Shared WebView instance
-
-   // lateinit var navController: NavHostController
-
-
-
     @SuppressLint("InlinedApi")
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,47 +170,17 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val context = LocalContext.current
             var canExitApp by remember { mutableStateOf(false) }
-//            var showExitToast by remember { mutableStateOf(false) }
 
             val currentLanguage by languageViewModel.currentLanguage.collectAsState()
 
             val appUpdateViewModel: AppUpdateViewModel = viewModel()
             val updateAvailable by appUpdateViewModel.updateAvailable.collectAsState()
 
-           //  var showExitDialog by remember { mutableStateOf(false) }
-
 
             // Initialize update check
             LaunchedEffect(Unit) {
                 appUpdateViewModel.initializeAppUpdateCheck(context as Activity)
             }
-
-
-//            // Handle back press
-//            BackHandler {
-//                if (canExitApp) {
-//                    // Exit the app
-//                    (context as? Activity)?.finish()
-//                } else {
-//                    showExitToast = true
-//                    canExitApp = true
-//                }
-//            }
-//
-//
-//            // Show exit toast with delay for reset
-//            if (showExitToast) {
-//                Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
-//
-//                // Delay resetting `showExitToast` and `canExitApp`
-//                LaunchedEffect(showExitToast) {
-//                    kotlinx.coroutines.delay(2000) // 2 seconds delay
-//                    showExitToast = false
-//                    canExitApp = false
-//                }
-//            }
-
-
 
             // Update Alert
             UpdateAlert(
@@ -229,15 +193,6 @@ class MainActivity : ComponentActivity() {
                     })
                 }
             )
-
-//            // Exit Confirmation
-//            ExitConfirmationDialog(
-//                showDialog = showExitDialog,
-//                onDismiss = { showExitDialog = false },
-//                onConfirm = { (context as? Activity)?.finish() }
-//            )
-
-
 
             LaunchedEffect(currentLanguage) {
                 languageViewModel.updateLocale(context = applicationContext, Locale(currentLanguage.code))
@@ -272,20 +227,8 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Routes.HOME,
                     ) {
-//                        composable(Routes.HOME) {
-//                            BackHandler(enabled = canExitApp) {
-//                                (context as? Activity)?.finish()
-//                            }
-//                            LaunchedEffect(Unit) {
-//                                canExitApp = true
-//                            }
-//                            Home(navController, languageViewModel, languages)
-//                        }
                         composable(Routes.HOME) {
-                            //val context = LocalContext.current
-                            // var canExitApp by remember { mutableStateOf(false) }
                             var showExitToast by remember { mutableStateOf(false) }
-
                             // Handle back press with confirmation
                             BackHandler {
                                 if (canExitApp) {
@@ -371,16 +314,6 @@ class MainActivity : ComponentActivity() {
                             AddFarm(navController = navController, siteId = siteId, plotData = plotData)
                         }
 
-
-
-
-
-
-
-
-
-
-
                         composable(Routes.ADD_SITE) {
                             LaunchedEffect(Unit) {
                                 canExitApp = false
@@ -400,18 +333,6 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-
-//                        composable(Routes.SET_POLYGON,
-//                            arguments = listOf(
-//                                navArgument("coordinates") { type = NavType.StringType },
-//                                navArgument("accuracyArray") { type = NavType.StringType }
-//                            )
-//                        ) { backStackEntry ->
-//                            LaunchedEffect(Unit) {
-//                                canExitApp = false
-//                            }
-//                            SetPolygon(navController, viewModel)
-//                        }
 
                         composable(Routes.SET_POLYGON,
                             arguments = listOf(
@@ -456,53 +377,6 @@ class MainActivity : ComponentActivity() {
 
         // Update the locale using the LanguageViewModel
         languageViewModel.selectLanguage(preferredLanguage, this)
-    }
-
-    fun parseCoordinates(coordinatesString: String): List<Pair<Double, Double>> {
-        val result = mutableListOf<Pair<Double, Double>>()
-        val cleanedString = coordinatesString.trim().removeSurrounding("\"", "").replace(" ", "")
-
-        if (cleanedString.isNotEmpty()) {
-            // Check if the coordinates are in polygon or point format
-            val isPolygon = cleanedString.startsWith("[[") && cleanedString.endsWith("]]")
-            val isPoint = cleanedString.startsWith("[") && cleanedString.endsWith("]") && !isPolygon
-
-            if (isPolygon) {
-                // Handle Polygon Format
-                val pairs =
-                    cleanedString
-                        .removePrefix("[[")
-                        .removeSuffix("]]")
-                        .split("],[")
-                        .map { it.split(",") }
-                for (pair in pairs) {
-                    if (pair.size == 2) {
-                        try {
-                            val lat = pair[1].toDouble()
-                            val lon = pair[0].toDouble()
-                            result.add(Pair(lat, lon))
-                        } catch (e: NumberFormatException) {
-                            println("Error parsing polygon coordinate pair: ${pair.joinToString(",")}")
-                        }
-                    }
-                }
-            } else if (isPoint) {
-                // Handle Point Format
-                val coords = cleanedString.removePrefix("[").removeSuffix("]").split(", ")
-                if (coords.size == 2) {
-                    try {
-                        val lat = coords[1].toDouble()
-                        val lon = coords[0].toDouble()
-                        result.add(Pair(lat, lon))
-                    } catch (e: NumberFormatException) {
-                        println("Error parsing point coordinate pair: ${coords.joinToString(",")}")
-                    }
-                }
-            } else {
-                println("Unrecognized coordinates format: $coordinatesString")
-            }
-        }
-        return result
     }
 
     override fun onDestroy() {

@@ -47,141 +47,177 @@
 
 <script>
 
-    // Register the service worker for offline caching
-       if ('serviceWorker' in navigator) {
-         navigator.serviceWorker.register('./service-worker.js').then(() => {
-           console.log('Service Worker registered for offline map caching');
-         }).catch(error => {
-           console.error('Service Worker registration failed:', error);
-         });
-       }
+// Register the service worker for offline caching
+ if ('serviceWorker' in navigator) {
+   navigator.serviceWorker.register('./service-worker.js').then(() => {
+     console.log('Service Worker registered for offline map caching');
+   }).catch(error => {
+     console.error('Service Worker registration failed:', error);
+   });
+ }
 
-       // Function to parse query parameters from URL
-       function getQueryParams() {
-         const params = new URLSearchParams(window.location.search);
-         const center = params.get('center');
-         const zoom = params.get('zoom');
+ // Function to parse query parameters from URL
+ function getQueryParams() {
+   const params = new URLSearchParams(window.location.search);
+   const center = params.get('center');
+   const zoom = params.get('zoom');
 
-         let latLng = [51.505, -0.09]; // Default center (e.g., London)
-         let zoomLevel = 13; // Default zoom
+   let latLng = [51.505, -0.09]; // Default center (e.g., London)
+   let zoomLevel = 13; // Default zoom
 
-         if (center) {
-           const [lat, lng] = center.split(',').map(Number);
-           latLng = [lat, lng];
+   if (center) {
+     const [lat, lng] = center.split(',').map(Number);
+     latLng = [lat, lng];
+   }
+
+   if (zoom) {
+     zoomLevel = parseInt(zoom, 10);
+   }
+
+   return { latLng, zoomLevel };
+ }
+
+ // Extract parameters and initialize the map
+ const { latLng, zoomLevel } = getQueryParams();
+
+ document.addEventListener("DOMContentLoaded", function () {
+   const urlParams = new URLSearchParams(window.location.search);
+   const plotId = urlParams.get("plotId");
+
+   if (plotId && typeof Android !== "undefined" && Android.getSelectedPlot) {
+     console.log("Android interface is available.");
+     console.log("Plot ID from URL:", plotId);
+
+     const plotJson = Android.getSelectedPlot(parseInt(plotId)); // Use the dynamic ID
+     console.log("Plot data:", plotJson);
+
+     if (typeof visualizeData === "function") {
+       visualizeData(plotJson);
+     } else {
+       console.error("visualizeData is not defined.");
+     }
+   } else {
+     console.error("Android interface is not available or plotId is missing.");
+   }
+ });
+
+ function visualizeData(data) {
+   const statusElement = document.getElementById("status");
+   console.log("Data received:", data);
+
+   try {
+     // Parse the data if it is not already in JSON format
+     const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+     console.log("Parsed data:", parsedData);
+
+     // Initialize the map centered on the provided latitude and longitude
+     const map = L.map("map").setView(
+       [parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)],
+       13
+     );
+
+     // Add a tile layer to the map
+     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+       attribution: "&copy; OpenStreetMap contributors",
+     }).addTo(map);
+
+
+         // Default street view layer
+window.streetLayer = L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap contributors",
+  }
+).addTo(map);
+
+// Satellite view layer
+window.satelliteLayer = L.tileLayer(
+  "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+  {
+    maxZoom: 19,
+    attribution: "© Google Satellite",
+  }
+);
+
+// Terrain view layer
+window.terrainLayer = L.tileLayer(
+  "https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+  {
+    maxZoom: 19,
+    attribution: "© Google Maps",
+  }
+);
+
+// Add layer controls
+const baseLayers = {
+  Street: window.streetLayer,
+  Satellite: window.satelliteLayer,
+  Terrain: window.terrainLayer,
+};
+L.control.layers(baseLayers).addTo(map);
+
+     // Handle coordinates
+     if (parsedData.coordinates && parsedData.coordinates.length > 0) {
+       // Transform coordinates from {first, second} to [lat, lng]
+       const latlngs = parsedData.coordinates.map(coord => [
+         coord.first, // Latitude
+         coord.second // Longitude
+       ]);
+       console.log("Transformed Coordinates:", latlngs);
+
+       // Draw the polygon on the map
+       const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
+
+       // Bind a popup to the polygon to display plot metadata
+       polygon.bindPopup(`
+         <b>Farm Information</b><br>
+         Site ID: ${parsedData.siteId}<br>
+         Farmer: ${parsedData.farmerName}<br>
+         Village: ${parsedData.village}<br>
+         District: ${parsedData.district}<br>
+         Size: ${parsedData.size.toFixed(2)} sq units<br>
+         Accuracy: ${
+           Array.isArray(parsedData.accuracyArray)
+             ? parsedData.accuracyArray.join(", ")
+             : "N/A"
          }
+       `);
+     } else {
+       console.warn("Coordinates are missing or empty. Displaying centroid only.");
+     }
 
-         if (zoom) {
-           zoomLevel = parseInt(zoom, 10);
-         }
+     // Add a marker at the centroid (latitude and longitude)
+     L.marker([parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)])
+       .addTo(map)
+       .bindPopup(`
+         <b>Centroid</b><br>
+         Latitude: ${parseFloat(parsedData.latitude).toFixed(5)}<br>
+         Longitude: ${parseFloat(parsedData.longitude).toFixed(5)}
+       `);
 
-         return { latLng, zoomLevel };
-       }
+     // Log the farm details for debugging
+     console.log("Farm Details:");
+     console.log(`Site ID: ${parsedData.siteId}`);
+     console.log(`Farmer Name: ${parsedData.farmerName}`);
+     console.log(
+       `Coordinates: ${
+         parsedData.coordinates && parsedData.coordinates.length > 0
+           ? JSON.stringify(parsedData.coordinates)
+           : "None"
+       }`
+     );
 
-       // Extract parameters and initialize the map
-       const { latLng, zoomLevel } = getQueryParams();
-
-       document.addEventListener("DOMContentLoaded", function () {
-         const urlParams = new URLSearchParams(window.location.search);
-         const plotId = urlParams.get("plotId");
-
-         if (plotId && typeof Android !== "undefined" && Android.getSelectedPlot) {
-           console.log("Android interface is available.");
-           console.log("Plot ID from URL:", plotId);
-
-           const plotJson = Android.getSelectedPlot(parseInt(plotId)); // Use the dynamic ID
-           console.log("Plot data:", plotJson);
-
-           if (typeof visualizeData === "function") {
-             visualizeData(plotJson);
-           } else {
-             console.error("visualizeData is not defined.");
-           }
-         } else {
-           console.error("Android interface is not available or plotId is missing.");
-         }
-       });
-
-       function visualizeData(data) {
-         const statusElement = document.getElementById("status");
-         console.log("Data received:", data);
-
-         try {
-           // Parse the data if it is not already in JSON format
-           const parsedData = typeof data === "string" ? JSON.parse(data) : data;
-           console.log("Parsed data:", parsedData);
-
-           // Initialize the map centered on the provided latitude and longitude
-           const map = L.map("map").setView(
-             [parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)],
-             13
-           );
-
-           // Add a tile layer to the map
-           L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-             attribution: "&copy; OpenStreetMap contributors",
-           }).addTo(map);
-
-           // Handle coordinates
-           if (parsedData.coordinates && parsedData.coordinates.length > 0) {
-             // Transform coordinates from {first, second} to [lat, lng]
-             const latlngs = parsedData.coordinates.map(coord => [
-               coord.first, // Latitude
-               coord.second // Longitude
-             ]);
-             console.log("Transformed Coordinates:", latlngs);
-
-             // Draw the polygon on the map
-             const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
-
-             // Bind a popup to the polygon to display plot metadata
-             polygon.bindPopup(`
-               <b>Farm Information</b><br>
-               Site ID: ${parsedData.siteId}<br>
-               Farmer: ${parsedData.farmerName}<br>
-               Village: ${parsedData.village}<br>
-               District: ${parsedData.district}<br>
-               Size: ${parsedData.size.toFixed(2)} sq units<br>
-               Accuracy: ${
-                 Array.isArray(parsedData.accuracyArray)
-                   ? parsedData.accuracyArray.join(", ")
-                   : "N/A"
-               }
-             `);
-           } else {
-             console.warn("Coordinates are missing or empty. Displaying centroid only.");
-           }
-
-           // Add a marker at the centroid (latitude and longitude)
-           L.marker([parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)])
-             .addTo(map)
-             .bindPopup(`
-               <b>Centroid</b><br>
-               Latitude: ${parseFloat(parsedData.latitude).toFixed(5)}<br>
-               Longitude: ${parseFloat(parsedData.longitude).toFixed(5)}
-             `);
-
-           // Log the farm details for debugging
-           console.log("Farm Details:");
-           console.log(`Site ID: ${parsedData.siteId}`);
-           console.log(`Farmer Name: ${parsedData.farmerName}`);
-           console.log(
-             `Coordinates: ${
-               parsedData.coordinates && parsedData.coordinates.length > 0
-                 ? JSON.stringify(parsedData.coordinates)
-                 : "None"
-             }`
-           );
-
-           // Update the status to indicate the map was loaded successfully
-           statusElement.textContent = "Map loaded successfully!";
-           statusElement.classList.remove("error");
-         } catch (error) {
-           // Handle and display errors
-           statusElement.textContent = `Error loading map: ${error.message}`;
-           statusElement.classList.add("error");
-           console.error("Error visualizing data:", error);
-         }
-       }
+     // Update the status to indicate the map was loaded successfully
+     statusElement.textContent = "Map loaded successfully!";
+     statusElement.classList.remove("error");
+   } catch (error) {
+     // Handle and display errors
+     statusElement.textContent = `Error loading map: ${error.message}`;
+     statusElement.classList.add("error");
+     console.error("Error visualizing data:", error);
+   }
+ }
 
 </script>
 </body>

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.technoserve.farmcollector.database.models.map.MapState
 import org.technoserve.farmcollector.database.models.map.ZoneClusterItem
 import org.technoserve.farmcollector.database.helpers.map.ZoneClusterManager
+import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.utils.GeoCalculator
 import org.technoserve.farmcollector.utils.map.calculateCameraViewPoints
 import org.technoserve.farmcollector.utils.map.getCenterOfPolygon
@@ -57,6 +58,13 @@ class MapViewModel @Inject constructor() : ViewModel() {
 
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
+
+    private val _plotData = MutableStateFlow<Farm?>(null)
+    val plotData: StateFlow<Farm?> = _plotData
+
+    fun updatePlotData(newData: Farm) {
+        _plotData.value = newData
+    }
 
 
     // Method to set coordinates and calculated area

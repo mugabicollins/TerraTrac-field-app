@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -112,8 +113,8 @@ fun FarmForm(
         factory = FarmViewModelFactory(context.applicationContext as Application)
     )
     val mapViewModel: MapViewModel = viewModel()
-//    var size by rememberSaveable { mutableStateOf(readStoredValue(sharedPref)) }
-    var size by remember { mutableStateOf("") }
+    var size by rememberSaveable { mutableStateOf(readStoredValue(sharedPref)) }
+    //var size by remember { mutableStateOf("0.0") }
     var selectedUnit by rememberSaveable {
         mutableStateOf(
             sharedPref.getString(
@@ -141,20 +142,22 @@ fun FarmForm(
             locationState = state
         }
     }
-    // Load the plot size from SharedPreferences
-    LaunchedEffect(Unit) {
-        val sharedPref = context.getSharedPreferences("plot_size", Context.MODE_PRIVATE)
-        size = sharedPref.getString("plot_size", "") ?: ""
-    }
+
+//    // Load the plot size from SharedPreferences
+//    LaunchedEffect(Unit) {
+//        val sharedPref = context.getSharedPreferences("plot_size", Context.MODE_PRIVATE)
+//        size = sharedPref.getString("plot_size", "") ?: ""
+//        Log.d("Saved Size", "Saved Size: $size")
+//    }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-//                size = sharedPref.getString("plot_size", "") ?: ""
+                size = sharedPref.getString("plot_size", "") ?: ""
                 selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
                 with(sharedPref.edit()) {
-//                    remove("plot_size")
+                    remove("plot_size")
                     remove("selectedUnit")
                     apply()
                 }

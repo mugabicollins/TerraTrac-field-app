@@ -5,19 +5,31 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import org.joda.time.Instant
 import org.json.JSONObject
 import org.technoserve.farmcollector.database.AppDatabase
 import org.technoserve.farmcollector.database.models.Farm
+import org.technoserve.farmcollector.ui.composes.AreaDialog
+import org.technoserve.farmcollector.ui.screens.farms.formatInput
+import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
+import org.technoserve.farmcollector.ui.screens.map.CALCULATED_AREA_OPTION
+import org.technoserve.farmcollector.ui.screens.map.ENTERED_AREA_OPTION
+import org.technoserve.farmcollector.utils.convertSize
+import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.net.URLEncoder
 import java.util.UUID
 
 // JavaScript Interface
 class JavaScriptInterface(
     private val context: Context,
-    private val navController: NavController
+    private val navController: NavController,
+    private val mapViewModel: MapViewModel
 ) {
     fun parseCoordinates(coordinatesString: String): List<Pair<Double, Double>> {
         val result = mutableListOf<Pair<Double, Double>>()
@@ -39,8 +51,8 @@ class JavaScriptInterface(
                 for (pair in pairs) {
                     if (pair.size == 2) {
                         try {
-                            val lat = pair[1].toDouble()
-                            val lon = pair[0].toDouble()
+                            val lat = pair[0].toDouble()
+                            val lon = pair[1].toDouble()
                             result.add(Pair(lat, lon))
                         } catch (e: NumberFormatException) {
                             println("Error parsing polygon coordinate pair: ${pair.joinToString(",")}")
@@ -69,6 +81,7 @@ class JavaScriptInterface(
     @JavascriptInterface
     fun receivePlotData(plotDataJson: String) {
         Log.d("JavaScriptInterface", "Received Plot Data: $plotDataJson")
+        val sharedPref = context.getSharedPreferences("FarmCollector", Context.MODE_PRIVATE)
 
         try {
             // Parse the JSON string into a JSONObject
@@ -107,28 +120,31 @@ class JavaScriptInterface(
 
             Log.d("JavaScriptInterface", "Parsed Plot Data: $farmData")
 
+            mapViewModel.updatePlotData(farmData)
+
             val gson = Gson()
             val farmDataJson = gson.toJson(farmData)
             if(farmDataJson == null){
                 Log.d("JavaScriptInterface", "Farm Data Json is null")
                 navController.navigate("addFarm/${farmData.siteId}")
             }
-            val encodedFarmDataJson = URLEncoder.encode(farmDataJson, "UTF-8") // Encode J SON to avoid special character issues
+            val encodedFarmDataJson = URLEncoder.encode(farmDataJson, "UTF-8") // Encode J SON to avoid special character issues'
+
+            val calculatedArea: Double = farmData.size.toDouble() ?: 0.0
+            val enteredArea = sharedPref.getString("plot_size", "0.0")?.toDoubleOrNull() ?: 0.0
+            val selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
+            val enteredAreaConverted = convertSize(enteredArea, selectedUnit)
 
             // Navigate to the AddFarm composable on the main thread
             Handler(Looper.getMainLooper()).post {
-               //navController.navigate("addFarm/${farmData.siteId}/${farmData}")
-
-                navController.navigate("addFarm/${farmData.siteId}?plotDataJson=$encodedFarmDataJson")
-                Log.d("Navigation", "Navigating to: addFarm/$${farmData.siteId}?plotDataJson=$encodedFarmDataJson")
-
-                //  navController.navigate("addFarm/${farmData.siteId}")
+                mapViewModel.showAreaDialog(calculatedArea = calculatedArea.toString(), enteredArea = enteredAreaConverted.toString())// Update the dialog state in the ViewModel
             }
 
         } catch (e: Exception) {
             Log.e("JavaScriptInterface", "Error parsing plot data: ${e.message}", e)
         }
     }
+
 
 
 

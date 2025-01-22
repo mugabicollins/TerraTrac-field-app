@@ -868,48 +868,7 @@
         } else {
           console.error("Android interface not available");
         }
-
-        alert(
-          `Plot saved successfully!\nArea: ${area.toFixed(
-            2
-          )} hectares\nCentroid: ${centroid.lat.toFixed(
-            6
-          )}, ${centroid.lng.toFixed(6)}`
-        );
       });
-
-       function getPlotData() {
-        // Collect the plot data
-          if (points.length < 3) {
-          alert("Please capture at least 3 points to form a valid polygon");
-          return;
-        }
-
-        const area = calculateArea(points);
-        const centroid = calculateCentroid(points);
-
-        // Create plot data with only the map-captured fields filled
-        const plotData = {
-          siteId: "2",
-          remoteId: "e262ae0e-dcf9-41a4-8418-49971478e6e2",
-          farmerPhoto: "photo",
-          farmerName: "test farmer",
-          memberId: "300",
-          village: "test village",
-          district: "test district",
-          purchases: "2.50",
-          size: area,
-          latitude: centroid.lat,
-          longitude: centroid.lng,
-          coordinates: points.map((point) => [point.lat, point.lng]),
-          accuracyArray: accuracyArray,
-          createdAt: "",
-          updatedAt: "",
-        };
-
-        console.log("Get Plot Data to send to Android:", plotData);
-        return JSON.stringify(plotData);
-    }
     });
 </script>
 </body>
