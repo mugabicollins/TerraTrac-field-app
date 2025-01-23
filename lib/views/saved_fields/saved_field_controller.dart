@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -9,6 +10,8 @@ import 'package:terrapipe/local_db_helper/shared_preference.dart';
 import 'package:terrapipe/utilts/helper_functions.dart';
 import 'package:terrapipe/views/saved_fields/components/save_field_map.dart';
 import 'package:terrapipe/widgets/dialogs/session_out_dialog.dart';
+
+import '../../widgets/dialogs/score_dialog.dart';
 
 class SavedFieldController extends GetxController {
   late final MapController mapController;
@@ -37,7 +40,7 @@ class SavedFieldController extends GetxController {
     }
   }
 
-// Initialize the domain list
+  /// Initialize the domain list
   Future<void> fetchGeoId() async {
     const url = 'https://be.terrapipe.io/geo-id';
     String? piplineToken = await SharedPreference.instance.getPiplineToken();
@@ -52,7 +55,6 @@ class SavedFieldController extends GetxController {
           headers: headers,
         ),
       );
-      print("here is the saved fields data::: ${response.data['message']}");
       if (response.statusCode == 200) {
         var jsonData = response.data;
         if (response.data['message'] != "Expired Token") {
@@ -134,6 +136,7 @@ class SavedFieldController extends GetxController {
   }
 
   RxBool loading = false.obs;
+  var fieldData = {}.obs;
 
   Future<void> fetchFieldByGeoId(String geoId) async {
     loading.value = true;
@@ -153,15 +156,14 @@ class SavedFieldController extends GetxController {
 
       if (response.statusCode == 200) {
         var jsonData = response.data;
-        print('Response Data: $jsonData');
+        // log('Response Data: $jsonData');
+        fieldData.value = jsonData;
+        log('fieldData.value ${fieldData}');
         var geoJson = jsonData['JSON Response']?['Geo JSON'];
-        print('geoJson: $geoJson'); // Debugging: check the Geo JSON
         if (geoJson != null && geoJson['geometry'] != null) {
           final geometry = geoJson['geometry'];
           if (geometry['type'] == 'Polygon') {
             final coordinates = geometry['coordinates'];
-            print('Coordinates: $coordinates');
-
             List<LatLng> points = parseCoordinatesToLatLng(coordinates);
             if (points.isNotEmpty) {
               showSnackBar(
@@ -193,7 +195,6 @@ class SavedFieldController extends GetxController {
       } else {
         loading.value = false;
         update();
-        print('Error: ${response.statusCode} - ${response.statusMessage}');
       }
     } catch (e) {
       loading.value = false;
@@ -276,6 +277,106 @@ class SavedFieldController extends GetxController {
         initialZoom: 14.0,
         interactiveFlags: InteractiveFlag.none,
       );
+    }
+  }
+
+// Dio instance for making API calls
+
+  /// Fetch the Wisp TMF Deforestation Score
+  Future<double?> fetchWispTmfDeforestationScore(Map<String, dynamic> geojson) async {
+    String? piplineToken = await SharedPreference.instance.getPiplineToken();
+    var headers = {
+      'Authorization': 'Bearer $piplineToken',
+    };
+    try {
+      var data = json.encode({
+        "geojson":geojson['Geo JSON']
+      });
+      var dio = Dio();
+      var response = await dio.request(
+        'https://be.terrapipe.io/fetch-whisp-tmf-deforestation-score',
+        options: Options(
+          method: 'POST',
+          headers: headers,
+        ),
+        data: data,
+      );
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data != null && data['data'] != null) {
+          return data['data']['tmf_deforestation_score'] is double ? data['data']['tmf_deforestation_score'] : double.tryParse(data['data']['tmf_deforestation_score'].toString());
+        } else {
+          print("Error: Invalid response structure. 'score' not found.");
+          return 0;
+        }
+      } else {
+        print("Error: ${response.statusMessage}");
+        return 0;
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return 0;
+    }
+  }
+
+  /// Fetch the Terra pipe TMF Deforestation Score
+  Future<double?> fetchTerraPipeTmfDeforestationScore(String geoid) async {
+    try {
+      String? pipelineToken = await SharedPreference.instance.getPiplineToken();
+      if (pipelineToken == null || pipelineToken.isEmpty) {
+        return 0.0;
+      }
+
+      // Define headers
+      var headers = {
+        'Authorization': 'Bearer $pipelineToken',
+      };
+      var dio = Dio();
+      var response = await dio.request(
+        'https://be.terrapipe.io/fetch-tmf-deforestation-score?geoid=${geoid}',
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        ),
+      );
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data != null && data['data'] != null) {
+          return data['data']['tmf_deforestation_score'] is double ? data['data']['tmf_deforestation_score'] : double.tryParse(data['data']['tmf_deforestation_score'].toString());
+        } else {
+          print("Error: Invalid response structure. 'score' not found.");
+          return 0.0;
+        }
+      } else {
+        print("Error: ${response.statusMessage} (${response.statusCode})");
+        return 0.0;
+      }
+    } catch (e) {
+      // Catch and log exceptions
+      print("Exception fetchTerraPipeTmfDeforestationScore: $e");
+      return 0.0;
+    }
+  }
+
+  RxBool gettingDetail=false.obs;
+  RxString terraPipeTMFScore="0.0".obs;
+  RxString wispTMFScore="0.0".obs;
+  /// Main function to handle API calls and navigate to the new page
+  Future<void> handleAccessData() async {
+    gettingDetail.value=true;
+    update();
+    final terraPipeScore = await fetchTerraPipeTmfDeforestationScore(fieldData['JSON Response']['GEO Id']);
+    final wispScore = await fetchWispTmfDeforestationScore(fieldData['JSON Response']);
+    gettingDetail.value=false;
+    update();
+    if (wispScore != null || terraPipeScore != null) {
+      terraPipeTMFScore.value="${terraPipeScore}";
+      wispTMFScore.value="${wispScore}";
+      update();
+      Get.dialog(ScoreDialog());
+
+    } else {
+      print("Failed to fetch scores.");
     }
   }
 }
