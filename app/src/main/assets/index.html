@@ -175,6 +175,27 @@
           ]);
           console.log("Transformed Coordinates:", latlngs);
 
+          // Calculate the centroid (center) of the coordinates
+          const centroid = latlngs
+            .reduce(
+              (acc, curr) => {
+                acc[0] += curr[0]; // Sum latitude
+                acc[1] += curr[1]; // Sum longitude
+                return acc;
+              },
+              [0, 0]
+            )
+            .map((sum) => sum / latlngs.length); // Divide sums by the number of points
+
+          console.log("Centroid Coordinates:", centroid);
+          // Add a marker at the centroid
+          const centroidMarker = L.marker(centroid).addTo(map);
+          centroidMarker.bindPopup(`
+            <b>Centroid Information</b><br>
+            Latitude: ${centroid[0].toFixed(6)}<br>
+            Longitude: ${centroid[1].toFixed(6)}
+          `);
+
           // Draw the polygon on the map
           const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
 
@@ -197,16 +218,6 @@
             "Coordinates are missing or empty. Displaying centroid only."
           );
         }
-
-        // Add a marker at the centroid (latitude and longitude)
-        L.marker([
-          parseFloat(parsedData.latitude),
-          parseFloat(parsedData.longitude),
-        ]).addTo(map).bindPopup(`
-       <b>Centroid</b><br>
-       Latitude: ${parseFloat(parsedData.latitude).toFixed(5)}<br>
-       Longitude: ${parseFloat(parsedData.longitude).toFixed(5)}
-     `);
 
         // Log the farm details for debugging
         console.log("Farm Details:");
