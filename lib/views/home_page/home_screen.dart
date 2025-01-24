@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         opacity: 0.9,
         color: AppColor.white,
         progressIndicator: BounceAbleLoader(
-          title: controller.isPolygonLoading.isTrue?"Registering Field":"Fetching Details",
+          title: controller.isPolygonLoading.isTrue?"Registering Field":controller.isFieldSaveLoading.value?"Saving Field":"Fetching Details",
           textColor: AppColor.black,
           loadingColor: AppColor.black,
         ),
@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                       fillColor: AppColor.white,
                                       cursorColor: AppColor.black45,
                                       onSubmitted: (val) async {
-                                        await controller.getFieldByGeoId(controller
+                                        await controller.searchFieldByGeoId(controller
                                             .searchController.text
                                             .trim());
                                       },
@@ -259,7 +259,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                               loadLocation();
                                               setState(() {});
                                             }else{
-                                              await controller.getFieldByGeoId(controller
+                                              FocusScope.of(context).unfocus();
+                                              await controller.searchFieldByGeoId(controller
                                                   .searchController.text
                                                   .trim());
                                             }
@@ -296,6 +297,28 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               ],
                             ),
                           ),
+
+                          if(controller.saveButtonEABLE.value)
+                            Positioned(
+                              left: Get.width*0.2,
+                              right: Get.width*0.2,
+                              bottom: Get.height*0.24,
+                              child: ElevatedButton.icon(
+                                onPressed: () async {
+                                  print("tAP BUTTON ${controller.searchResult['JSON Response']['GEO Id']}");
+                                  await controller.saveFieldByGeoIdTerraPipe(controller.searchResult['JSON Response']['GEO Id']);
+                                },
+                                icon: Icon(
+                                  Icons.add,
+                                  color: AppColor.white,
+                                ),
+                                label: Text("Save Field",
+                                    style:
+                                    TextStyle(color: AppColor.white)),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColor.primaryColor),
+                              ),
+                            ),
                           if (controller.isMarkPostion.value)
                             Positioned(
                               left: 20,

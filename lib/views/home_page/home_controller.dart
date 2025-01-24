@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' as m;
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -135,7 +137,6 @@ class HomeController extends GetxController {
     shapePoints.add(point);
   }
 
-
   void finishShape(context) async {
     if (shapePoints.length < 3) {
       showError("A shape must have at least 3 points.", context);
@@ -143,7 +144,6 @@ class HomeController extends GetxController {
     }
 
     List<LatLng> finalShapePoints = List.from(shapePoints)..add(shapePoints[0]);
-
 
     drawnPolygons.add(
       Polygon(
@@ -173,6 +173,7 @@ class HomeController extends GetxController {
     isDrawingLine.value = false;
     update();
   }
+
   void startDrawing() {
     isDrawPolygon.value = true;
     shapePoints.clear();
@@ -206,7 +207,7 @@ class HomeController extends GetxController {
       double lat = rectangleStart!.latitude;
       double lon = rectangleStart!.longitude;
       double newLat = lat + (rectangleSize / 111320);
-      double newLon = lon + (rectangleSize / (111320 * cos(lat * pi / 180)));
+      double newLon = lon + (rectangleSize / (111320 * m.cos(lat * pi / 180)));
       rectangleEnd = LatLng(newLat, newLon);
     }
   }
@@ -219,7 +220,7 @@ class HomeController extends GetxController {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        print('domainsReponseBody: ${response.body}');
+
         var data = jsonDecode(response.body);
 
         if (data['Domains'] is List) {
@@ -228,8 +229,7 @@ class HomeController extends GetxController {
           print('Error: "Domains" is not a list');
         }
       } else {
-        print('Error: ${response.statusCode}');
-        print('Response: ${response.body}');
+
       }
     } catch (e) {
       print('Exception Occurred: $e');
@@ -279,6 +279,7 @@ class HomeController extends GetxController {
     }
     update();
   }
+
   // Other properties and methods...
   void addPolygon(List<LatLng> points, {Color borderColor = Colors.yellow}) {
     // Add the polygon to the list
@@ -294,8 +295,10 @@ class HomeController extends GetxController {
     if (points.isNotEmpty) {
       final latitudes = points.map((point) => point.latitude);
       final longitudes = points.map((point) => point.longitude);
-      final southWest = LatLng(latitudes.reduce((a, b) => a < b ? a : b), longitudes.reduce((a, b) => a < b ? a : b));
-      final northEast = LatLng(latitudes.reduce((a, b) => a > b ? a : b), longitudes.reduce((a, b) => a > b ? a : b));
+      final southWest = LatLng(latitudes.reduce((a, b) => a < b ? a : b),
+          longitudes.reduce((a, b) => a < b ? a : b));
+      final northEast = LatLng(latitudes.reduce((a, b) => a > b ? a : b),
+          longitudes.reduce((a, b) => a > b ? a : b));
       final bounds = LatLngBounds(southWest, northEast);
       animatedMapMove(bounds, duration: const Duration(milliseconds: 1500));
     }
@@ -304,6 +307,7 @@ class HomeController extends GetxController {
   void clearPolygons() {
     drawnPolygons.clear();
   }
+
   void incrementValue() {
     int currentValue = int.tryParse(thresholdController.text) ?? 0;
     thresholdController.text = (currentValue + 1).toString();
@@ -313,61 +317,107 @@ class HomeController extends GetxController {
     int currentValue = int.tryParse(thresholdController.text) ?? 0;
     thresholdController.text = (currentValue - 1).toString();
   }
+
   void markPostionLatLng(LatLng point) {
     if (!isMarkPostion.value) return;
     markPosition.add(point);
   }
-  RxBool searchEnable=false.obs;
 
+  RxBool searchEnable = false.obs;
+  RxBool saveButtonEABLE = false.obs;
+  var searchResult = {}.obs;
 
-  Future<void> getFieldByGeoId(String geoId) async {
-    searchEnable.value=true;
-    update();
+  Future<void> searchFieldByGeoId(String geoId) async {
     if (geoId.isEmpty) {
       print("Error: GeoID is empty");
       return;
     }
+    drawnPolygons.clear();
+    searchEnable.value = true;
     searchLoading.value = true;
     update();
-    const baseUrl = 'https://api-ar.agstack.org';
-    final cleanedGeoId = geoId.trim();
-    final url = Uri.parse('$baseUrl/fetch-field-wkt/$cleanedGeoId');
-    try {
-      final response = await http.get(url).timeout(const Duration(seconds: 15),
-          onTimeout: () {
-        searchLoading.value = false;
-        update();
-        throw TimeoutException(
-            'The connection has timed out, please try again later.');
-      });
-      print("here is the  Search Response::::>>>>> ${response.body}");
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('Parsed Data: $data');
 
-        // Assuming the polygon data is under 'WKT' field.
-        final wktData = data['WKT'];
-        if (wktData != null) {
-          List<LatLng> polygonPoints = parseWKTToLatLng(wktData);
+    String? pipelineToken = await SharedPreference.instance.getPiplineToken();
+    if (pipelineToken == null || pipelineToken.isEmpty) {
+      searchLoading.value = false;
+      update();
+      return;
+    }
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $pipelineToken',
+    };
+    const baseUrl = 'https://be.terrapipe.io/fetch-field';
+    final cleanedGeoId = geoId.trim();
+    final url = '$baseUrl/$cleanedGeoId';
+
+    try {
+      var response = await dio.request(
+        url,
+        options: Options(
+          method: 'GET',
+          headers: headers,
+        ),
+      );
+
+
+      if (response.statusCode == 200) {
+        // Ensure response.data is handled as a Map
+        final Map<String, dynamic> data = response.data;
+        searchResult.value=data;
+        if(searchResult.containsKey("registered")){
+          if(!searchResult['registered']){
+            saveButtonEABLE.value=true;
+          }
+        }
+
+        // Access the required fields
+        final geoJson = data['JSON Response']['Geo JSON'];
+        final coordinates = geoJson?['geometry']?['coordinates'];
+        if (coordinates != null) {
+          // Parse coordinates into LatLng list
+          List<LatLng> polygonPoints = parseCoordinatesToLatLng(coordinates);
           addPolygon(polygonPoints);
-          searchLoading.value = false;
-          update();
+        } else {
+          showSnackBar(
+            title: "Search",
+            message: "No result found against given id",
+          );
         }
       } else {
+        // print("Error: ${response.statusMessage}");
         searchLoading.value = false;
         update();
       }
     } catch (e) {
+      // print('Exception Occurred: $e');
+      showSnackBar(
+        title: "Search",
+        message: "No result found against given id",
+      );
       searchLoading.value = false;
       update();
-      print('Exception Occurred: $e');
+    } finally {
+      searchLoading.value = false;
+      update();
     }
+  }
+
+  /// Helper function to parse coordinates into LatLng list
+  List<LatLng> parseCoordinatesToLatLng(dynamic coordinates) {
+    if (coordinates is List && coordinates.isNotEmpty) {
+      return coordinates.first
+          .map<LatLng>((coord) => LatLng(coord[1], coord[0]))
+          .toList();
+    }
+    return [];
   }
 
   Future<dynamic> saveFieldByGeoIdTerraPipe(String geoId) async {
     isFieldSaveLoading.value = true;
+    update();
     String? piplineToken = await SharedPreference.instance.getPiplineToken();
-
     var headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $piplineToken'
@@ -386,8 +436,6 @@ class HomeController extends GetxController {
         ),
         data: data,
       );
-
-      print("here is the field sSubmit To TerraPipe  ::::: >>>>> ${response.data}");
       if (response.statusCode == 200) {
         Get.back();
         showSnackBar(
@@ -395,6 +443,7 @@ class HomeController extends GetxController {
           title: "Success",
           message: "Field has been saved successfully",
         );
+        saveButtonEABLE.value=false;
         Clipboard.setData(ClipboardData(text: geoId));
         isFieldSaveLoading.value = false;
         return response.data;
@@ -424,8 +473,10 @@ class HomeController extends GetxController {
     isPolygonLoading.value = true;
     const baseUrl = 'https://api-ar.agstack.org';
     final url = Uri.parse('$baseUrl/register-field-boundary');
-    String? apiKey = await SharedPreference.instance.getSecretKeyLocalDb('api_key');
-    String? clientSecret = await SharedPreference.instance.getSecretKeyLocalDb('client_secret');
+    String? apiKey =
+        await SharedPreference.instance.getSecretKeyLocalDb('api_key');
+    String? clientSecret =
+        await SharedPreference.instance.getSecretKeyLocalDb('client_secret');
 
     final headers = {
       'API-KEYS-AUTHENTICATION': '1',
@@ -433,12 +484,11 @@ class HomeController extends GetxController {
       'CLIENT-SECRET': clientSecret ?? '',
       'AUTOMATED-FIELD': '0',
     };
-
-    print("here is the save response ${drawnPolygons}");
     String wkt = convertPolygonToWKT(drawnPolygons);
-    print("hehehehehe${wkt}");
-    String? s2Index = s2IndexController.text.isNotEmpty ? s2IndexController.text : null;
-    String? threshold = thresholdController.text.isNotEmpty ? thresholdController.text : null;
+    String? s2Index =
+        s2IndexController.text.isNotEmpty ? s2IndexController.text : null;
+    String? threshold =
+        thresholdController.text.isNotEmpty ? thresholdController.text : null;
 
     final body = {
       'wkt': wkt,
@@ -452,9 +502,7 @@ class HomeController extends GetxController {
         headers: headers,
         body: jsonEncode(body),
       );
-      print('polygonReponseBody: ${response.body}');
       if (response.statusCode == 200) {
-        print('polygonReponseBody: ${response.body}');
         isPolygonLoading.value = false;
         // Extract Geo Id from the response
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -518,8 +566,7 @@ class HomeController extends GetxController {
           ),
         );
       } else {
-        print('polygonReponseBody: ${response.body}');
-        var result=jsonDecode(response.body);
+        var result = jsonDecode(response.body);
         showSnackBar(
           color: Colors.red,
           title: "Exception",
@@ -529,10 +576,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       isPolygonLoading.value = false;
-      print('Exception Occurred: $e');
+      update();
     }
   }
-
 
   String convertPolygonToWKT(RxList<Polygon> polygons) {
     if (polygons.isEmpty || polygons.first.points.isEmpty) {

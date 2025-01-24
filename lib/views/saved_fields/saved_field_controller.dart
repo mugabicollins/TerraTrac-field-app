@@ -125,7 +125,7 @@ class SavedFieldController extends GetxController {
           }
         }
       } else {
-        print('Error: ${response.statusCode} - ${response.statusMessage}');
+        // print('Error: ${response.statusCode} - ${response.statusMessage}');
       }
     } catch (e) {
       print('Exception Occurred: $e');
@@ -353,7 +353,7 @@ class SavedFieldController extends GetxController {
       }
     } catch (e) {
       // Catch and log exceptions
-      print("Exception fetchTerraPipeTmfDeforestationScore: $e");
+      // print("Exception fetchTerraPipeTmfDeforestationScore: $e");
       return 0.0;
     }
   }
@@ -376,7 +376,7 @@ class SavedFieldController extends GetxController {
       Get.dialog(ScoreDialog());
 
     } else {
-      print("Failed to fetch scores.");
+      // print("Failed to fetch scores.");
     }
   }
 }
