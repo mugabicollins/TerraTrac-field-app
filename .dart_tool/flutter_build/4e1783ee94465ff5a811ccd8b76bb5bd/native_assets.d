@@ -1,0 +1,1 @@
+ C:\\Users\\nireg\\OneDrive\\Desktop\\agstack\\TerraTrac-field-app\\.dart_tool\\flutter_build\\4e1783ee94465ff5a811ccd8b76bb5bd\\native_assets.yaml: 

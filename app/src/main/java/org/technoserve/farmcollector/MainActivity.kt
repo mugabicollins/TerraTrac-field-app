@@ -311,7 +311,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             } else null
 
-                            AddFarm(navController = navController, siteId = siteId, plotData = plotData)
+                            AddFarm(navController = navController, siteId = siteId, plotData = plotData, mapViewModel=viewModel)
                         }
 
                         composable(Routes.ADD_SITE) {

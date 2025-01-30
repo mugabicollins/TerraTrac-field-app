@@ -36,6 +36,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -94,17 +95,18 @@ fun FarmForm(
     navController: NavController,
     siteId: Long,
     coordinatesData: List<Pair<Double, Double>>?,
-    accuracyArrayData: List<Float?>?
+    accuracyArrayData: List<Float?>?,
+   mapViewModel: MapViewModel
 ) {
     val context = LocalContext.current as Activity
     var isValid by remember { mutableStateOf(true) }
-    var farmerName by rememberSaveable { mutableStateOf("") }
-    var memberId by rememberSaveable { mutableStateOf("") }
-    val farmerPhoto by rememberSaveable { mutableStateOf("") }
-    var village by rememberSaveable { mutableStateOf("") }
-    var district by rememberSaveable { mutableStateOf("") }
-    var latitude by rememberSaveable { mutableStateOf("") }
-    var longitude by rememberSaveable { mutableStateOf("") }
+//    var farmerName by rememberSaveable { mutableStateOf("") }
+//    var memberId by rememberSaveable { mutableStateOf("") }
+//    val farmerPhoto by rememberSaveable { mutableStateOf("") }
+//    var village by rememberSaveable { mutableStateOf("") }
+//    var district by rememberSaveable { mutableStateOf("") }
+//    var latitude by rememberSaveable { mutableStateOf("") }
+//    var longitude by rememberSaveable { mutableStateOf("") }
     //var accuracyArray by rememberSaveable { mutableStateOf(listOf<Float>()) }
     val items = listOf("Ha", "Acres", "Sqm", "Timad", "Fichesa", "Manzana", "Tarea")
     var expanded by remember { mutableStateOf(false) }
@@ -112,8 +114,8 @@ fun FarmForm(
     val farmViewModel: FarmViewModel = viewModel(
         factory = FarmViewModelFactory(context.applicationContext as Application)
     )
-    val mapViewModel: MapViewModel = viewModel()
-    var size by rememberSaveable { mutableStateOf(readStoredValue(sharedPref)) }
+    // val mapViewModel: MapViewModel = viewModel()
+    //var size by rememberSaveable { mutableStateOf(readStoredValue(sharedPref)) }
     //var size by remember { mutableStateOf("0.0") }
     var selectedUnit by rememberSaveable {
         mutableStateOf(
@@ -123,6 +125,42 @@ fun FarmForm(
             ) ?: items[0]
         )
     }
+    // Collect plotData from ViewModel
+    val farmData by mapViewModel.plotData.collectAsState()
+
+    // ✅ Use state variables linked to ViewModel
+    var farmerName by remember { mutableStateOf(farmData.farmerName) }
+    var memberId by remember { mutableStateOf(farmData.memberId) }
+    var farmerPhoto by remember { mutableStateOf(farmData.farmerPhoto) }
+    var village by remember { mutableStateOf(farmData.village) }
+    var district by remember { mutableStateOf(farmData.district) }
+    var coordinates by remember { mutableStateOf(farmData.coordinates) }
+    var latitude by remember { mutableStateOf(farmData.latitude) }
+    var longitude by remember { mutableStateOf(farmData.longitude) }
+    var size by remember { mutableStateOf(farmData.size.toString()) }
+    var accuracyArray by remember { mutableStateOf(farmData.accuracyArray) }
+
+    // ✅ Ensure state updates when farmData changes
+    LaunchedEffect(farmData) {
+        Log.d("SITE ID", "$siteId")
+        Log.d("FarmDataChanged", "FarmData changed: $farmData")
+        farmerName = farmData.farmerName
+        memberId = farmData.memberId
+        farmerPhoto = farmData.farmerPhoto
+        village = farmData.village
+        district = farmData.district
+        coordinates = farmData.coordinates
+        latitude = farmData.latitude
+        longitude = farmData.longitude
+        size = farmData.size.toString()
+        accuracyArray = farmData.accuracyArray
+    }
+
+
+
+
+
+
     var isValidSize by remember { mutableStateOf(true) }
     var isFormSubmitted by remember { mutableStateOf(false) }
     val scientificNotationPattern = Pattern.compile("([+-]?\\d*\\.?\\d+)[eE][+-]?\\d+")
@@ -148,10 +186,10 @@ fun FarmForm(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                size = sharedPref.getString("plot_size", "") ?: ""
+               size = sharedPref.getString("plot_size", "") ?: ""
                 selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
                 with(sharedPref.edit()) {
-                    remove("plot_size")
+                   remove("plot_size")
                     remove("selectedUnit")
                     apply()
                 }
@@ -195,6 +233,7 @@ fun FarmForm(
     }
 
     fun saveFarm() {
+        Log.d("Save Farm", " Data to save  $farmData")
         // Validate size input if the size is empty we use the default size 0
         if (size.isEmpty()) {
             size = "0.0"
@@ -255,7 +294,7 @@ fun FarmForm(
                 TextButton(onClick =
                 {
                     showDialog.value = false
-                    navController.navigate("setPolygon")
+                    navController.navigate("setPolygon/$siteId")
                 }) {
                     Text(text = stringResource(id = R.string.set_polygon))
                 }
@@ -320,6 +359,7 @@ fun FarmForm(
             value = farmerName,
             onValueChange = {
                 farmerName = it
+                mapViewModel.updatePlotData(farmerName = it)
                 isfarmerNameValid =
                     farmerName.isNotBlank() && farmerName.matches(textWithNumbersRegex)
             },
@@ -363,7 +403,9 @@ fun FarmForm(
                 onDone = { focusRequester1.requestFocus() }
             ),
             value = memberId,
-            onValueChange = { memberId = it },
+            onValueChange = { memberId = it
+                mapViewModel.updatePlotData(memberId = it)
+                },
             label = { Text(stringResource(id = R.string.member_id), color = inputLabelColor) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.background,
@@ -389,6 +431,7 @@ fun FarmForm(
             value = village,
             onValueChange = {
                 village = it
+                mapViewModel.updatePlotData(village = it)
                 isvillageValid = village.isNotBlank() && village.matches(textWithNumbersRegex)
             },
             label = {
@@ -428,6 +471,7 @@ fun FarmForm(
             value = district,
             onValueChange = {
                 district = it
+                mapViewModel.updatePlotData(district = it)
                 isDistrictValid = district.isNotBlank() && district.matches(textWithNumbersRegex)
             },
             label = {

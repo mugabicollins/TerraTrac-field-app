@@ -97,6 +97,22 @@ fun WebViewPage(
     val showDialog by viewModel.showDialog.collectAsState()
 
     val plotData by viewModel.plotData.collectAsState()
+//    // Log or use the data
+//    LaunchedEffect(plotData) {
+//        plotData?.let {
+//            Log.d("WebViewPage", "Plot Data Loaded: $it")
+//            Log.d("FarmCollector", "Plot Data: $plotData")
+//        }
+//    }
+
+
+
+//    val farmData =
+//        navController.previousBackStackEntry?.arguments?.getParcelable<ParcelableFarmData>("farmData")
+//    // cast farmData string to Farm object
+//    val farmInfo = farmData?.farm
+
+    Log.d("Data in web view page", "Data in web view page: $plotData")
 
     // Define cache directory
     val cachePath = File(context.cacheDir, "webview-cache")
@@ -383,10 +399,21 @@ fun PlotVisualizationApp(
     navController: NavController,
     viewModel: MapViewModel, siteId: Long
 ) {
-    val farmData =
-        navController.previousBackStackEntry?.arguments?.getParcelable<ParcelableFarmData>("farmData")
-    // cast farmData string to Farm object
-    val farmInfo = farmData?.farm
+//    val farmData =
+//        navController.previousBackStackEntry?.arguments?.getParcelable<ParcelableFarmData>("farmData")
+//    // cast farmData string to Farm object
+//    val farmInfo = farmData?.farm
+//
+//    Log.d("FarmCollector", "Plot Info: $farmInfo")
+
+    val plotData by viewModel.plotData.collectAsState()
+    LaunchedEffect(plotData) {
+        plotData?.let {
+            Log.d("Plot Data Loaded", "Plot Data Loaded: $it")
+        }
+    }
+    val farmInfo = plotData
+
     var viewSelectFarm by remember { mutableStateOf(false) }
     val mapViewModel: MapViewModel = viewModel()
     var accuracy by remember { mutableStateOf("") }
@@ -443,7 +470,7 @@ fun PlotVisualizationApp(
     )
 
     // Display coordinates of a farm on map
-    if (farmInfo != null && !viewSelectFarm) {
+    if (farmInfo.siteId != 0L && !viewSelectFarm) {
         viewModel.clearCoordinates()
         if (farmInfo.coordinates?.isNotEmpty() == true) {
             viewModel.addCoordinates(farmInfo.coordinates!!)
@@ -476,7 +503,7 @@ fun PlotVisualizationApp(
             // Leaflet map
             val farmId = farmInfo?.id
             val farmJson = Gson().toJson(farmInfo)
-            if (farmInfo != null) {
+            if (farmInfo.siteId != 0L && farmInfo.id != null) {
                 WebViewWithVisualization(
                     dataJson = farmJson,
                     farmId = farmId!!,
@@ -484,17 +511,19 @@ fun PlotVisualizationApp(
                     mapViewModel = viewModel
                 )
             } else {
-                WebViewPage(
-                    url = "file:///android_asset/leaflet_map.html?siteId=${siteId}",
-                    onWebViewCreated = { webView ->
-                        webView.evaluateJavascript(
-                            "if (typeof visualizeData === 'function') { visualizeData([]); } else { console.error('visualizeData is not defined'); }",
-                            null
-                        )
-                    },
-                    navController = navController,
-                    viewModel
-                )
+                if(siteId != 0L) {
+                    WebViewPage(
+                        url = "file:///android_asset/leaflet_map.html?siteId=${siteId}",
+                        onWebViewCreated = { webView ->
+                            webView.evaluateJavascript(
+                                "if (typeof visualizeData === 'function') { visualizeData([]); } else { console.error('visualizeData is not defined'); }",
+                                null
+                            )
+                        },
+                        navController = navController,
+                        viewModel
+                    )
+                }
             }
 
         }

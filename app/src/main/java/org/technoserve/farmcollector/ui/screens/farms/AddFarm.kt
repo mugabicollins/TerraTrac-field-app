@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.location.LocationManager
 import android.provider.Settings
 import android.util.Log
-import android.webkit.WebView
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,15 +32,14 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.Gson
 import org.joda.time.Instant
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.Farm
-import org.technoserve.farmcollector.database.models.ParcelablePair
 
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.ui.components.FarmForm
 import org.technoserve.farmcollector.ui.components.FarmListHeader
+import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.UUID
@@ -59,7 +57,8 @@ import java.util.UUID
 fun AddFarm(
     navController: NavController,
     siteId: Long,
-    plotData: Farm?
+    plotData: Farm?,
+    mapViewModel: MapViewModel
 ) {
 
     Log.d("Farm Data on add farm ", "Farm Data on add farm: $plotData")
@@ -90,7 +89,7 @@ fun AddFarm(
             onRestoreClicked = {}
         )
         Spacer(modifier = Modifier.height(16.dp))
-        FarmForm(navController, siteId, coordinatesData, accuracyArrayData)
+        FarmForm(navController, siteId, coordinatesData, accuracyArrayData,mapViewModel)
     }
 }
 

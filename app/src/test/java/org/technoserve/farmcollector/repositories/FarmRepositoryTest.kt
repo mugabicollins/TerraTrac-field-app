@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -18,7 +17,6 @@ import org.mockito.MockitoAnnotations
 import org.technoserve.farmcollector.database.dao.FarmDAO
 import org.technoserve.farmcollector.database.models.CollectionSite
 import org.technoserve.farmcollector.database.models.Farm
-import java.util.UUID
 
 class FarmRepositoryTest {
 

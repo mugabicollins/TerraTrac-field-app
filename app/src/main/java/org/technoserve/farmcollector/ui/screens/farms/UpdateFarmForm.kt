@@ -281,7 +281,7 @@ fun UpdateFarmForm(
             onCaptureNew = {
                 coordinates =
                     listOf()
-                navController.navigate("SetPolygon")
+                navController.navigate("setPolygon/${item.siteId}")
 
                 with(sharedPref.edit()) {
                     putBoolean(KEY_HAS_NEW_POLYGON, true)
@@ -321,7 +321,7 @@ fun UpdateFarmForm(
                     onClick =
                     {
                         showDialog.value = false
-                        navController.navigate("setPolygon")
+                        navController.navigate("setPolygon/${item.siteId}")
                     },
                 ) {
                     Text(text = stringResource(id = R.string.set_polygon))

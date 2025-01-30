@@ -5,21 +5,11 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
-import org.joda.time.Instant
 import org.json.JSONObject
 import org.technoserve.farmcollector.database.AppDatabase
 import org.technoserve.farmcollector.database.models.Farm
-import org.technoserve.farmcollector.ui.composes.AreaDialog
-import org.technoserve.farmcollector.ui.screens.farms.formatInput
-import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
-import org.technoserve.farmcollector.ui.screens.map.CALCULATED_AREA_OPTION
-import org.technoserve.farmcollector.ui.screens.map.ENTERED_AREA_OPTION
 import org.technoserve.farmcollector.utils.convertSize
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.net.URLEncoder
@@ -99,7 +89,7 @@ class JavaScriptInterface(
                 siteId = jsonObject.getLong("siteId"),
                 remoteId = jsonObject.optString("remoteId").takeIf { it.isNotBlank() }?.let { UUID.fromString(it) } ?: UUID.randomUUID(),
                 farmerPhoto = jsonObject.getString("farmerPhoto"),
-                farmerName = jsonObject.getString("farmerName"),
+                farmerName = jsonObject.getString("farmerName")?: "Farmer",
                 memberId = jsonObject.getString("memberId"),
                 village = jsonObject.getString("village"),
                 district = jsonObject.getString("district"),
@@ -120,7 +110,16 @@ class JavaScriptInterface(
 
             Log.d("JavaScriptInterface", "Parsed Plot Data: $farmData")
 
-            mapViewModel.updatePlotData(farmData)
+//            mapViewModel.updatePlotData(farmData)
+            mapViewModel.updatePlotData(
+                siteId = farmData.siteId,
+                coordinates = parsedCoordinates,
+                latitude = farmData.latitude,
+                longitude = farmData.longitude,
+                size = farmData.size,
+                accuracyArray = farmData.accuracyArray as List<Float>?
+            )
+
 
             val gson = Gson()
             val farmDataJson = gson.toJson(farmData)
@@ -130,7 +129,7 @@ class JavaScriptInterface(
             }
             val encodedFarmDataJson = URLEncoder.encode(farmDataJson, "UTF-8") // Encode J SON to avoid special character issues'
 
-            val calculatedArea: Double = farmData.size.toDouble() ?: 0.0
+            val calculatedArea: Double = farmData.size?.toDouble() ?: 0.0
             val enteredArea = sharedPref.getString("plot_size", "0.0")?.toDoubleOrNull() ?: 0.0
             val selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
             val enteredAreaConverted = convertSize(enteredArea, selectedUnit)
@@ -175,8 +174,13 @@ class JavaScriptInterface(
         Log.d("Selected farm", "getSelectedPlot: $farm")
 
         if (farm != null) {
-            // Parse coordinates if stored as a string
-            val parsedCoordinates = parseCoordinatesVisualize(farm.coordinates.toString())
+
+            // Determine coordinates
+            val coordinates = farm.coordinates?.toString()?.takeIf { it.isNotEmpty() }
+                ?: "[${farm.latitude}, ${farm.longitude}]" // Use latitude and longitude if coordinates are null
+
+            // Parse coordinates
+            val parsedCoordinates = parseCoordinatesVisualize(coordinates)
 
             Log.d("Selected Coordinates", "getSelectedPlot: $parsedCoordinates")
 

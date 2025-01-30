@@ -116,7 +116,7 @@
       try {
         // Parse the data if it is not already in JSON format
         const parsedData = typeof data === "string" ? JSON.parse(data) : data;
-        console.log("Parsed data:", parsedData);
+        console.log("Parsed data:", parsedData.latitude, parsedData.longitude);
 
         // Initialize the map centered on the provided latitude and longitude
         const map = L.map("map").setView(
@@ -167,57 +167,92 @@
         L.control.layers(baseLayers).addTo(map);
 
         // Handle coordinates
-        if (parsedData.coordinates && parsedData.coordinates.length > 0) {
-          // Transform coordinates from {first, second} to [lat, lng]
-          const latlngs = parsedData.coordinates.map((coord) => [
-            coord.first, // Latitude
-            coord.second, // Longitude
-          ]);
-          console.log("Transformed Coordinates:", latlngs);
+let latlngs = [];
 
-          // Calculate the centroid (center) of the coordinates
-          const centroid = latlngs
-            .reduce(
-              (acc, curr) => {
-                acc[0] += curr[0]; // Sum latitude
-                acc[1] += curr[1]; // Sum longitude
-                return acc;
-              },
-              [0, 0]
-            )
-            .map((sum) => sum / latlngs.length); // Divide sums by the number of points
+if (parsedData.coordinates && parsedData.coordinates.length > 0) {
+  latlngs = parsedData.coordinates.map((coord) => [
+    parseFloat(coord.first),  // Ensure it's a number
+    parseFloat(coord.second)  // Ensure it's a number
+  ]);
+} else if (parsedData.latitude && parsedData.longitude) {
+  // Use latitude and longitude as a single point if coordinates are missing
+  latlngs = [[parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)]];
+  console.warn("Coordinates are missing or empty. Using latitude and longitude instead.");
+}
 
-          console.log("Centroid Coordinates:", centroid);
-          // Add a marker at the centroid
-          const centroidMarker = L.marker(centroid).addTo(map);
-          centroidMarker.bindPopup(`
-            <b>Centroid Information</b><br>
-            Latitude: ${centroid[0].toFixed(6)}<br>
-            Longitude: ${centroid[1].toFixed(6)}
-          `);
+// Check if latlngs contains valid numbers
+latlngs = latlngs.filter(coord => !isNaN(coord[0]) && !isNaN(coord[1]));
 
-          // Draw the polygon on the map
-          const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
+if (latlngs.length > 0) {
+  console.log("Transformed Coordinates:", latlngs);
 
-          // Bind a popup to the polygon to display plot metadata
-          polygon.bindPopup(`
-       <b>Farm Information</b><br>
-       Site ID: ${parsedData.siteId}<br>
-       Farmer: ${parsedData.farmerName}<br>
-       Village: ${parsedData.village}<br>
-       District: ${parsedData.district}<br>
-       Size: ${parsedData.size.toFixed(2)} sq units<br>
-       Accuracy: ${
-         Array.isArray(parsedData.accuracyArray)
-           ? parsedData.accuracyArray.join(", ")
-           : "N/A"
-       }
-     `);
-        } else {
-          console.warn(
-            "Coordinates are missing or empty. Displaying centroid only."
-          );
-        }
+  // Calculate the centroid (center) of the coordinates
+  const centroid = latlngs
+    .reduce(
+      (acc, curr) => {
+        acc[0] += curr[0]; // Sum latitude
+        acc[1] += curr[1]; // Sum longitude
+        return acc;
+      },
+      [0, 0]
+    )
+    .map(sum => sum / latlngs.length); // Divide sums by the number of points
+
+  console.log("Centroid Coordinates:", centroid);
+
+  // Ensure centroid is valid before proceeding
+  if (!isNaN(centroid[0]) && !isNaN(centroid[1])) {
+    // Add a marker at the centroid
+    const centroidMarker = L.marker(centroid).addTo(map);
+    centroidMarker.bindPopup(`
+      <b>Centroid Information</b><br>
+      Latitude: ${centroid[0].toFixed(6)}<br>
+      Longitude: ${centroid[1].toFixed(6)}
+    `);
+  } else {
+    console.warn("Invalid centroid calculated.");
+  }
+
+  // Draw the polygon (or point if only one lat/lng)
+  if (latlngs.length > 1) {
+    const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
+    polygon.bindPopup(`
+      <b>Farm Information</b><br>
+      Site ID: ${parsedData.siteId}<br>
+      Farmer: ${parsedData.farmerName}<br>
+      Village: ${parsedData.village}<br>
+      District: ${parsedData.district}<br>
+      Size: ${parsedData.size ? parsedData.size.toFixed(2) : "N/A"} sq units<br>
+      Accuracy: ${
+        Array.isArray(parsedData.accuracyArray)
+          ? parsedData.accuracyArray.join(", ")
+          : "N/A"
+      }
+    `);
+  } else {
+    const marker = L.marker(latlngs[0]).addTo(map);
+    marker.bindPopup(`
+      <b>Farm Information</b><br>
+      Site ID: ${parsedData.siteId}<br>
+      Farmer: ${parsedData.farmerName}<br>
+      Village: ${parsedData.village}<br>
+      District: ${parsedData.district}<br>
+      Size: ${parsedData.size ? parsedData.size.toFixed(2) : "N/A"} sq units<br>
+      Accuracy: ${
+        Array.isArray(parsedData.accuracyArray)
+          ? parsedData.accuracyArray.join(", ")
+          : "N/A"
+      }
+    `);
+  }
+} else {
+  console.warn("No valid coordinates available.");
+}
+
+
+
+
+
 
         // Log the farm details for debugging
         console.log("Farm Details:");

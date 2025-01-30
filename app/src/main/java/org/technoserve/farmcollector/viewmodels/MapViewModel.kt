@@ -59,13 +59,44 @@ class MapViewModel @Inject constructor() : ViewModel() {
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
 
-    private val _plotData = MutableStateFlow<Farm?>(null)
-    val plotData: StateFlow<Farm?> = _plotData
+//    private val _plotData = MutableStateFlow<Farm?>(null)
+//    val plotData: StateFlow<Farm?> = _plotData
+//
+//    fun updatePlotData(newData: Farm) {
+//        _plotData.value = newData
+//    }
 
-    fun updatePlotData(newData: Farm) {
-        _plotData.value = newData
+
+    private val _plotData = MutableStateFlow(Farm()) // ✅ Ensure non-null default value
+    val plotData: StateFlow<Farm> = _plotData.asStateFlow()
+
+    fun updatePlotData(
+        siteId: Long? = null, // Allow siteId to be updated
+        coordinates: List<Pair<Double, Double>>? = null,
+        latitude: String? = null,
+        longitude: String? = null,
+        size: Float? = null,
+        accuracyArray: List<Float>? = null,
+        farmerName: String? = null,
+        memberId: String? = null,
+        farmerPhoto: String? = null,
+        village: String? = null,
+        district: String? = null
+    ) {
+        _plotData.value = _plotData.value.copy(
+            siteId = siteId ?: _plotData.value.siteId, // ✅ Update siteId if provided
+            coordinates = coordinates ?: _plotData.value.coordinates,
+            latitude = latitude ?: _plotData.value.latitude,
+            longitude = longitude ?: _plotData.value.longitude,
+            size = size ?: _plotData.value.size,
+            accuracyArray = accuracyArray ?: _plotData.value.accuracyArray,
+            farmerName = farmerName ?: _plotData.value.farmerName,
+            memberId = memberId ?: _plotData.value.memberId,
+            farmerPhoto = farmerPhoto ?: _plotData.value.farmerPhoto,
+            village = village ?: _plotData.value.village,
+            district = district ?: _plotData.value.district
+        )
     }
-
 
     // Method to set coordinates and calculated area
     fun calculateArea(coordinates: List<Pair<Double, Double>>?): Double {
