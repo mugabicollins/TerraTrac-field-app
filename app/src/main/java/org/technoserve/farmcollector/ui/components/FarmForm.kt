@@ -5,6 +5,8 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
@@ -208,6 +210,36 @@ fun FarmForm(
         }
     }
 
+//    if (showLocationDialog.value) {
+//        AlertDialog(
+//            onDismissRequest = { showLocationDialog.value = false },
+//            title = { Text(stringResource(id = R.string.enable_location)) },
+//            text = { Text(stringResource(id = R.string.enable_location_msg)) },
+//            confirmButton = {
+//                Button(onClick = {
+//                    showLocationDialog.value = false
+//                    promptEnableLocation(context)
+//                }) {
+//                    Text(stringResource(id = R.string.yes))
+//                }
+//            },
+//            dismissButton = {
+//                Button(onClick = {
+//                    showLocationDialog.value = false
+//                    Toast.makeText(
+//                        context,
+//                        R.string.location_permission_denied_message,
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }) {
+//                    Text(stringResource(id = R.string.no))
+//                }
+//            },
+//            containerColor = MaterialTheme.colorScheme.background,
+//            tonalElevation = 6.dp
+//        )
+//    }
+
     if (showLocationDialog.value) {
         AlertDialog(
             onDismissRequest = { showLocationDialog.value = false },
@@ -226,9 +258,14 @@ fun FarmForm(
                     showLocationDialog.value = false
                     Toast.makeText(
                         context,
-                        R.string.location_permission_denied_message,
+                        context.getString(R.string.location_permission_denied_message),
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    // Re-prompt user for permission even if they denied it before
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        showLocationDialog.value = true
+                    }, 2000) // 2-second delay before re-showing the dialog
                 }) {
                     Text(stringResource(id = R.string.no))
                 }
@@ -237,6 +274,7 @@ fun FarmForm(
             tonalElevation = 6.dp
         )
     }
+
 
     fun saveFarm() {
         Log.d("Save Farm", " Data to save  $farmData")

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.LocationManager
+import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -197,6 +198,70 @@ fun promptEnableLocation(context: Context) {
 }
 
 
+//@OptIn(ExperimentalPermissionsApi::class)
+//@Composable
+//fun LocationPermissionRequest(
+//    onLocationEnabled: () -> Unit,
+//    onPermissionsGranted: () -> Unit,
+//    showLocationDialogNew: MutableState<Boolean>,
+//    hasToShowDialog: Boolean
+//) {
+//    val context = LocalContext.current
+//    val multiplePermissionsState = rememberMultiplePermissionsState(
+//        listOf(
+//            Manifest.permission.ACCESS_COARSE_LOCATION,
+//            Manifest.permission.ACCESS_FINE_LOCATION
+//        )
+//    )
+//
+//    LaunchedEffect(Unit) {
+//        if (isLocationEnabled(context)) {
+//            if (multiplePermissionsState.allPermissionsGranted) {
+//                onPermissionsGranted()
+//            } else {
+//                multiplePermissionsState.launchMultiplePermissionRequest()
+//            }
+//        } else {
+//            onLocationEnabled()
+//        }
+//    }
+//
+//
+//    if ((!multiplePermissionsState.allPermissionsGranted) && hasToShowDialog) {
+//        Column {
+//            AlertDialog(
+//                onDismissRequest = { showLocationDialogNew.value = false },
+//                title = { Text(stringResource(id = R.string.enable_location)) },
+//                text = { Text(stringResource(id = R.string.enable_location_msg)) },
+//                confirmButton = {
+//                    Button(onClick = {
+//                        // Perform action to enable location permissions
+//                        promptEnableLocation(context)
+//                        showLocationDialogNew.value = false
+//                    }) {
+//                        Text(stringResource(id = R.string.yes))
+//                    }
+//                },
+//                dismissButton = {
+//                    Button(onClick = {
+//                        // Show a toast message indicating that the permission was denied
+//                        Toast.makeText(
+//                            context,
+//                            R.string.location_permission_denied_message,
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        showLocationDialogNew.value = false
+//                    }) {
+//                        Text(stringResource(id = R.string.no))
+//                    }
+//                },
+//                containerColor = MaterialTheme.colorScheme.background,
+//                tonalElevation = 6.dp
+//            )
+//        }
+//    }
+//}
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationPermissionRequest(
@@ -215,51 +280,82 @@ fun LocationPermissionRequest(
 
     LaunchedEffect(Unit) {
         if (isLocationEnabled(context)) {
-            if (multiplePermissionsState.allPermissionsGranted) {
-                onPermissionsGranted()
-            } else {
-                multiplePermissionsState.launchMultiplePermissionRequest()
+            when {
+                multiplePermissionsState.allPermissionsGranted -> {
+                    onPermissionsGranted()
+                }
+                multiplePermissionsState.shouldShowRationale -> {
+                    showLocationDialogNew.value = true // Show rationale dialog
+                }
+                else -> {
+                    multiplePermissionsState.launchMultiplePermissionRequest()
+                }
             }
         } else {
             onLocationEnabled()
         }
     }
 
+    if (!multiplePermissionsState.allPermissionsGranted && hasToShowDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocationDialogNew.value = false },
+            title = { Text(stringResource(id = R.string.enable_location)) },
+            text = { Text(stringResource(id = R.string.enable_location_msg)) },
+            confirmButton = {
+                Button(onClick = {
+                    multiplePermissionsState.launchMultiplePermissionRequest()
+                    showLocationDialogNew.value = false
+                }) {
+                    Text(stringResource(id = R.string.yes))
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    showLocationDialogNew.value = false
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.location_permission_denied_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }) {
+                    Text(stringResource(id = R.string.no))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 6.dp
+        )
+    }
 
-    if ((!multiplePermissionsState.allPermissionsGranted) && hasToShowDialog) {
-        Column {
-            AlertDialog(
-                onDismissRequest = { showLocationDialogNew.value = false },
-                title = { Text(stringResource(id = R.string.enable_location)) },
-                text = { Text(stringResource(id = R.string.enable_location_msg)) },
-                confirmButton = {
-                    Button(onClick = {
-                        // Perform action to enable location permissions
-                        promptEnableLocation(context)
-                        showLocationDialogNew.value = false
-                    }) {
-                        Text(stringResource(id = R.string.yes))
+    // Handle case when permission is permanently denied (user selected "Don't ask again")
+    if (!multiplePermissionsState.allPermissionsGranted && !multiplePermissionsState.shouldShowRationale) {
+        AlertDialog(
+            onDismissRequest = { showLocationDialogNew.value = false },
+            title = { Text(stringResource(id = R.string.permission_required)) },
+            text = { Text(stringResource(id = R.string.go_to_settings_msg)) },
+            confirmButton = {
+                Button(onClick = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
                     }
-                },
-                dismissButton = {
-                    Button(onClick = {
-                        // Show a toast message indicating that the permission was denied
-                        Toast.makeText(
-                            context,
-                            R.string.location_permission_denied_message,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        showLocationDialogNew.value = false
-                    }) {
-                        Text(stringResource(id = R.string.no))
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.background,
-                tonalElevation = 6.dp
-            )
-        }
+                    context.startActivity(intent)
+                    showLocationDialogNew.value = false
+                }) {
+                    Text(stringResource(id = R.string.open_settings))
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    showLocationDialogNew.value = false
+                }) {
+                    Text(stringResource(id = R.string.cancel))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 6.dp
+        )
     }
 }
+
 
 fun List<Pair<Double, Double>>.toLatLngList(): List<LatLng> {
     return map { LatLng(it.first, it.second) }

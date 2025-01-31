@@ -178,5 +178,9 @@
     <string name="error_loading_more_sites">Error Loading More Sites</string>
     <string name="press_back_again">Press back again to exit</string>
 
+    <string name="permission_required">Permission Required</string>
+    <string name="go_to_settings_msg">You have permanently denied location permission. Please go to settings to enable it.</string>
+
+
 
 </resources>
