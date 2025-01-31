@@ -3,6 +3,7 @@ package org.technoserve.farmcollector.ui.screens.map
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -69,6 +70,7 @@ import org.technoserve.farmcollector.ui.composes.AreaDialog
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import org.technoserve.farmcollector.utils.convertSize
+import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.io.File
 import java.net.URLConnection
@@ -299,7 +301,8 @@ fun WebViewWithVisualization(
     dataJson: String,
     farmId: Long,
     navController: NavController,
-    mapViewModel: MapViewModel
+    mapViewModel: MapViewModel,
+    currentLanguage: String
 ) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
@@ -307,6 +310,7 @@ fun WebViewWithVisualization(
 
     println("Data JSON: $dataJson")
     println("Farm ID: $farmId")
+    println("current Language: $currentLanguage")
 
 
     AndroidView(
@@ -358,7 +362,9 @@ fun WebViewWithVisualization(
                 }
 
                 // Load the URL
-                loadUrl("file:///android_asset/index.html?plotId=${farmId}")
+
+//                loadUrl("file:///android_asset/index.html?plotId=${farmId}")
+                loadUrl("file:///android_asset/index.html?plotId=${farmId}&lang=${currentLanguage}")
                 webView = this
             }
         },
@@ -397,28 +403,48 @@ fun WebViewWithVisualization(
 @Composable
 fun PlotVisualizationApp(
     navController: NavController,
-    viewModel: MapViewModel, siteId: Long
+    viewModel: MapViewModel, siteId: Long, languageViewModel: LanguageViewModel
 ) {
 //    val farmData =
 //        navController.previousBackStackEntry?.arguments?.getParcelable<ParcelableFarmData>("farmData")
 //    // cast farmData string to Farm object
-//    val farmInfo = farmData?.farm
-//
+//    val farmInfo = farmData!!.farm
+
 //    Log.d("FarmCollector", "Plot Info: $farmInfo")
 
+//    val plotData by viewModel.plotData.collectAsState()
+//    LaunchedEffect(plotData) {
+//        plotData?.let {
+//            Log.d("Plot Data Loaded", "Plot Data Loaded: $it")
+//        }
+//    }
+//    val farmInfo = plotData
+
+    val farmData =
+        navController.previousBackStackEntry?.arguments?.getParcelable<ParcelableFarmData>("farmData")
+
     val plotData by viewModel.plotData.collectAsState()
-    LaunchedEffect(plotData) {
-        plotData?.let {
-            Log.d("Plot Data Loaded", "Plot Data Loaded: $it")
-        }
-    }
-    val farmInfo = plotData
+
+    val farmInfo = farmData?.farm ?: plotData
 
     var viewSelectFarm by remember { mutableStateOf(false) }
     val mapViewModel: MapViewModel = viewModel()
     var accuracy by remember { mutableStateOf("") }
     val context = LocalContext.current as Activity
     val locationHelper = LocationHelper(context)
+
+
+    // ✅ Observe language from ViewModel (Assuming it's an object)
+    val currentLanguageObject by languageViewModel.currentLanguage.collectAsState()
+
+    // ✅ Extract only the `code` field (e.g., "es")
+    val languageCode = currentLanguageObject.code // Extract only the code part
+
+    // ✅ Append language as a query parameter
+    val url = "file:///android_asset/leaflet_map.html?siteId=$siteId&lang=$languageCode"
+
+    println("URL Language Code: $languageCode") // ✅ This should print "es"
+
 
 
     LaunchedEffect(Unit) {
@@ -470,7 +496,7 @@ fun PlotVisualizationApp(
     )
 
     // Display coordinates of a farm on map
-    if (farmInfo.siteId != 0L && !viewSelectFarm) {
+    if ( farmInfo.id != 0L && !viewSelectFarm) {
         viewModel.clearCoordinates()
         if (farmInfo.coordinates?.isNotEmpty() == true) {
             viewModel.addCoordinates(farmInfo.coordinates!!)
@@ -499,21 +525,23 @@ fun PlotVisualizationApp(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Log.d("INFO Visualization", "${farmInfo?.coordinates}")
+            Log.d("INFO Visualization", "${farmInfo.coordinates}")
             // Leaflet map
-            val farmId = farmInfo?.id
+            val farmId = farmInfo.id
             val farmJson = Gson().toJson(farmInfo)
-            if (farmInfo.siteId != 0L && farmInfo.id != null) {
+            if (farmId != 0L) {
                 WebViewWithVisualization(
                     dataJson = farmJson,
-                    farmId = farmId!!,
+                    farmId = farmId,
                     navController = navController,
-                    mapViewModel = viewModel
+                    mapViewModel = viewModel,
+                    currentLanguage = languageCode
                 )
             } else {
                 if(siteId != 0L) {
                     WebViewPage(
-                        url = "file:///android_asset/leaflet_map.html?siteId=${siteId}",
+//                        url = "file:///android_asset/leaflet_map.html?siteId=${siteId}",
+                        url = "file:///android_asset/leaflet_map.html?siteId=$siteId&lang=$languageCode",
                         onWebViewCreated = { webView ->
                             webView.evaluateJavascript(
                                 "if (typeof visualizeData === 'function') { visualizeData([]); } else { console.error('visualizeData is not defined'); }",

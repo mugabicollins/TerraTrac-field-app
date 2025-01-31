@@ -178,6 +178,8 @@
     <string name="total_farms">%1$d granjas en total</string>
     <string name="total_farms_with_incomplete_data">%1$d con datos incompletos</string>
     <string name="error_loading_more_sites">Error al cargar más sitios</string>
+    <string name="press_back_again">Presiona atrás otra vez para salir</string>
+
 
 
 

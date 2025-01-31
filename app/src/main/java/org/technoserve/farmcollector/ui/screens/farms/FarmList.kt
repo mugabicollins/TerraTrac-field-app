@@ -94,6 +94,8 @@ import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
 import org.technoserve.farmcollector.utils.createFile
 import org.technoserve.farmcollector.utils.createFileForSharing
 import org.technoserve.farmcollector.utils.isSystemInDarkTheme
+import org.technoserve.farmcollector.viewmodels.MapViewModel
+import org.technoserve.farmcollector.viewmodels.MapViewModelFactory
 import java.io.File
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
@@ -138,6 +140,7 @@ fun FarmList(
         viewModel(
             factory = FarmViewModelFactory(context.applicationContext as Application),
         )
+    val mapViewModel: MapViewModel =  viewModel(factory = MapViewModelFactory())// ✅ Use Hilt's hiltViewModel()
     val selectedIds = remember { mutableStateListOf<Long>() }
     val selectedFarm = remember { mutableStateOf<Farm?>(null) }
     val showDeleteDialog = remember { mutableStateOf(false) }
@@ -432,6 +435,7 @@ fun FarmList(
                                                     ParcelableFarmData(item, "view")
                                                 )
                                             }
+                                            mapViewModel.submitForm() // ✅ Submits and clears the form
                                             navController.navigate(route = "setPolygon/${siteId}")
                                         },
                                         onDeleteClick = {

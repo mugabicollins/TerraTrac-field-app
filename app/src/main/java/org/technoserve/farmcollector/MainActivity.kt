@@ -245,7 +245,7 @@ class MainActivity : ComponentActivity() {
                                 // Show the toast
                                 Toast.makeText(
                                     context,
-                                    "Press back again to exit",
+                                    context.getString(R.string.press_back_again),
                                     Toast.LENGTH_SHORT
                                 ).show()
 
@@ -345,7 +345,7 @@ class MainActivity : ComponentActivity() {
                             LaunchedEffect(Unit) {
                                 canExitApp = false
                             }
-                            PlotVisualizationApp(navController, viewModel,siteId)
+                            PlotVisualizationApp(navController, viewModel,siteId,languageViewModel)
                         }
 
 

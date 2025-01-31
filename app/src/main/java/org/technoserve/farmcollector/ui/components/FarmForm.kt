@@ -8,6 +8,7 @@ import android.content.Intent
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -137,8 +138,16 @@ fun FarmForm(
     var coordinates by remember { mutableStateOf(farmData.coordinates) }
     var latitude by remember { mutableStateOf(farmData.latitude) }
     var longitude by remember { mutableStateOf(farmData.longitude) }
-    var size by remember { mutableStateOf(farmData.size.toString()) }
+//    var size by remember { mutableStateOf(truncateToDecimalPlaces(farmData.size.toString(), 9)) }
+    var size by remember { mutableStateOf(truncateToDecimalPlaces(farmData.size.takeIf { it != 0f }?.toString().orEmpty(), 9)) }
     var accuracyArray by remember { mutableStateOf(farmData.accuracyArray) }
+
+    // ✅ Handle Back Press to Clear Form Only on Back Navigation
+    BackHandler {
+        mapViewModel.submitForm() // ✅ Clears form ONLY when the user presses back
+        navController.popBackStack() // ✅ Navigate back
+    }
+
 
     // ✅ Ensure state updates when farmData changes
     LaunchedEffect(farmData) {
@@ -155,9 +164,6 @@ fun FarmForm(
         size = farmData.size.toString()
         accuracyArray = farmData.accuracyArray
     }
-
-
-
 
 
 
@@ -189,7 +195,7 @@ fun FarmForm(
                size = sharedPref.getString("plot_size", "") ?: ""
                 selectedUnit = sharedPref.getString("selectedUnit", "Ha") ?: "Ha"
                 with(sharedPref.edit()) {
-                   remove("plot_size")
+                    remove("plot_size")
                     remove("selectedUnit")
                     apply()
                 }
@@ -272,6 +278,8 @@ fun FarmForm(
         val returnIntent = Intent()
         context.setResult(Activity.RESULT_OK, returnIntent)
         navController.navigate("farmList/${siteId}")
+        // ✅ Submit the form
+        mapViewModel.submitForm() // ✅ Submits and clears the form
     }
     if (showDialog.value) {
         AlertDialog(
@@ -509,14 +517,15 @@ fun FarmForm(
         ) {
             TextField(
                 singleLine = true,
-                value = truncateToDecimalPlaces(size, 9),
+//                value = truncateToDecimalPlaces(size, 9),
+                value = formatInput(size.takeIf { it != "0.0" }?.toString().orEmpty()),
                 onValueChange = { inputValue ->
                     val formattedValue = when {
-                        validateSize(inputValue) -> inputValue
+                        validateSize(inputValue.takeIf { it != "0.0" }?.toString().orEmpty()) -> inputValue.takeIf { it != "0.0" }?.toString().orEmpty()
                         scientificNotationPattern.matcher(inputValue).matches() -> {
                             truncateToDecimalPlaces(formatInput(inputValue), 9)
                         }
-                        else -> inputValue
+                        else -> inputValue.takeIf { it != "0.0" }?.toString().orEmpty()
                     }
                     size = formattedValue
                     isValidSize = validateSize(formattedValue)
@@ -790,6 +799,7 @@ fun FarmForm(
         Button(
             onClick = {
                 isFormSubmitted = true
+
                 // Finding the center of the polygon captured
                 if (coordinatesData?.isNotEmpty() == true && latitude.isBlank() && longitude.isBlank()) {
                     val center = coordinatesData.toLatLngList().getCenterOfPolygon()

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--<html lang="en">-->
 <head>
     <title>Plot Visualization</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -40,7 +40,7 @@
 </head>
 <body>
 <div id="header">
-    <h1>Plot Visualization</h1>
+    <h1 id="header-title">Plot Visualization</h1>
 </div>
 <div id="map"></div>
 <div id="status">Loading map...</div>
@@ -61,30 +61,118 @@
     // Function to parse query parameters from URL
     function getQueryParams() {
       const params = new URLSearchParams(window.location.search);
-      const center = params.get("center");
-      const zoom = params.get("zoom");
-
-      let latLng = [51.505, -0.09]; // Default center (e.g., London)
-      let zoomLevel = 13; // Default zoom
-
-      if (center) {
-        const [lat, lng] = center.split(",").map(Number);
-        latLng = [lat, lng];
-      }
-
-      if (zoom) {
-        zoomLevel = parseInt(zoom, 10);
-      }
-
-      return { latLng, zoomLevel };
+      return {
+        center: params.get("center"),
+        zoom: params.get("zoom"),
+        lang: params.get("lang") || "en",
+        plotId: params.get("plotId"),
+      };
     }
 
     // Extract parameters and initialize the map
-    const { latLng, zoomLevel } = getQueryParams();
+    // ✅ Extract parameters
+  const { lang, center, zoom, plotId } = getQueryParams();
+  console.log('Selected Language:', lang);
+
+    // ✅ Translation Object
+    const translations = {
+      en: {
+        serviceWorkerSuccess:
+          "Service Worker registered for offline map caching.",
+        serviceWorkerError: "Service Worker registration failed:",
+        mapLoaded: "Map loaded successfully!",
+        errorLoadingMap: "Error loading map:",
+        centroidInfo: "Centroid Information",
+        latitude: "Latitude",
+        longitude: "Longitude",
+        farmInfo: "Farm Information",
+        siteId: "Site ID",
+        farmer: "Farmer",
+        village: "Village",
+        district: "District",
+        size: "Size",
+        accuracy: "Accuracy",
+        hectares: "sq units",
+        missingCoordinates:
+          "Coordinates are missing or empty. Using latitude and longitude instead.",
+        header: "Plot Visualization",
+        loadingMap: "Loading map...",
+      },
+      sw: {
+        serviceWorkerSuccess:
+          "Huduma ya Mtandaoni imesajiliwa kwa uhifadhi nje ya mtandao.",
+        serviceWorkerError: "Usajili wa Huduma ya Mtandaoni umeshindikana:",
+        mapLoaded: "Ramani imepakiwa kwa mafanikio!",
+        errorLoadingMap: "Hitilafu katika kupakia ramani:",
+        centroidInfo: "Taarifa ya Kati",
+        latitude: "Latitudo",
+        longitude: "Longitudo",
+        farmInfo: "Taarifa ya Shamba",
+        siteId: "Kitambulisho cha Tovuti",
+        farmer: "Mkulima",
+        village: "Kijiji",
+        district: "Wilaya",
+        size: "Ukubwa",
+        accuracy: "Usahihi",
+        hectares: "mita za mraba",
+        missingCoordinates:
+          "Hakuna viwianishi. Inatumia latitudo na longitudo badala yake.",
+        header: "Taswira ya Kiwanja",
+        loadingMap: "Ramani inapakia...",
+      },
+      am: {
+        serviceWorkerSuccess: "አገልግሎት ሠራተኛ ለኦፍላይን መሰብሰብ ተመዝግቧል።",
+        serviceWorkerError: "አገልግሎት ሠራተኛ መመዝገብ አልተሳካም፦",
+        mapLoaded: "ካርታው በተሳካ ሁኔታ ተጭኗል።",
+        errorLoadingMap: "ካርታ ማንቀሳቀስ ስህተት፦",
+        centroidInfo: "የመሀከል መረጃ",
+        latitude: "ኬንትሮዲድ",
+        longitude: "ሎንግቲድ",
+        farmInfo: "የአርሶ አደር መረጃ",
+        siteId: "የአዳራሽ መታወቂያ",
+        farmer: "አርሶ አደር",
+        village: "መንደር",
+        district: "ዞን",
+        size: "መጠን",
+        accuracy: "ትክክለኛነት",
+        hectares: "ኩባንያ",
+        missingCoordinates: "አካባቢ የለም። ላቲትዱን እና ሎንግቲዱን በመጠቀም ቀጥሏል።",
+        header: "የመሬት ምስል",
+        loadingMap: "ካርታ በመጫን ላይ...",
+      },
+      om: {
+        serviceWorkerSuccess:
+          "Tajaajila intarneetii bilisummaa keessatti galmaa'e.",
+        serviceWorkerError: "Tajaajilli intarneetii galmaa'uu hin dandeenye:",
+        mapLoaded: "Kaartaan milkaa'inaan fe'ameera!",
+        errorLoadingMap: "Kaartaa fe'uu keessatti dogoggora:",
+        centroidInfo: "Odeeffannoo Giddugaleessaa",
+        latitude: "Laatiitiiyuudii",
+        longitude: "Loongitiiyuudii",
+        farmInfo: "Odeeffannoo Qonnaa",
+        siteId: "Iddoo Beeksisuu",
+        farmer: "Qonnaan Bultoota",
+        village: "Ganda",
+        district: "Godina",
+        size: "Bal'ina",
+        accuracy: "Sirrii",
+        hectares: "Hektaroota",
+        missingCoordinates:
+          "Hirriba hin qabu. Laatiitiiyuudii fi Loongitiiyuudii fayyadamuun hojjatame.",
+        header: "Ilaalcha Qonnaa",
+        loadingMap: "Kaartaa fe'amaa jira...",
+      },
+    };
+
+    // ✅ Function to get translated text
+    function t(key) {
+      return translations[lang]?.[key] || translations["en"][key]; // Default to English
+    }
 
     document.addEventListener("DOMContentLoaded", function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const plotId = urlParams.get("plotId");
+
+      document.getElementById('header-title').textContent = t('header');
+      document.getElementById('status').textContent = t('loadingMap');
 
       if (
         plotId &&
@@ -116,7 +204,11 @@
       try {
         // Parse the data if it is not already in JSON format
         const parsedData = typeof data === "string" ? JSON.parse(data) : data;
-        console.log("Parsed data:", parsedData.latitude, parsedData.longitude);
+        console.log(
+          "Parsed data:",
+          parsedData.latitude,
+          parsedData.longitude
+        );
 
         // Initialize the map centered on the provided latitude and longitude
         const map = L.map("map").setView(
@@ -167,92 +259,86 @@
         L.control.layers(baseLayers).addTo(map);
 
         // Handle coordinates
-let latlngs = [];
+        let latlngs = [];
 
-if (parsedData.coordinates && parsedData.coordinates.length > 0) {
-  latlngs = parsedData.coordinates.map((coord) => [
-    parseFloat(coord.first),  // Ensure it's a number
-    parseFloat(coord.second)  // Ensure it's a number
-  ]);
-} else if (parsedData.latitude && parsedData.longitude) {
-  // Use latitude and longitude as a single point if coordinates are missing
-  latlngs = [[parseFloat(parsedData.latitude), parseFloat(parsedData.longitude)]];
-  console.warn("Coordinates are missing or empty. Using latitude and longitude instead.");
-}
+        if (parsedData.coordinates && parsedData.coordinates.length > 0) {
+          latlngs = parsedData.coordinates.map((coord) => [
+            parseFloat(coord.first), // Ensure it's a number
+            parseFloat(coord.second), // Ensure it's a number
+          ]);
+        } else if (parsedData.latitude && parsedData.longitude) {
+          // Use latitude and longitude as a single point if coordinates are missing
+          latlngs = [
+            [
+              parseFloat(parsedData.latitude),
+              parseFloat(parsedData.longitude),
+            ],
+          ];
+          console.warn(
+            "Coordinates are missing or empty. Using latitude and longitude instead."
+          );
+        }
 
-// Check if latlngs contains valid numbers
-latlngs = latlngs.filter(coord => !isNaN(coord[0]) && !isNaN(coord[1]));
+        // Check if latlngs contains valid numbers
+        latlngs = latlngs.filter(
+          (coord) => !isNaN(coord[0]) && !isNaN(coord[1])
+        );
 
-if (latlngs.length > 0) {
-  console.log("Transformed Coordinates:", latlngs);
+        if (latlngs.length > 0) {
+          console.log("Transformed Coordinates:", latlngs);
 
-  // Calculate the centroid (center) of the coordinates
-  const centroid = latlngs
-    .reduce(
-      (acc, curr) => {
-        acc[0] += curr[0]; // Sum latitude
-        acc[1] += curr[1]; // Sum longitude
-        return acc;
-      },
-      [0, 0]
-    )
-    .map(sum => sum / latlngs.length); // Divide sums by the number of points
+          // Calculate the centroid (center) of the coordinates
+          const centroid = latlngs
+            .reduce(
+              (acc, curr) => {
+                acc[0] += curr[0]; // Sum latitude
+                acc[1] += curr[1]; // Sum longitude
+                return acc;
+              },
+              [0, 0]
+            )
+            .map((sum) => sum / latlngs.length); // Divide sums by the number of points
 
-  console.log("Centroid Coordinates:", centroid);
+          console.log("Centroid Coordinates:", centroid);
 
-  // Ensure centroid is valid before proceeding
-  if (!isNaN(centroid[0]) && !isNaN(centroid[1])) {
-    // Add a marker at the centroid
-    const centroidMarker = L.marker(centroid).addTo(map);
-    centroidMarker.bindPopup(`
-      <b>Centroid Information</b><br>
-      Latitude: ${centroid[0].toFixed(6)}<br>
-      Longitude: ${centroid[1].toFixed(6)}
-    `);
-  } else {
-    console.warn("Invalid centroid calculated.");
-  }
+          // Ensure centroid is valid before proceeding
+          if (!isNaN(centroid[0]) && !isNaN(centroid[1])) {
+            // Add a marker at the centroid
+            const centroidMarker = L.marker(centroid).addTo(map);
+            centroidMarker.bindPopup(`
+    <b>${t("centroidInfo")}</b><br>
+    Latitude: ${centroid[0].toFixed(6)}<br>
+    Longitude: ${centroid[1].toFixed(6)}
+  `);
+          } else {
+            console.warn("Invalid centroid calculated.");
+          }
 
-  // Draw the polygon (or point if only one lat/lng)
-  if (latlngs.length > 1) {
-    const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
-    polygon.bindPopup(`
-      <b>Farm Information</b><br>
-      Site ID: ${parsedData.siteId}<br>
-      Farmer: ${parsedData.farmerName}<br>
-      Village: ${parsedData.village}<br>
-      District: ${parsedData.district}<br>
-      Size: ${parsedData.size ? parsedData.size.toFixed(2) : "N/A"} sq units<br>
-      Accuracy: ${
-        Array.isArray(parsedData.accuracyArray)
-          ? parsedData.accuracyArray.join(", ")
-          : "N/A"
-      }
-    `);
-  } else {
-    const marker = L.marker(latlngs[0]).addTo(map);
-    marker.bindPopup(`
-      <b>Farm Information</b><br>
-      Site ID: ${parsedData.siteId}<br>
-      Farmer: ${parsedData.farmerName}<br>
-      Village: ${parsedData.village}<br>
-      District: ${parsedData.district}<br>
-      Size: ${parsedData.size ? parsedData.size.toFixed(2) : "N/A"} sq units<br>
-      Accuracy: ${
-        Array.isArray(parsedData.accuracyArray)
-          ? parsedData.accuracyArray.join(", ")
-          : "N/A"
-      }
-    `);
-  }
-} else {
-  console.warn("No valid coordinates available.");
-}
-
-
-
-
-
+          // Draw the polygon (or point if only one lat/lng)
+          if (latlngs.length > 1) {
+            const polygon = L.polygon(latlngs, { color: "blue" }).addTo(map);
+            polygon.bindPopup(`
+     <b>${t("farmInfo")}</b><br>
+    ${t("siteId")}: ${parsedData.siteId}<br>
+    ${t("farmer")}: ${parsedData.farmerName}<br>
+    ${t("village")}: ${parsedData.village}<br>
+    ${t("district")}: ${parsedData.district}<br>
+    ${t("size")}: ${parsedData.size} ${t("hectares")}
+  `);
+          } else {
+            const marker = L.marker(latlngs[0]).addTo(map);
+            marker.bindPopup(`
+     <b>${t("farmInfo")}</b><br>
+    ${t("siteId")}: ${parsedData.siteId}<br>
+    ${t("farmer")}: ${parsedData.farmerName}<br>
+    ${t("village")}: ${parsedData.village}<br>
+    ${t("district")}: ${parsedData.district}<br>
+    ${t("size")}: ${parsedData.size} ${t("hectares")}
+  `);
+          }
+        } else {
+          console.warn("No valid coordinates available.");
+        }
 
         // Log the farm details for debugging
         console.log("Farm Details:");
@@ -267,11 +353,14 @@ if (latlngs.length > 0) {
         );
 
         // Update the status to indicate the map was loaded successfully
-        statusElement.textContent = "Map loaded successfully!";
+        // ✅ Translate Status Message
+        statusElement.textContent = t("mapLoaded");
         statusElement.classList.remove("error");
       } catch (error) {
         // Handle and display errors
-        statusElement.textContent = `Error loading map: ${error.message}`;
+        statusElement.textContent = `${t("errorLoadingMap")} ${
+          error.message
+        }`;
         statusElement.classList.add("error");
         console.error("Error visualizing data:", error);
       }

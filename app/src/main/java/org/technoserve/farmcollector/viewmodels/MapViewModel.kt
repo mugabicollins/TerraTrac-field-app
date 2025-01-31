@@ -2,12 +2,14 @@ package org.technoserve.farmcollector.viewmodels
 
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -97,6 +99,14 @@ class MapViewModel @Inject constructor() : ViewModel() {
             district = district ?: _plotData.value.district
         )
     }
+
+    fun submitForm() {
+        // ✅ Perform form submission logic here (e.g., API call, database update)
+
+        // ✅ Reset the form after successful submission
+        _plotData.value = Farm() // Clears all values
+    }
+
 
     // Method to set coordinates and calculated area
     fun calculateArea(coordinates: List<Pair<Double, Double>>?): Double {
@@ -230,4 +240,15 @@ class MapViewModel @Inject constructor() : ViewModel() {
         state.value = state.value.copy(mapType = mapType)
     }
 
+}
+
+class MapViewModelFactory @Inject constructor() : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MapViewModel() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
 }

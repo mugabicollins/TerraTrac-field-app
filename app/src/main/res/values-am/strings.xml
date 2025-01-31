@@ -177,7 +177,7 @@
     <string name="total_farms">%1$d አጠቃላይ ግብሮች</string>
     <string name="total_farms_with_incomplete_data">%1$d የማይሞላ ዳታ አለበት</string>
     <string name="error_loading_more_sites">ተጨማሪ ቦታዎችን ማስገባት ላይ ስህተት</string>
-
+    <string name="press_back_again">ወጣሁ የሚል ለመውጣት ደግሞ ይጫኑ</string>
 
 
 

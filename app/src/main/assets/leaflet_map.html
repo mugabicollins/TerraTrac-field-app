@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--<html lang="en">-->
 <head>
     <meta charset="UTF-8" />
     <meta
@@ -309,433 +309,590 @@
 
 <script>
     let map,
-      polygon,
-      points = [],
-      polyline,
-      isCapturing = false;
-    let currentAccuracy = 0;
-    let accuracyArray = [];
-    let locationMarker = null;
-    let watchId = null;
+  polygon,
+  points = [],
+  polyline,
+  isCapturing = false;
+let currentAccuracy = 0,
+  accuracyArray = [],
+  locationMarker = null,
+  watchId = null;
+let currentLatitude = null,
+  currentLongitude = null;
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./service-worker.js").then(() => {
-        console.log("Service Worker registered for offline map caching");
-      });
+// ✅ Extract Language from URL (Ensure it's set before `t(key)` is used)
+function getQueryParam(param) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param) || "en"; // Default to English
+}
+const currentLanguage = getQueryParam("lang"); // Get language from URL
+console.log("Current Language:", currentLanguage);
+
+// ✅ Translation Object
+const translations = {
+  en: {
+    yourLocation: "Your Location",
+    accuracy: "Accuracy",
+    unableToGetLocation:
+      "Unable to get your location. Please enable location services.",
+    geolocationNotSupported:
+      "Geolocation is not supported by your browser",
+    street: "Street",
+    satellite: "Satellite",
+    terrain: "Terrain",
+    plotSize: "Plot Size",
+    hectares: "hectares",
+    largePlotWarning:
+      "Plot is larger than 4 hectares - polygon capture required",
+    smallPlotWarning:
+      "Polygon capture optional for plots under 4 hectares",
+    startCapture: "Start Capture",
+    stopCapture: "Stop Capture",
+    savePlot: "Save Plot",
+    deletePoint: "Delete Last Point",
+    clearMap: "Clear Map",
+  },
+  es: {
+    yourLocation: "Tu Ubicación",
+    accuracy: "Precisión",
+    unableToGetLocation:
+      "No se puede obtener tu ubicación. Por favor, habilita los servicios de ubicación.",
+    geolocationNotSupported:
+      "La geolocalización no es compatible con tu navegador",
+    street: "Calle",
+    satellite: "Satélite",
+    terrain: "Terreno",
+    plotSize: "Tamaño del terreno",
+    hectares: "hectáreas",
+    largePlotWarning:
+      "El terreno es mayor de 4 hectáreas - se requiere captura de polígono",
+    smallPlotWarning:
+      "La captura de polígono es opcional para terrenos menores de 4 hectáreas",
+    startCapture: "Iniciar Captura",
+    stopCapture: "Detener Captura",
+    savePlot: "Guardar Parcela",
+    deletePoint: "Eliminar Último Punto",
+    clearMap: "Limpiar Mapa",
+  },
+  fr: {
+    yourLocation: "Votre Position",
+    accuracy: "Précision",
+    unableToGetLocation:
+      "Impossible d'obtenir votre position. Veuillez activer les services de localisation.",
+    geolocationNotSupported:
+      "La géolocalisation n'est pas prise en charge par votre navigateur",
+    street: "Rue",
+    satellite: "Satellite",
+    terrain: "Terrain",
+    plotSize: "Taille du terrain",
+    hectares: "hectares",
+    largePlotWarning:
+      "Le terrain est supérieur à 4 hectares - capture du polygone requise",
+    smallPlotWarning:
+      "La capture du polygone est facultative pour les terrains de moins de 4 hectares",
+    startCapture: "Démarrer la capture",
+    stopCapture: "Arrêter la capture",
+    savePlot: "Enregistrer la parcelle",
+    deletePoint: "Supprimer le dernier point",
+    clearMap: "Effacer la carte",
+  },
+   sw: { // Swahili
+    yourLocation: "Eneo Lako",
+    accuracy: "Usahihi",
+    unableToGetLocation:
+      "Imeshindikana kupata eneo lako. Tafadhali wezesha huduma za eneo.",
+    geolocationNotSupported:
+      "Jiografia haitegemezwi na kivinjari chako",
+    street: "Mtaa",
+    satellite: "Satelaiti",
+    terrain: "Ardhi",
+    plotSize: "Ukubwa wa Kiwanja",
+    hectares: "hekta",
+    largePlotWarning:
+      "Kiwanja ni kikubwa zaidi ya hekta 4 - unahitaji kuchukua poligoni",
+    smallPlotWarning:
+      "Kuchukua poligoni ni hiari kwa viwanja vidogo vya chini ya hekta 4",
+    startCapture: "Anza Kuchukua",
+    stopCapture: "Acha Kuchukua",
+    savePlot: "Hifadhi Kiwanja",
+    deletePoint: "Futa Nukta ya Mwisho",
+    clearMap: "Futa Ramani",
+  },
+  am: { // Amharic (አማርኛ)
+    yourLocation: "የእርስዎ አካባቢ",
+    accuracy: "ትክክለኛነት",
+    unableToGetLocation:
+      "አካባቢዎን ማግኘት አልተቻለም። እባኮትን የአካባቢ አገልግሎቶችን አንቀሳቅስ።",
+    geolocationNotSupported:
+      "የጂኦሎኬሽን አገልግሎት በእርስዎ አንቀሳቅስ አይደለም።",
+    street: "መንገድ",
+    satellite: "ሳተላይት",
+    terrain: "መሬት",
+    plotSize: "የመሬት መጠን",
+    hectares: "ሄክተር",
+    largePlotWarning:
+      "መሬቱ ከ 4 ሄክተር በላይ ነው። የፖሊጎን መረጃ ያስፈልጋል።",
+    smallPlotWarning:
+      "ከ 4 ሄክተር በታች የሆኑ መሬቶች የፖሊጎን መረጃ የትራንዚት ነው።",
+    startCapture: "መያዝ ጀምር",
+    stopCapture: "መያዝ አቁም",
+    savePlot: "መሬቱን አስቀምጥ",
+    deletePoint: "የመጨረሻ ነጥብ ሰርዝ",
+    clearMap: "ካርታውን አጥፋ",
+  },
+  om: { // Oromo (Afaan Oromoo)
+    yourLocation: "Iddoo Kee",
+    accuracy: "Sirrii",
+    unableToGetLocation:
+      "Iddoo kee argachuu hin dandeenye. Mee tajaajila iddoo tokkoon tokkoo bana.",
+    geolocationNotSupported:
+      "Baay'ina iddoo hin deeggaramu mul'ata kee",
+    street: "Daandii",
+    satellite: "Sataalaayitii",
+    terrain: "Lafa",
+    plotSize: "Giddu Gala Lafaa",
+    hectares: "heektaara",
+    largePlotWarning:
+      "Lafti heektaara 4 caalaa jira - poligooni fudhatamuu qaba",
+    smallPlotWarning:
+      "Lafti xiqqaan 4 heektaara gadi kan poligooni fudhatamuu danda'uudha",
+    startCapture: "Ka'umsa Fudhachuu",
+    stopCapture: "Dhiisi Fudhachuu",
+    savePlot: "Lafa Galmeessi",
+    deletePoint: "Boca Dhumaa Haqi",
+    clearMap: "Kaartaa Haqi",
+  }
+};
+
+function t(key) {
+  return translations[currentLanguage]?.[key] || translations["en"][key]; // Fallback to English
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./service-worker.js").then(() => {
+    console.log("Service Worker registered for offline map caching");
+  });
+}
+function showAlert(message) {
+  const alertBox = document.getElementById("customAlert");
+  const overlay = document.getElementById("overlay");
+  const alertMessage = document.getElementById("alertMessage");
+  const okButton = document.getElementById("alertOkButton");
+
+  // Set the custom message
+  alertMessage.textContent = message;
+
+  // Show the alert and overlay
+  alertBox.style.display = "block";
+  overlay.style.display = "block";
+
+  // Close the alert when OK is clicked
+  okButton.onclick = function () {
+    alertBox.style.display = "none";
+    overlay.style.display = "none";
+  };
+}
+
+function initMap() {
+  // Initialize map without a specific center
+  map = L.map("map", {
+    zoom: 18, // Start with a zoomed-out view
+    attributionControl: true,
+  });
+
+  // Default street view layer
+  window.streetLayer = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap contributors",
     }
+  ).addTo(map);
 
-    function showAlert(message) {
-      const alertBox = document.getElementById("customAlert");
-      const overlay = document.getElementById("overlay");
-      const alertMessage = document.getElementById("alertMessage");
-      const okButton = document.getElementById("alertOkButton");
-
-      // Set the custom message
-      alertMessage.textContent = message;
-
-      // Show the alert and overlay
-      alertBox.style.display = "block";
-      overlay.style.display = "block";
-
-      // Close the alert when OK is clicked
-      okButton.onclick = function () {
-        alertBox.style.display = "none";
-        overlay.style.display = "none";
-      };
+  // Satellite view layer
+  window.satelliteLayer = L.tileLayer(
+    "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+    {
+      maxZoom: 19,
+      attribution: "© Google Satellite",
     }
+  );
 
-    function initMap() {
-      // Initialize map without a specific center
-      map = L.map("map", {
-        zoom: 18, // Start with a zoomed-out view
-        attributionControl: true,
-      });
-
-      // Default street view layer
-      window.streetLayer = L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          maxZoom: 19,
-          attribution: "© OpenStreetMap contributors",
-        }
-      ).addTo(map);
-
-      // Satellite view layer
-      window.satelliteLayer = L.tileLayer(
-        "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-        {
-          maxZoom: 19,
-          attribution: "© Google Satellite",
-        }
-      );
-
-      // Terrain view layer
-      window.terrainLayer = L.tileLayer(
-        "https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-        {
-          maxZoom: 19,
-          attribution: "© Google Maps",
-        }
-      );
-
-      // Add terrain layer as the default layer
-      window.terrainLayer.addTo(map);
-
-      // Add layer controls
-      const baseLayers = {
-        Street: window.streetLayer,
-        Satellite: window.satelliteLayer,
-        Terrain: window.terrainLayer,
-      };
-      L.control.layers(baseLayers).addTo(map);
-
-      // Get current location with better centering
-      if ("geolocation" in navigator) {
-        // Add loading indicator
-        map.spin = true;
-
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
-
-            // First center the map
-            map.setView([lat, lon], 18, {
-              animate: true,
-              duration: 1, // 1 second animation
-            });
-
-            // Remove loading indicator
-            map.spin = false;
-
-            // Reverse geocode to get country name
-            fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-            )
-              .then((response) => response.json())
-              .then((data) => {
-                const country = data.address.country || "Unknown Location";
-                const city =
-                  data.address.city ||
-                  data.address.town ||
-                  data.address.village ||
-                  "";
-
-                // Add marker with more detailed location info
-                L.marker([lat, lon])
-                  .addTo(map)
-                  .bindPopup(
-                    `
-    <b>Your Location:</b><br>
-    ${city ? city + ", " : ""}${country}<br>
-    <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
-     <small>Accuracy: ${accuracy.toFixed(1)} meters </small>
-
-  `
-                  )
-                  .openPopup();
-              })
-              .catch((error) => {
-                console.error("Error getting location info:", error);
-                L.marker([lat, lon])
-                  .addTo(map)
-                  .bindPopup(`Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}`)
-                  .openPopup();
-              });
-          },
-          function (error) {
-            map.spin = false; // Remove loading indicator if using
-            console.error("Error getting location:", error);
-            // Set a default view if location access is denied
-            map.setView([0, 0], 2);
-            alert(
-              "Unable to get your location. Please enable location services."
-            );
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0,
-          }
-        );
-      } else {
-        alert("Geolocation is not supported by your browser");
-        // Set a default view if geolocation is not supported
-        map.setView([0, 0], 2);
-      }
-
-      startLocationTracking();
+  // Terrain view layer
+  window.terrainLayer = L.tileLayer(
+    "https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+    {
+      maxZoom: 19,
+      attribution: "© Google Maps",
     }
+  );
 
-    // Start tracking user location
-    function startLocationTracking() {
-      if (navigator.geolocation) {
-        watchId = navigator.geolocation.watchPosition(
-          updateLocation,
-          handleLocationError,
-          {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 5000,
-          }
-        );
-      }
-    }
+  // Add terrain layer as the default layer
+  window.terrainLayer.addTo(map);
 
-    // Add these variables at the top with other global variables
-    let currentLatitude = null;
-    let currentLongitude = null;
+  // Add layer controls
+  const baseLayers = {
+    [t("street")]: window.streetLayer,
+    [t("satellite")]: window.satelliteLayer,
+    [t("terrain")]: window.terrainLayer,
+  };
+  L.control.layers(baseLayers).addTo(map);
 
-    // Modify the updateLocation function to store current position
-    function updateLocation(position) {
-      const { latitude, longitude, accuracy } = position.coords;
-      currentAccuracy = accuracy;
-      currentLatitude = latitude; // Store current latitude
-      currentLongitude = longitude; // Store current longitude
+  // Get current location with better centering
+  if ("geolocation" in navigator) {
+    // Add loading indicator
+    map.spin = true;
 
-      document.getElementById(
-        "accuracy"
-      ).textContent = `Accuracy: ${accuracy.toFixed(1)} meters`;
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
 
-      if (locationMarker) {
-        map.removeLayer(locationMarker);
-      }
-
-      map.setView([latitude, longitude]);
-    }
-
-    function handleLocationError(error) {
-      console.error("Geolocation error:", error);
-      document.getElementById("accuracy").textContent =
-        "Accuracy: Unable to determine";
-    }
-
-    // Calculate area of polygon in hectares
-    function calculateArea(coords) {
-      if (coords.length < 3) return 0;
-
-      let area = 0;
-      const R = 6371000; // Earth's radius in meters
-
-      for (let i = 0; i < coords.length; i++) {
-        const j = (i + 1) % coords.length;
-        const p1 = coords[i];
-        const p2 = coords[j];
-        const φ1 = (p1.lat * Math.PI) / 180;
-        const φ2 = (p2.lat * Math.PI) / 180;
-        const λ1 = (p1.lng * Math.PI) / 180;
-        const λ2 = (p2.lng * Math.PI) / 180;
-
-        area += (λ2 - λ1) * (2 + Math.sin(φ1) + Math.sin(φ2));
-      }
-
-      area = Math.abs((area * R * R) / 2);
-      return area / 10000; // Convert to hectares
-    }
-
-    // Calculate centroid of polygon
-    function calculateCentroid(coords) {
-      if (coords.length === 0) return null;
-
-      let x = 0,
-        y = 0;
-      for (const coord of coords) {
-        x += coord.lat;
-        y += coord.lng;
-      }
-      return {
-        lat: x / coords.length,
-        lng: y / coords.length,
-      };
-    }
-
-    // Update plot information
-    function updatePlotInfo() {
-      if (points.length < 3) {
-        document.getElementById("plotInfo").textContent =
-          "Plot Size: 0 hectares";
-        document.getElementById("warning").textContent = "";
-        return;
-      }
-
-      const area = calculateArea(points);
-      document.getElementById(
-        "plotInfo"
-      ).textContent = `Plot Size: ${area.toFixed(2)} hectares`;
-
-      if (area > 4) {
-        document.getElementById("warning").textContent =
-          "Plot is larger than 4 hectares - polygon capture required";
-      } else {
-        document.getElementById("warning").textContent =
-          "Polygon capture optional for plots under 4 hectares";
-      }
-    }
-
-    // Initialize the map
-    document.addEventListener("DOMContentLoaded", function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const siteId = urlParams.get("siteId");
-      initMap();
-
-      // Polygon capture controls
-      document
-        .getElementById("startCapture")
-        .addEventListener("click", () => {
-          isCapturing = !isCapturing;
-
-          const startButton = document.getElementById("startCapture");
-          const saveButton = document.getElementById("savePlot");
-
-          if (isCapturing) {
-            points = [];
-            if (polygon) map.removeLayer(polygon);
-            if (polyline) map.removeLayer(polyline);
-            polygon = L.polygon([]).addTo(map);
-            polyline = L.polyline([]).addTo(map);
-
-            // Set Start/Stop button to Stop state
-            startButton.innerHTML = '<i class="fas fa-stop"></i>';
-            startButton.style.backgroundColor = "#000000";
-          } else {
-            // Hide Start/Stop button and show Save button
-            startButton.style.display = "none";
-            saveButton.style.display = "block";
-          }
+        // First center the map
+        map.setView([lat, lon], 18, {
+          animate: true,
+          duration: 1, // 1 second animation
         });
 
-      // Modify the addPoint click handler
-      document.getElementById("addPoint").addEventListener("click", () => {
-        if (!isCapturing) {
-          // alert("Please start capture first");
-          // Example usage
-          showAlert("Please start capture first");
-          return;
-        }
+        // Remove loading indicator
+        map.spin = false;
 
-        if (currentLatitude === null || currentLongitude === null) {
-          alert(
-            "Waiting for location data. Please make sure location services are enabled."
-          );
-          return;
-        }
+        // Reverse geocode to get country name
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            const country = data.address.country || "Unknown Location";
+            const city =
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              "";
 
-        // Create a point using current location
-        const currentLocation = L.latLng(currentLatitude, currentLongitude);
-        points.push(currentLocation);
-        accuracyArray.push(currentAccuracy);
-        L.marker(currentLocation).addTo(map);
-        polyline.setLatLngs(points);
-        polygon.setLatLngs([points]);
-        updatePlotInfo();
+            // Add marker with more detailed location info
+            L.marker([lat, lon])
+              .addTo(map)
+              .bindPopup(
+                `
+               <b>${t("yourLocation")}:</b><br>
+${city ? city + ", " : ""}${country}<br>
+<small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
+<small>${t("accuracy")}: ${accuracy.toFixed(1)} meters </small>
 
-        // Optional: Add a small animation or feedback
-        const feedbackDiv = document.getElementById("accuracy");
-        feedbackDiv.textContent = `Point added at current location (Accuracy: ${currentAccuracy.toFixed(
-          1
-        )}m)`;
-
-        // Optional: Add a fade-in animation
-        feedbackDiv.style.transition = "opacity 0.5s";
-        feedbackDiv.style.opacity = 1;
-
-        setTimeout(() => {
-          feedbackDiv.textContent = `Accuracy: ${currentAccuracy.toFixed(
-            1
-          )} meters`;
-        }, 2000);
-
-        // Optional: Add a fade-out effect after 5 seconds
-        setTimeout(() => {
-          feedbackDiv.style.opacity = 0;
-        }, 5000);
-      });
-
-      document.getElementById("deletePoint").addEventListener("click", () => {
-        if (points.length > 0) {
-          points.pop();
-          polyline.setLatLngs(points);
-          polygon.setLatLngs([points]);
-          map.eachLayer((layer) => {
-            if (layer instanceof L.Marker && layer !== locationMarker) {
-              map.removeLayer(layer);
-            }
+`
+              )
+              .openPopup();
+          })
+          .catch((error) => {
+            console.error("Error getting location info:", error);
+            L.marker([lat, lon])
+              .addTo(map)
+              .bindPopup(
+                `${t("yourLocation")}: ${lat.toFixed(4)}, ${lon.toFixed(
+                  4
+                )}`
+              )
+              .openPopup();
           });
-          points.forEach((point) => L.marker(point).addTo(map));
-          updatePlotInfo();
-        }
-      });
+      },
+      function (error) {
+        map.spin = false; // Remove loading indicator if using
+        console.error("Error getting location:", error);
+        // Set a default view if location access is denied
+        map.setView([0, 0], 2);
+        alert(t("unableToGetLocation"));
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      }
+    );
+  } else {
+    alert(t("geolocationNotSupported"));
+    // Set a default view if geolocation is not supported
+    map.setView([0, 0], 2);
+  }
 
-      document.getElementById("clearMap").addEventListener("click", () => {
+  startLocationTracking();
+}
+
+// Start tracking user location
+function startLocationTracking() {
+  if (navigator.geolocation) {
+    watchId = navigator.geolocation.watchPosition(
+      updateLocation,
+      handleLocationError,
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000,
+      }
+    );
+  }
+}
+
+// Modify the updateLocation function to store current position
+function updateLocation(position) {
+  const { latitude, longitude, accuracy } = position.coords;
+  currentAccuracy = accuracy;
+  currentLatitude = latitude; // Store current latitude
+  currentLongitude = longitude; // Store current longitude
+
+  document.getElementById(
+    "accuracy"
+  ).textContent = `Accuracy: ${accuracy.toFixed(1)} meters`;
+
+  if (locationMarker) {
+    map.removeLayer(locationMarker);
+  }
+
+  map.setView([latitude, longitude]);
+}
+
+function handleLocationError(error) {
+  console.error("Geolocation error:", error);
+  document.getElementById("accuracy").textContent =
+    "Accuracy: Unable to determine";
+}
+
+// Calculate area of polygon in hectares
+function calculateArea(coords) {
+  if (coords.length < 3) return 0;
+
+  let area = 0;
+  const R = 6371000; // Earth's radius in meters
+
+  for (let i = 0; i < coords.length; i++) {
+    const j = (i + 1) % coords.length;
+    const p1 = coords[i];
+    const p2 = coords[j];
+    const φ1 = (p1.lat * Math.PI) / 180;
+    const φ2 = (p2.lat * Math.PI) / 180;
+    const λ1 = (p1.lng * Math.PI) / 180;
+    const λ2 = (p2.lng * Math.PI) / 180;
+
+    area += (λ2 - λ1) * (2 + Math.sin(φ1) + Math.sin(φ2));
+  }
+
+  area = Math.abs((area * R * R) / 2);
+  return area / 10000; // Convert to hectares
+}
+
+// Calculate centroid of polygon
+function calculateCentroid(coords) {
+  if (coords.length === 0) return null;
+
+  let x = 0,
+    y = 0;
+  for (const coord of coords) {
+    x += coord.lat;
+    y += coord.lng;
+  }
+  return {
+    lat: x / coords.length,
+    lng: y / coords.length,
+  };
+}
+
+// ✅ Update Plot Information with Translations
+function updatePlotInfo() {
+  if (points.length < 3) {
+    document.getElementById("plotInfo").textContent = `${t(
+      "plotSize"
+    )}: 0 ${t("hectares")}`;
+    document.getElementById("warning").textContent = "";
+    return;
+  }
+
+  const area = calculateArea(points);
+  document.getElementById("plotInfo").textContent = `${t(
+    "plotSize"
+  )}: ${area.toFixed(2)} ${t("hectares")}`;
+
+  if (area > 4) {
+    document.getElementById("warning").textContent =
+      t("largePlotWarning");
+  } else {
+    document.getElementById("warning").textContent =
+      t("smallPlotWarning");
+  }
+}
+
+// Initialize the map
+document.addEventListener("DOMContentLoaded", function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const siteId = urlParams.get("siteId");
+  const language = urlParams.get("lang");
+  console.log("Current Language:", language);
+
+   // ✅ Translate Plot Info Panel
+    document.getElementById("plotInfo").textContent = `${t("plotSize")}: 0 ${t("hectares")}`;
+    document.getElementById("accuracy").textContent = `${t("accuracy")}: ${t("calculating")}`;
+    document.getElementById("warning").textContent = ""; // Initially empty
+
+  initMap();
+
+  // Polygon capture controls
+  document
+    .getElementById("startCapture")
+    .addEventListener("click", () => {
+      isCapturing = !isCapturing;
+
+      const startButton = document.getElementById("startCapture");
+      const saveButton = document.getElementById("savePlot");
+
+      if (isCapturing) {
         points = [];
-        map.eachLayer((layer) => {
-          if (layer instanceof L.Marker && layer !== locationMarker) {
-            map.removeLayer(layer);
-          }
-        });
         if (polygon) map.removeLayer(polygon);
         if (polyline) map.removeLayer(polyline);
-        updatePlotInfo();
-      });
+        polygon = L.polygon([]).addTo(map);
+        polyline = L.polyline([]).addTo(map);
 
-      // Save plot functionality
-      document.getElementById("savePlot").addEventListener("click", () => {
-        if (points.length < 3) {
-          alert("Please capture at least 3 points to form a valid polygon");
-          return;
-        }
-
-        const area = calculateArea(points);
-        const centroid = calculateCentroid(points);
-
-        // Create plot data with only the map-captured fields filled
-        const plotData = {
-          siteId: siteId,
-          remoteId: "",
-          farmerPhoto: "photo",
-          farmerName: "test farmer",
-          memberId: "300",
-          village: "test village",
-          district: "test district",
-          purchases: "2.50",
-          size: area,
-          latitude: centroid.lat,
-          longitude: centroid.lng,
-          coordinates: points.map((point) => [point.lat, point.lng]),
-          accuracyArray: accuracyArray,
-          createdAt: "2025-01-17T00:00:00Z",
-          updatedAt: "2025-01-17T01:00:00Z",
-        };
-
-        console.log("Incomplete Plot Data to send to Android:", plotData);
-
-        // Send incomplete data to Android for editing
-        if (typeof Android !== "undefined" && Android.receivePlotData) {
-          Android.receivePlotData(JSON.stringify(plotData));
-        } else {
-          console.error("Android interface not available");
-        }
-
-        // Reset buttons after saving
-        const startButton = document.getElementById("startCapture");
-        const saveButton = document.getElementById("savePlot");
-
-        saveButton.style.display = "none"; // Hide Save button
-        startButton.style.display = "block"; // Show Start button again
-        startButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset to Start Capture state
-        startButton.style.backgroundColor = "#4CAF50";
-
-        console.log("Sending Plot Data to Android:", plotData);
-
-        // Send data to Android
-        if (typeof Android !== "undefined" && Android.receivePlotData) {
-          Android.receivePlotData(JSON.stringify(plotData));
-        } else {
-          console.error("Android interface not available");
-        }
-      });
+        // Set Start/Stop button to Stop state
+        startButton.innerHTML = '<i class="fas fa-stop"></i>';
+        startButton.style.backgroundColor = "#000000";
+      } else {
+        // Hide Start/Stop button and show Save button
+        startButton.style.display = "none";
+        saveButton.style.display = "block";
+      }
     });
+
+  // Modify the addPoint click handler
+  document.getElementById("addPoint").addEventListener("click", () => {
+    if (!isCapturing) {
+      // alert("Please start capture first");
+      // Example usage
+      showAlert("Please start capture first");
+      return;
+    }
+
+    if (currentLatitude === null || currentLongitude === null) {
+      alert(
+        "Waiting for location data. Please make sure location services are enabled."
+      );
+      return;
+    }
+
+    // Create a point using current location
+    const currentLocation = L.latLng(currentLatitude, currentLongitude);
+    points.push(currentLocation);
+    accuracyArray.push(currentAccuracy);
+    L.marker(currentLocation).addTo(map);
+    polyline.setLatLngs(points);
+    polygon.setLatLngs([points]);
+    updatePlotInfo();
+
+    // Optional: Add a small animation or feedback
+    const feedbackDiv = document.getElementById("accuracy");
+    feedbackDiv.textContent = `Point added at current location (Accuracy: ${currentAccuracy.toFixed(
+      1
+    )}m)`;
+
+    // Optional: Add a fade-in animation
+    feedbackDiv.style.transition = "opacity 0.5s";
+    feedbackDiv.style.opacity = 1;
+
+    setTimeout(() => {
+      feedbackDiv.textContent = `Accuracy: ${currentAccuracy.toFixed(
+        1
+      )} meters`;
+    }, 2000);
+
+    // Optional: Add a fade-out effect after 5 seconds
+    setTimeout(() => {
+      feedbackDiv.style.opacity = 0;
+    }, 5000);
+  });
+
+  document.getElementById("deletePoint").addEventListener("click", () => {
+    if (points.length > 0) {
+      points.pop();
+      polyline.setLatLngs(points);
+      polygon.setLatLngs([points]);
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Marker && layer !== locationMarker) {
+          map.removeLayer(layer);
+        }
+      });
+      points.forEach((point) => L.marker(point).addTo(map));
+      updatePlotInfo();
+    }
+  });
+
+  document.getElementById("clearMap").addEventListener("click", () => {
+    points = [];
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Marker && layer !== locationMarker) {
+        map.removeLayer(layer);
+      }
+    });
+    if (polygon) map.removeLayer(polygon);
+    if (polyline) map.removeLayer(polyline);
+    updatePlotInfo();
+  });
+
+  // Save plot functionality
+  document.getElementById("savePlot").addEventListener("click", () => {
+    if (points.length < 3) {
+      alert("Please capture at least 3 points to form a valid polygon");
+      return;
+    }
+
+    const area = calculateArea(points);
+    const centroid = calculateCentroid(points);
+
+    // Create plot data with only the map-captured fields filled
+    const plotData = {
+      siteId: siteId,
+      remoteId: "",
+      farmerPhoto: "photo",
+      farmerName: "test farmer",
+      memberId: "300",
+      village: "test village",
+      district: "test district",
+      purchases: "2.50",
+      size: area,
+      latitude: centroid.lat,
+      longitude: centroid.lng,
+      coordinates: points.map((point) => [point.lat, point.lng]),
+      accuracyArray: accuracyArray,
+      createdAt: "2025-01-17T00:00:00Z",
+      updatedAt: "2025-01-17T01:00:00Z",
+    };
+
+    console.log("Incomplete Plot Data to send to Android:", plotData);
+
+    // Send incomplete data to Android for editing
+    if (typeof Android !== "undefined" && Android.receivePlotData) {
+      Android.receivePlotData(JSON.stringify(plotData));
+    } else {
+      console.error("Android interface not available");
+    }
+
+    // Reset buttons after saving
+    const startButton = document.getElementById("startCapture");
+    const saveButton = document.getElementById("savePlot");
+
+    saveButton.style.display = "none"; // Hide Save button
+    startButton.style.display = "block"; // Show Start button again
+    startButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset to Start Capture state
+    startButton.style.backgroundColor = "#4CAF50";
+
+    console.log("Sending Plot Data to Android:", plotData);
+
+    // Send data to Android
+    if (typeof Android !== "undefined" && Android.receivePlotData) {
+      Android.receivePlotData(JSON.stringify(plotData));
+    } else {
+      console.error("Android interface not available");
+    }
+  });
+});
 </script>
+
 </body>
 </html>
