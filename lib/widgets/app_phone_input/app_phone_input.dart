@@ -3,7 +3,7 @@ import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
-import 'package:terrapipe/utilts/app_colors.dart';
+import 'package:terrapipe/utils/constants/app_colors.dart';
 
 class AppPhoneInput extends StatelessWidget {
   const AppPhoneInput({

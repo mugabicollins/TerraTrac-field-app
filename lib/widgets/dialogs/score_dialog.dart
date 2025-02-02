@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:terrapipe/utilts/app_colors.dart';
-import 'package:terrapipe/widgets/custom_button.dart';
-
-import '../../views/saved_fields/saved_field_controller.dart';
+import 'package:terrapipe/app/modules/saved_fields/controllers/saved_field_controller.dart';
+import 'package:terrapipe/utils/constants/app_colors.dart';
+import 'package:terrapipe/widgets/app_buttons/custom_button.dart';
 
 class ScoreDialog extends StatefulWidget {
   @override
