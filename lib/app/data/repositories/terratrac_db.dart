@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -56,23 +57,43 @@ class TerraTracDataBaseHelper {
 
     return database;
   }
-  static const polygonTable = 'polygonTable';
+  static const polygonTable = 'polygon_table';
   static const id = 'id';
-  static const polygonData = 'polygonData';
+  static const polygonData = 'polygon_data';
+  static const timestamp = 'timestamp';
+  static const userEmail = 'user_email';
+  static const phoneNumber = 'phone_number';
+  static const deviceId = 'device_id';
+
 
   /// creating table here
   Future _onCreate(Database db, int version) async {
     await db.execute('''
     CREATE TABLE $polygonTable (
       $id INTEGER PRIMARY KEY AUTOINCREMENT,
-      $polygonData TEXT NOT NULL
-    )''');
+      $polygonData TEXT NOT NULL,
+      $timestamp TEXT NOT NULL,
+      $userEmail TEXT NOT NULL,
+      $phoneNumber TEXT NOT NULL,
+      $deviceId TEXT NOT NULL
+    )
+  ''');
   }
 
-
-  Future<void> insertPolygonData(polygons) async {
+  Future<void> insertPolygonData(
+      {String? polygons, String? email, String? phone, String? deviceID}) async {
     Database db = await dbInstance.database;
-    await db.insert(polygonTable, {polygonData: polygons,});
+
+    // Get current timestamp
+    String currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    await db.insert(polygonTable, {
+      polygonData: polygons,
+      timestamp: currentTime,
+      userEmail: email,
+      phoneNumber: phone,
+      deviceId: deviceID,
+    });
+
     getUnsyncedPolygons();
   }
 

@@ -18,33 +18,42 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   get: ^4.6.6
+  intl:
 #  Fonts
   google_fonts:
 #  local db
   sqflite:
+  shared_preferences:
+# device info
+  device_info_plus: ^11.2.2
+#  map
   flutter_map: 6.1.0
   flutter_map_cache: ^1.5.1
+  geodesy: ^0.10.2
+  latlong2: ^0.9.1
   dio_cache_interceptor_hive_store:
-  path_provider:
+
   geolocator:
+# permission handler
   permission_handler:
   flutter_colorpicker:
-  floating_action_bubble:
+  path_provider:
+# api call
   dio:
-  shared_preferences:
+  http:
+# loading
   modal_progress_hud_nsn:
   flutter_spinkit:
-  persistent_bottom_nav_bar:
+#    bottom bar
   stylish_bottom_bar:
+#  image picker
   image_picker:
-  fab_circular_menu_plus: ^0.0.2
   lottie:
-  http:
+
   intl_phone_field:
     git:
       url: https://github.com/huzaifaa786/intl_phone_field
-  geodesy: ^0.10.2
-  latlong2: ^0.9.1
+
   animated_custom_dropdown: ^3.1.1
 
 dev_dependencies:

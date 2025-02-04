@@ -193,7 +193,8 @@ class PolygonBottomSheet extends StatelessWidget {
                   borderColor: AppColor.primaryColor,
                   onTap: () async {
                     Get.back();
-                    await homeController.savePolygonTeraTrac();
+                    // await homeController.savePolygonTeraTrac();
+                    await homeController.savePolygonToDb();
                     homeController.clearShapes();
                   },
                   textStyle: TextStyle(

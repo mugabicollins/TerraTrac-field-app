@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -556,112 +558,138 @@ class HomeController extends GetxController {
 
   Future savePolygonTeraTrac() async {
     isPolygonLoading.value = true;
-    // const baseUrl = 'https://api-ar.agstack.org';
-    // final url = Uri.parse('$baseUrl/register-field-boundary');
-    // String? apiKey = await SharedPreference.instance.getSecretKeyLocalDb('api_key');
-    // String? clientSecret = await SharedPreference.instance.getSecretKeyLocalDb('client_secret');
-    // final headers = {
-    //   'API-KEYS-AUTHENTICATION': '1',
-    //   'API-KEY': apiKey ?? '',
-    //   'CLIENT-SECRET': clientSecret ?? '',
-    //   'AUTOMATED-FIELD': '0',
-    // };
+    const baseUrl = 'https://api-ar.agstack.org';
+    final url = Uri.parse('$baseUrl/register-field-boundary');
+    String? apiKey = await SharedPreference.instance.getSecretKeyLocalDb('api_key');
+    String? clientSecret = await SharedPreference.instance.getSecretKeyLocalDb('client_secret');
+
+    final headers = {
+      'API-KEYS-AUTHENTICATION': '1',
+      'API-KEY': apiKey ?? '',
+      'CLIENT-SECRET': clientSecret ?? '',
+      'AUTOMATED-FIELD': '0',
+    };
     String wkt = convertPolygonToWKT(drawnPolygons);
-    dbHelper.insertPolygonData(wkt);
     String? s2Index = s2IndexController.text.isNotEmpty ? s2IndexController.text : null;
     String? threshold = thresholdController.text.isNotEmpty ? thresholdController.text : null;
+    final body = {
+      'wkt': wkt,
+      if (s2Index != null) 's2_index': s2Index,
+      if (threshold != null) 'threshold': int.tryParse(threshold) ?? threshold,
+    };
 
-    // final body = {
-    //   'wkt': wkt,
-    //   if (s2Index != null) 's2_index': s2Index,
-    //   if (threshold != null) 'threshold': int.tryParse(threshold) ?? threshold,
-    // };
-
-    // try {
-    //   final response = await http.post(
-    //     url,
-    //     headers: headers,
-    //     body: jsonEncode(body),
-    //   );
-    //   if (response.statusCode == 200) {
-    //     isPolygonLoading.value = false;
-    //     // Extract Geo Id from the response
-    //     final Map<String, dynamic> responseData = jsonDecode(response.body);
-    //     final geoId = responseData['Geo Id'] ?? 'Unknown Geo Id';
-    //     tempGeoId.value = geoId;
-    //     await saveFieldByGeoIdTerraPipe(geoId);
-    //     // Show success dialog with Geo Id and copy button
-    //     Get.dialog(
-    //       AlertDialog(
-    //         backgroundColor: Colors.white,
-    //         shape: RoundedRectangleBorder(
-    //           borderRadius: BorderRadius.circular(20),
-    //         ),
-    //         title: const Text(
-    //           'Success',
-    //           style: TextStyle(
-    //             color: Colors.green,
-    //             fontWeight: FontWeight.bold,
-    //           ),
-    //         ),
-    //         content: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           children: [
-    //             const Text(
-    //               'You have successfully added the polygon!',
-    //               style: TextStyle(color: Colors.black),
-    //             ),
-    //             const SizedBox(height: 10),
-    //             Text(
-    //               'Geo Id: $geoId',
-    //               style: const TextStyle(color: Colors.black),
-    //             ),
-    //           ],
-    //         ),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () {
-    //               Clipboard.setData(ClipboardData(text: geoId));
-    //               Get.back();
-    //               showSnackBar(
-    //                 color: Colors.green,
-    //                 title: "Copied",
-    //                 message: "Geo Id has been copied to clipboard!",
-    //               );
-    //             },
-    //             child: const Text(
-    //               'Copy',
-    //               style: TextStyle(color: Colors.blue),
-    //             ),
-    //           ),
-    //           TextButton(
-    //             onPressed: () {
-    //               Get.back();
-    //             },
-    //             child: const Text(
-    //               'OK',
-    //               style: TextStyle(color: Colors.black),
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   }
-    //   else {
-    //     var result = jsonDecode(response.body);
-    //     showSnackBar(
-    //       color: Colors.red,
-    //       title: "Exception",
-    //       message: result['message'],
-    //     );
-    //     isPolygonLoading.value = false;
-    //   }
-    // } catch (e) {
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(body),
+      );
+      if (response.statusCode == 200) {
+        isPolygonLoading.value = false;
+        // Extract Geo Id from the response
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final geoId = responseData['Geo Id'] ?? 'Unknown Geo Id';
+        tempGeoId.value = geoId;
+        await saveFieldByGeoIdTerraPipe(geoId);
+        // Show success dialog with Geo Id and copy button
+        Get.dialog(
+          AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text(
+              'Success',
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'You have successfully added the polygon!',
+                  style: TextStyle(color: Colors.black),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Geo Id: $geoId',
+                  style: const TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: geoId));
+                  Get.back();
+                  showSnackBar(
+                    color: Colors.green,
+                    title: "Copied",
+                    message: "Geo Id has been copied to clipboard!",
+                  );
+                },
+                child: const Text(
+                  'Copy',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                },
+                child: const Text(
+                  'OK',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+      else {
+        var result = jsonDecode(response.body);
+        showSnackBar(
+          color: Colors.red,
+          title: "Exception",
+          message: result['message'],
+        );
+        isPolygonLoading.value = false;
+      }
+    } catch (e) {
       isPolygonLoading.value = false;
       update();
-    // }
+    }
   }
 
+
+  savePolygonToDb() async {
+    isPolygonLoading.value = true;
+    String wkt = convertPolygonToWKT(drawnPolygons);
+    String deviceID = await getDeviceId();
+    String email=await HelperFunctions.getFromPreference("userEmail")??"";
+    String number=await HelperFunctions.getFromPreference("phoneNumber")??"";
+    dbHelper.insertPolygonData(polygons:wkt,phone: number,email: email, deviceID:deviceID, );
+    isPolygonLoading.value = false;
+  }
+
+
+  /// get device id
+  Future<String> getDeviceId() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.id; // Android device ID
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      return iosInfo.identifierForVendor!; // iOS device ID
+    } else {
+      return "Unknown Device";
+    }
+  }
+
+  /// convert polygon to wkt
   String convertPolygonToWKT(RxList<Polygon> polygons) {
     if (polygons.isEmpty || polygons.first.points.isEmpty) {
       print("Error: Polygon points are empty");
