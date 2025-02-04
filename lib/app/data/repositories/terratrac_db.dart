@@ -56,71 +56,39 @@ class TerraTracDataBaseHelper {
 
     return database;
   }
-  static const newFields = 'newFieldTable';
-  ///name the column of productTable(table)
-  static const barcode = 'barcode';
-  static const name = 'name';
-  static const image = 'image';
-  static const brand = 'brand';
+  static const polygonTable = 'polygonTable';
+  static const id = 'id';
+  static const polygonData = 'polygonData';
 
   /// creating table here
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-          CREATE TABLE $newFields (
-            $barcode INTEGER PRIMARY KEY,
-            $name TEXT NOT NULL,
-            $name INTEGER NOT NULL,
-            $name TEXT NOT NULL)''');
-
+    CREATE TABLE $polygonTable (
+      $id INTEGER PRIMARY KEY AUTOINCREMENT,
+      $polygonData TEXT NOT NULL
+    )''');
   }
 
 
-
-  /// local product CRUD operations
-  // Future<void> insertProduct(LocalProduct model) async {
-  //   Database db = await dbInstance.database;
-  //   Map<String, dynamic> row = {
-  //     barcode: model.barcode.toString(),
-  //     name: model.name,
-  //     image: model.image,
-  //     ingredientImage: model.ingredientImage,
-  //     labelImage: model.labelImage,
-  //     ingredients: model.ingredients,
-  //     labels: model.labels,
-  //     type: model.status,
-  //     productUpdatedAt: DateTime.now().toString().split(' ').first,
-  //   };
-  //   try {
-  //     Database db = await dbInstance.database;
-  //     var result = await doesTableExist(db, productTable);
-  //     if (result == false) {
-  //       await db.execute('''
-  //         CREATE TABLE $productTable (
-  //           $barcode TEXT PRIMARY KEY,
-  //           $name TEXT ,
-  //           $image TEXT ,
-  //           $ingredientImage TEXT ,
-  //           $labelImage TEXT ,
-  //           $ingredients TEXT ,
-  //           $labels TEXT ,
-  //           $type TEXT ,
-  //           $productUpdatedAt TEXT)''');
-  //     }
-  //     await db.insert(
-  //       productTable,
-  //       row,
-  //     );
-  //   } catch (e, s) {
-  //     log('Product add failed due to $e $s');
-  //     //
-  //   }
-  // }
-
-  Future<int> deleteProductAt(productBarcode) async {
+  Future<void> insertPolygonData(polygons) async {
     Database db = await dbInstance.database;
-    return await db.delete(newFields,
-        where: '$barcode = ?', whereArgs: [productBarcode]);
+    await db.insert(polygonTable, {polygonData: polygons,});
+    getUnsyncedPolygons();
   }
+
+  Future<List<Map<String, dynamic>>> getUnsyncedPolygons() async {
+    Database db = await dbInstance.database;
+    var result = await db.query(polygonTable);
+    print("here is DB Data::>>>> ${result}");
+    return result;
+  }
+
+
+  Future<void> deletePolygonData(int polygonId) async {
+    Database db = await dbInstance.database;
+    await db.delete(polygonTable, where: '$id = ?', whereArgs: [polygonId]);
+  }
+
 
   /// checke table exist or not
   Future<bool> doesTableExist(Database db, String tableName) async {

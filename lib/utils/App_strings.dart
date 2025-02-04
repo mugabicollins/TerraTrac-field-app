@@ -18,5 +18,8 @@ class AppStrings {
   static const savingFields= 'Saving Field';
   static const fetchingDetails= 'Fetching Details';
   static const fetchingLocation= 'Fetching Location';
+  static const fetchingAction= 'Field Actions';
+  static const registeredField= 'Register Field';
+  static const cancel= 'Cancel';
 
 }

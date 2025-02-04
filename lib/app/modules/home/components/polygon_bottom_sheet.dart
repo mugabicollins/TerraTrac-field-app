@@ -3,6 +3,8 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:terrapipe/app/modules/home/controllers/home_controller.dart';
+import 'package:terrapipe/utils/App_strings.dart';
+import 'package:terrapipe/utils/app_text/app_text.dart';
 import 'package:terrapipe/utils/app_text_style.dart';
 import 'package:terrapipe/utils/constants/app_colors.dart';
 import 'package:terrapipe/widgets/app_buttons/custom_button.dart';
@@ -10,12 +12,19 @@ import 'package:terrapipe/widgets/textfields/custom_text_field.dart';
 
 class PolygonBottomSheet extends StatelessWidget {
   PolygonBottomSheet({super.key});
+
   final HomeController homeController = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
+      decoration:  const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(32),
+          topLeft: Radius.circular(32)
+        )
+      ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -23,26 +32,38 @@ class PolygonBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           // spacing: 10,
           children: [
-            const Center(
-              child: Text("Field Actions", style: AppTextStyles.labelLarge),
+            Center(
+              child: AppText(
+                title: AppStrings.fetchingAction,
+                size: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            SizedBox(height: Get.height*0.03,),
+            SizedBox(
+              height: Get.height * 0.03,
+            ),
             const Text(
               "Resolution level (optional):",
               style: AppTextStyles.labelMedium,
             ),
-            SizedBox(height: Get.height*0.01,),
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
             CustomTextFormField(
               controller: homeController.resolutionLevelController,
               hintText: "level",
               fillColor: Colors.white,
             ),
-            SizedBox(height: Get.height*0.02,),
+            SizedBox(
+              height: Get.height * 0.02,
+            ),
             const Text(
               "threshold (optional):",
               style: AppTextStyles.labelMedium,
             ),
-            SizedBox(height: Get.height*0.01,),
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
             CustomTextFormField(
               controller: homeController.thresholdController,
               hintText: "threshold",
@@ -69,12 +90,16 @@ class PolygonBottomSheet extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: Get.height*0.02,),
+            SizedBox(
+              height: Get.height * 0.02,
+            ),
             const Text(
               "Domain (optional):",
               style: AppTextStyles.labelMedium,
             ),
-            SizedBox(height: Get.height*0.01,),
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
             CustomDropdown<String>(
               hintText: 'Select Domain',
               items: homeController.domainList,
@@ -95,12 +120,16 @@ class PolygonBottomSheet extends StatelessWidget {
                 log('changing value to: $value');
               },
             ),
-            SizedBox(height: Get.height*0.02,),
+            SizedBox(
+              height: Get.height * 0.02,
+            ),
             const Text(
               "Boundary Type:",
               style: AppTextStyles.labelMedium,
             ),
-            SizedBox(height: Get.height*0.01,),
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
             CustomDropdown<String>(
               hintText: 'Select Boundary Type',
               items: homeController.boundaryTypeList,
@@ -121,51 +150,54 @@ class PolygonBottomSheet extends StatelessWidget {
                 log('changing value to: $value');
               },
             ),
-            SizedBox(height: Get.height*0.02,),
+            SizedBox(
+              height: Get.height * 0.02,
+            ),
             const Text(
               "S2_index (optional):",
               style: AppTextStyles.labelMedium,
             ),
-            SizedBox(height: Get.height*0.01,),
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
             CustomTextFormField(
               controller: homeController.s2IndexController,
               hintText: "S2_index",
               fillColor: Colors.white,
             ),
-            SizedBox(height: Get.height*0.05,),
+            SizedBox(
+              height: Get.height * 0.05,
+            ),
             Row(
               // spacing: 10,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 CustomButton(
-                  label: 'Cancel',
-                  width: Get.width/2.5,
+                  label: AppStrings.cancel,
+                  width: Get.width / 2.5,
                   height: 45,
                   onTap: () {
                     Get.back();
                   },
                   color: AppColor.white,
                   borderColor: AppColor.primaryColor,
-                  textStyle:  const TextStyle(
-                    color: AppColor.primaryColor,
-                    fontWeight: FontWeight.bold
-                  ),
+                  textStyle: const TextStyle(
+                      color: AppColor.primaryColor,
+                      fontWeight: FontWeight.bold),
                   textColor: AppColor.primaryColor,
                 ),
                 CustomButton(
-                  label: 'Register Field',
+                  label: AppStrings.registeredField,
                   height: 45,
-                  width: Get.width/2.5,
+                  width: Get.width / 2.5,
                   borderColor: AppColor.primaryColor,
                   onTap: () async {
                     Get.back();
                     await homeController.savePolygonTeraTrac();
                     homeController.clearShapes();
                   },
-                  textStyle:   TextStyle(
-                    color: AppColor.white,
-                    fontWeight: FontWeight.w700
-                  ),
+                  textStyle: TextStyle(
+                      color: AppColor.white, fontWeight: FontWeight.w700),
                   color: AppColor.primaryColor,
                   textColor: Colors.white,
                 ),

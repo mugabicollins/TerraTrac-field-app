@@ -24,7 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   final HomeController controller = Get.put(HomeController());
-  String mapPath = "";
+  // String mapPath = "";
 
   Future<String> getPath() async {
     final cacheDirectory = await getTemporaryDirectory();
@@ -43,17 +43,16 @@ class _HomeScreenState extends State<HomeScreen>
       curve: Curves.easeInOut,
       parent: controller.animationController,
     );
-    controller.animation =
-        Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
+    controller.animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
   Future<void> loadLocation() async {
-    mapPath = await getPath();
+    // mapPath = await getPath();
     await controller.getLocation();
-    // Cache 100km radius around user's location
-    if (controller.cameraPosition.value != null) {
-       controller.cacheMapTiles(controller.cameraPosition.value!, 100000); // 100km in meters
-    }
+    // // Cache 100km radius around user's location
+    // if (controller.cameraPosition.value != null) {
+    //    controller.cacheMapTiles(controller.cameraPosition.value!, 100000); // 100km in meters
+    // }
   }
 
   @override
@@ -94,25 +93,22 @@ class _HomeScreenState extends State<HomeScreen>
                                     setState(
                                         () {}); // Force a rebuild to reflect polygon changes
                                   },
-
-                                  initialZoom: 17.0,
+                                  initialZoom: 12.0,
                                   onTap: (_, LatLng point) {
                                     FocusScope.of(context).unfocus();
                                     controller.addPointToShape(point);
                                   }),
                               children: [
                                 TileLayer(
-                                  urlTemplate:
-                                      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                                  urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                                   subdomains: ['a', 'b', 'c'],
                                   errorTileCallback: (tile, error, stackTrace) {
-                                    print(
-                                        "Tile loading failed for ${tile.coordinates}: $error");
+                                    print("Tile loading failed for ${tile.coordinates}: $error");
                                   },
                                   tileProvider: CachedTileProvider(
                                     maxStale: const Duration(days: 30),
                                     store: HiveCacheStore(
-                                      mapPath,
+                                      controller.mapPath.value,
                                       hiveBoxName: 'HiveCacheStore',
                                     ),
                                   ),

@@ -14,8 +14,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as d;
+import 'package:sqflite/sqlite_api.dart';
 import 'package:terrapipe/app/data/repositories/shared_preference.dart';
 import 'package:terrapipe/utils/helper_functions.dart';
+
+import '../../../data/repositories/terratrac_db.dart';
 
 class HomeController extends GetxController {
   TextEditingController resolutionLevelController = TextEditingController();
@@ -25,7 +28,7 @@ class HomeController extends GetxController {
   RxList<LatLng> shapePoints = <LatLng>[].obs;
   RxList<Polygon> drawnPolygons = <Polygon>[].obs;
   RxList<LatLng> linePoints = <LatLng>[].obs;
-
+  final TerraTracDataBaseHelper dbHelper = TerraTracDataBaseHelper();
   RxList<String> boundaryTypeList = <String>[
     'Manual',
     'Automated',
@@ -38,7 +41,7 @@ class HomeController extends GetxController {
   late AnimationController animationController;
   late Animation<double> animation;
   var cameraPosition = Rxn<LatLng>(const LatLng(51.5, -0.09));
-  late final MapController mapController; // FlutterMap's MapController
+  final MapController mapController=MapController();
   LatLng? tapLocation;
   RxBool isDrawPolygon = false.obs;
   RxBool searchLoading = false.obs;
@@ -57,7 +60,7 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     PaintingBinding.instance.imageCache.maximumSize = 20000; // Adjust number as needed
-    mapController = MapController();
+    // mapController = MapController();
     getAllDomain();
   }
 
@@ -76,6 +79,7 @@ class HomeController extends GetxController {
     s2IndexController.clear();
     searchController.clear();
   }
+
 
   Future<void> getCurrentLocation() async {
     bool serviceEnabled;
@@ -111,10 +115,10 @@ class HomeController extends GetxController {
   }
 
   Future<void> getLocation() async {
-    try {
+    // try {
       // Set initial loading state
       locationFetched.value = false;
-      
+      mapPath.value=await getPath();
       // Request location permission
       PermissionStatus permission = await Permission.location.request();
 
@@ -126,39 +130,37 @@ class HomeController extends GetxController {
 
         LatLng userLocation = LatLng(position.latitude, position.longitude);
         cameraPosition.value = userLocation;
-        
+        locationFetched.value = true;
+        update();
+        await Future.delayed(const Duration(seconds: 3));
         if (mapController != null) {
           // Zoom out to show a 100 km radius (~ Zoom level 8)
-          mapController.move(userLocation, 8.0);
-
-          // Ensure the UI rebuilds
-          await Future.delayed(const Duration(milliseconds: 500));
-          mapController.move(userLocation, 8.0);
-
+          mapController.move(userLocation, 12.0);
           // Wait for 3 seconds before zooming back in
-          await Future.delayed(const Duration(seconds: 5));
-          mapController.move(userLocation, 15.0);
-          
+          await Future.delayed(const Duration(seconds: 2));
+          mapController.move(userLocation, 17.0);
           // Cache the map tiles
           await cacheMapTiles(cameraPosition.value!, 100000);
         } else {
           debugPrint("MapController is null");
         }
-        
+
         // Set loading state to false only after all operations are complete
         locationFetched.value = true;
-        
-      } else {
+
+      }
+      else {
         debugPrint('Location permission denied');
         await _requestLocationPermission();
         // Set loading state to false if permission denied
         locationFetched.value = true;
       }
-    } catch (e) {
-      debugPrint('Error occurred: $e');
-      // Set loading state to false in case of error
-      locationFetched.value = true;
-    }
+    // }
+    // catch (e) {
+    //   debugPrint('Error occurred: $e');
+    //   // Set loading state to false in case of error
+    //   locationFetched.value = true;
+    // }
   }
 
   Future<void> _requestLocationPermission() async {
@@ -184,15 +186,17 @@ class HomeController extends GetxController {
 
   Future<String> getPath() async {
     final cacheDirectory = await getTemporaryDirectory();
+
     return cacheDirectory.path;
   }
 
   Future<void> cacheMapTiles(LatLng center, double radiusInMeters) async {
     try {
+
       // Define zoom levels for 100km radius
       int minZoom = 8;  // For overview
       int maxZoom = 15; // Detailed enough for most use cases
-      
+
       final geodesy = Geodesy();
       List<LatLng> boundingBox = geodesy.calculateBoundingBox(center, radiusInMeters);
 
@@ -224,13 +228,14 @@ class HomeController extends GetxController {
               try {
                 // Construct the URL manually
                 final url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$zoom/$y/$x';
-                
+
+                print("Here url:::>>>>>>>>$url");
                 // Use NetworkImage to cache the tile
                 final NetworkImage image = NetworkImage(url);
-                
+
                 // Precache the image
                 await precacheImage(image, Get.context!);
-                
+
                 debugPrint("Cached Tile: Zoom: $zoom, X: $x, Y: $y");
               } catch (e) {
                 debugPrint("Error caching individual tile: $e");
@@ -551,113 +556,110 @@ class HomeController extends GetxController {
 
   Future savePolygonTeraTrac() async {
     isPolygonLoading.value = true;
-    const baseUrl = 'https://api-ar.agstack.org';
-    final url = Uri.parse('$baseUrl/register-field-boundary');
-    String? apiKey =
-        await SharedPreference.instance.getSecretKeyLocalDb('api_key');
-    String? clientSecret =
-        await SharedPreference.instance.getSecretKeyLocalDb('client_secret');
-
-    final headers = {
-      'API-KEYS-AUTHENTICATION': '1',
-      'API-KEY': apiKey ?? '',
-      'CLIENT-SECRET': clientSecret ?? '',
-      'AUTOMATED-FIELD': '0',
-    };
+    // const baseUrl = 'https://api-ar.agstack.org';
+    // final url = Uri.parse('$baseUrl/register-field-boundary');
+    // String? apiKey = await SharedPreference.instance.getSecretKeyLocalDb('api_key');
+    // String? clientSecret = await SharedPreference.instance.getSecretKeyLocalDb('client_secret');
+    // final headers = {
+    //   'API-KEYS-AUTHENTICATION': '1',
+    //   'API-KEY': apiKey ?? '',
+    //   'CLIENT-SECRET': clientSecret ?? '',
+    //   'AUTOMATED-FIELD': '0',
+    // };
     String wkt = convertPolygonToWKT(drawnPolygons);
-    String? s2Index =
-        s2IndexController.text.isNotEmpty ? s2IndexController.text : null;
-    String? threshold =
-        thresholdController.text.isNotEmpty ? thresholdController.text : null;
+    dbHelper.insertPolygonData(wkt);
+    String? s2Index = s2IndexController.text.isNotEmpty ? s2IndexController.text : null;
+    String? threshold = thresholdController.text.isNotEmpty ? thresholdController.text : null;
 
-    final body = {
-      'wkt': wkt,
-      if (s2Index != null) 's2_index': s2Index,
-      if (threshold != null) 'threshold': int.tryParse(threshold) ?? threshold,
-    };
+    // final body = {
+    //   'wkt': wkt,
+    //   if (s2Index != null) 's2_index': s2Index,
+    //   if (threshold != null) 'threshold': int.tryParse(threshold) ?? threshold,
+    // };
 
-    try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: jsonEncode(body),
-      );
-      if (response.statusCode == 200) {
-        isPolygonLoading.value = false;
-        // Extract Geo Id from the response
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final geoId = responseData['Geo Id'] ?? 'Unknown Geo Id';
-        tempGeoId.value = geoId;
-        await saveFieldByGeoIdTerraPipe(geoId);
-        // Show success dialog with Geo Id and copy button
-        Get.dialog(
-          AlertDialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Text(
-              'Success',
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'You have successfully added the polygon!',
-                  style: TextStyle(color: Colors.black),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Geo Id: $geoId',
-                  style: const TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: geoId));
-                  Get.back();
-                  showSnackBar(
-                    color: Colors.green,
-                    title: "Copied",
-                    message: "Geo Id has been copied to clipboard!",
-                  );
-                },
-                child: const Text(
-                  'Copy',
-                  style: TextStyle(color: Colors.blue),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: const Text(
-                  'OK',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-            ],
-          ),
-        );
-      } else {
-        var result = jsonDecode(response.body);
-        showSnackBar(
-          color: Colors.red,
-          title: "Exception",
-          message: result['message'],
-        );
-        isPolygonLoading.value = false;
-      }
-    } catch (e) {
+    // try {
+    //   final response = await http.post(
+    //     url,
+    //     headers: headers,
+    //     body: jsonEncode(body),
+    //   );
+    //   if (response.statusCode == 200) {
+    //     isPolygonLoading.value = false;
+    //     // Extract Geo Id from the response
+    //     final Map<String, dynamic> responseData = jsonDecode(response.body);
+    //     final geoId = responseData['Geo Id'] ?? 'Unknown Geo Id';
+    //     tempGeoId.value = geoId;
+    //     await saveFieldByGeoIdTerraPipe(geoId);
+    //     // Show success dialog with Geo Id and copy button
+    //     Get.dialog(
+    //       AlertDialog(
+    //         backgroundColor: Colors.white,
+    //         shape: RoundedRectangleBorder(
+    //           borderRadius: BorderRadius.circular(20),
+    //         ),
+    //         title: const Text(
+    //           'Success',
+    //           style: TextStyle(
+    //             color: Colors.green,
+    //             fontWeight: FontWeight.bold,
+    //           ),
+    //         ),
+    //         content: Column(
+    //           mainAxisSize: MainAxisSize.min,
+    //           children: [
+    //             const Text(
+    //               'You have successfully added the polygon!',
+    //               style: TextStyle(color: Colors.black),
+    //             ),
+    //             const SizedBox(height: 10),
+    //             Text(
+    //               'Geo Id: $geoId',
+    //               style: const TextStyle(color: Colors.black),
+    //             ),
+    //           ],
+    //         ),
+    //         actions: [
+    //           TextButton(
+    //             onPressed: () {
+    //               Clipboard.setData(ClipboardData(text: geoId));
+    //               Get.back();
+    //               showSnackBar(
+    //                 color: Colors.green,
+    //                 title: "Copied",
+    //                 message: "Geo Id has been copied to clipboard!",
+    //               );
+    //             },
+    //             child: const Text(
+    //               'Copy',
+    //               style: TextStyle(color: Colors.blue),
+    //             ),
+    //           ),
+    //           TextButton(
+    //             onPressed: () {
+    //               Get.back();
+    //             },
+    //             child: const Text(
+    //               'OK',
+    //               style: TextStyle(color: Colors.black),
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     );
+    //   }
+    //   else {
+    //     var result = jsonDecode(response.body);
+    //     showSnackBar(
+    //       color: Colors.red,
+    //       title: "Exception",
+    //       message: result['message'],
+    //     );
+    //     isPolygonLoading.value = false;
+    //   }
+    // } catch (e) {
       isPolygonLoading.value = false;
       update();
-    }
+    // }
   }
 
   String convertPolygonToWKT(RxList<Polygon> polygons) {
@@ -665,12 +667,10 @@ class HomeController extends GetxController {
       print("Error: Polygon points are empty");
       return 'POLYGON()';
     }
-
     final coordinates = polygons.map((polygon) {
       final polygonCoordinates = polygon.points
           .map((point) => '${point.longitude} ${point.latitude}')
           .join(', ');
-
       return '($polygonCoordinates)';
     }).join(', ');
 
