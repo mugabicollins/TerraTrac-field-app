@@ -47,12 +47,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> loadLocation() async {
-    // mapPath = await getPath();
     await controller.getLocation();
-    // // Cache 100km radius around user's location
-    // if (controller.cameraPosition.value != null) {
-    //    controller.cacheMapTiles(controller.cameraPosition.value!, 100000); // 100km in meters
-    // }
   }
 
   @override

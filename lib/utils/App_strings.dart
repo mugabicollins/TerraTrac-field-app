@@ -22,4 +22,13 @@ class AppStrings {
   static const registeredField= 'Register Field';
   static const cancel= 'Cancel';
 
+  /// saved field screen
+  static const delete= 'Delete';
+  static const fetchFields= 'Fetch Field';
+  static const copiedToClipBoard= 'Copied to clipboard!';
+  static const noFieldsFound= 'No Fields Found';
+  static const geoId= 'Geo-Id';
+  static const fieldName= 'Field Name';
+  static const fetchingFields= 'Fetching Fields';
+
 }

@@ -1,8 +1,8 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
-import 'package:terrapipe/app/data/repositories/shared_preference.dart';
 import 'package:terrapipe/app/modules/home/controllers/home_controller.dart';
 import 'package:terrapipe/app/modules/home/views/home_screen.dart';
 import 'package:terrapipe/app/modules/saved_fields/controllers/saved_field_controller.dart';
@@ -11,6 +11,8 @@ import 'package:terrapipe/utils/constants/app_colors.dart';
 import 'package:terrapipe/utils/helper_functions.dart';
 import 'package:terrapipe/widgets/appbars/custom_appbar.dart';
 import 'package:terrapipe/widgets/app_buttons/custom_button.dart';
+
+import '../../../services/conectivity_service.dart';
 
 class BottomBarView extends StatefulWidget {
   BottomBarView({super.key});
@@ -22,6 +24,7 @@ class BottomBarView extends StatefulWidget {
 class _BottomBarViewState extends State<BottomBarView> {
   var userEmail = "Guest User";
   var bottomSelectedIndex = 0;
+  final ConnectivityService connectivityService = ConnectivityService();
   PageController bottomController = PageController(initialPage: 0);
   SavedFieldController savedFieldController = Get.put(SavedFieldController());
   final HomeController homeController = Get.put(HomeController());
@@ -65,6 +68,29 @@ class _BottomBarViewState extends State<BottomBarView> {
   }
 
   loadUserData() async {
+    connectivityService.startListening((result) {
+      // Check if the result is a non-empty list
+      if (result.isNotEmpty) {
+        final connectivityResult = result.first; // Get the first element of the list
+
+        setState(() {
+          if (connectivityResult == ConnectivityResult.mobile) {
+            savedFieldController.connectionStatus.value = true;
+            savedFieldController.update();
+            print("Connectivity Result 1 >>>>>>  $connectivityResult");
+          } else if (connectivityResult == ConnectivityResult.wifi) {
+            savedFieldController.connectionStatus.value = true;
+            savedFieldController.update();
+
+          } else {
+            savedFieldController.connectionStatus.value = false;
+            savedFieldController.update();
+          }
+        });
+      } else {
+      }
+    });
+
     savedFieldController.isFetchFieldLoading.value = true;
     await savedFieldController.fetchGeoId();
     userEmail = await HelperFunctions.getFromPreference("userEmail") ?? "";

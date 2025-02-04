@@ -49,6 +49,8 @@ dependencies:
 #  image picker
   image_picker:
   lottie:
+#    connectivity
+  connectivity_plus:
 
   intl_phone_field:
     git:

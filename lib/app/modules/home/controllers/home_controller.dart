@@ -20,6 +20,7 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:terrapipe/app/data/repositories/shared_preference.dart';
 import 'package:terrapipe/utils/helper_functions.dart';
 
+import '../../../../utils/constants/app_colors.dart';
 import '../../../data/repositories/terratrac_db.dart';
 
 class HomeController extends GetxController {
@@ -671,6 +672,7 @@ class HomeController extends GetxController {
     String email=await HelperFunctions.getFromPreference("userEmail")??"";
     String number=await HelperFunctions.getFromPreference("phoneNumber")??"";
     dbHelper.insertPolygonData(polygons:wkt,phone: number,email: email, deviceID:deviceID, );
+    showSnackBar(title: "Success",message: "Field save successfully",color: AppColor.green);
     isPolygonLoading.value = false;
   }
 

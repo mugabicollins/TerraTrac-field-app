@@ -6,21 +6,26 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:terrapipe/app/data/repositories/shared_preference.dart';
+import 'package:terrapipe/app/modules/home/controllers/home_controller.dart';
 import 'package:terrapipe/app/modules/saved_fields/components/save_field_map.dart';
 import 'package:terrapipe/utils/helper_functions.dart';
 import 'package:terrapipe/widgets/dialogs/score_dialog.dart';
 import 'package:terrapipe/widgets/dialogs/session_out_dialog.dart';
+import '../../../data/models/polygoneModel.dart';
+import '../../../data/repositories/terratrac_db.dart';
 
 class SavedFieldController extends GetxController {
+  final TerraTracDataBaseHelper dbHelper = TerraTracDataBaseHelper();
+  final HomeController homeController = Get.put(HomeController());
   late final MapController mapController;
   RxList<Polygon> drawnPolygons = <Polygon>[].obs;
-
-  // List<MapController> ListMapController = [];
   final Dio dio = Dio();
   var fieldList = <List<String>>[].obs;
   List<LatLngBounds> boundsList = [];
   RxBool isFetchFieldLoading = false.obs;
   var polygons = <Polygon>[].obs;
+
+  RxBool connectionStatus = false.obs;
 
   @override
   void onInit() {
@@ -28,18 +33,16 @@ class SavedFieldController extends GetxController {
     mapController = MapController();
   }
 
-  List<MapController> mapControllers =
-      []; // Declare the list of map controllers
-
+  List<MapController> mapControllers = [];
   void initializeBoundsList(int length) {
     while (boundsList.length < length) {
       boundsList.add(LatLngBounds(
-          LatLng(0, 0), LatLng(0, 0))); // Initialize with a default value
+          const LatLng(0, 0), LatLng(0, 0))); // Initialize with a default value
     }
   }
-
   /// Initialize the domain list
   Future<void> fetchGeoId() async {
+    await getLocalSavedData();
     const url = 'https://be.terrapipe.io/geo-id';
     String? piplineToken = await SharedPreference.instance.getPiplineToken();
     var headers = {
@@ -61,7 +64,6 @@ class SavedFieldController extends GetxController {
                 .map((e) => List<String>.from(e))
                 .toList();
             initializeBoundsList(fieldList.length);
-
             for (int index = 0; index < fieldList.length; index++) {
               await fetchFieldShapeByGeoId(fieldList[index].first, index);
             }
@@ -72,7 +74,7 @@ class SavedFieldController extends GetxController {
             update();
           }
         } else {
-          Get.dialog(SessionExpireDialog(), barrierDismissible: false);
+          Get.dialog(const SessionExpireDialog(), barrierDismissible: false);
         }
       } else {
         isFetchFieldLoading.value = false;
@@ -115,7 +117,6 @@ class SavedFieldController extends GetxController {
                 borderStrokeWidth: 2.0,
                 color: Colors.blue.withOpacity(0.3),
               ));
-
               // Calculate bounds
               LatLngBounds bounds = await calculateBounds(points);
               boundsList[index] = bounds;
@@ -169,7 +170,7 @@ class SavedFieldController extends GetxController {
                 title: "Success",
                 message: "Field Map Opened successfully",
               );
-              Get.to(() =>  SaveFieldMap(), arguments: {
+              Get.to(() => SaveFieldMap(), arguments: {
                 'geoId': geoId,
                 'polygonPoints': points,
               });
@@ -253,30 +254,21 @@ class SavedFieldController extends GetxController {
     // Check if boundsList has the correct index
     if (boundsList.isNotEmpty && boundsList.length > index) {
       LatLngBounds bounds = boundsList[index];
-
       // Calculate center and zoom based on the bounds
       LatLng center = bounds.center;
-      double zoom =
-          16.0; // Default zoom level, you can adjust this based on your needs
-
-      // Optionally, you can calculate the zoom level dynamically based on the bounds
-      // For example, use an algorithm to fit the map to the bounds
-
+      double zoom = 16.0;
       return MapOptions(
         initialCenter: center,
         initialZoom: zoom,
-        interactionOptions: InteractionOptions(
-          flags: InteractiveFlag.none
-        ), // or adjust based on your requirement
+        interactionOptions: const InteractionOptions(
+            flags: InteractiveFlag.none), // or adjust based on your requirement
       );
     } else {
       // Default MapOptions in case boundsList doesn't have the required index
       return const MapOptions(
         initialCenter: LatLng(51.5, -0.09), // Example coordinates
         initialZoom: 14.0,
-        interactionOptions: InteractionOptions(
-            flags: InteractiveFlag.none
-        ),
+        interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
       );
     }
   }
@@ -284,15 +276,14 @@ class SavedFieldController extends GetxController {
 // Dio instance for making API calls
 
   /// Fetch the Wisp TMF Deforestation Score
-  Future<double?> fetchWispTmfDeforestationScore(Map<String, dynamic> geojson) async {
+  Future<double?> fetchWispTmfDeforestationScore(
+      Map<String, dynamic> geojson) async {
     String? piplineToken = await SharedPreference.instance.getPiplineToken();
     var headers = {
       'Authorization': 'Bearer $piplineToken',
     };
     try {
-      var data = json.encode({
-        "geojson":geojson['Geo JSON']
-      });
+      var data = json.encode({"geojson": geojson['Geo JSON']});
       var dio = Dio();
       var response = await dio.request(
         'https://be.terrapipe.io/fetch-whisp-tmf-deforestation-score',
@@ -305,7 +296,10 @@ class SavedFieldController extends GetxController {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data != null && data['data'] != null) {
-          return data['data']['tmf_deforestation_score'] is double ? data['data']['tmf_deforestation_score'] : double.tryParse(data['data']['tmf_deforestation_score'].toString());
+          return data['data']['tmf_deforestation_score'] is double
+              ? data['data']['tmf_deforestation_score']
+              : double.tryParse(
+                  data['data']['tmf_deforestation_score'].toString());
         } else {
           print("Error: Invalid response structure. 'score' not found.");
           return 0;
@@ -343,7 +337,10 @@ class SavedFieldController extends GetxController {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data != null && data['data'] != null) {
-          return data['data']['tmf_deforestation_score'] is double ? data['data']['tmf_deforestation_score'] : double.tryParse(data['data']['tmf_deforestation_score'].toString());
+          return data['data']['tmf_deforestation_score'] is double
+              ? data['data']['tmf_deforestation_score']
+              : double.tryParse(
+                  data['data']['tmf_deforestation_score'].toString());
         } else {
           print("Error: Invalid response structure. 'score' not found.");
           return 0.0;
@@ -359,25 +356,70 @@ class SavedFieldController extends GetxController {
     }
   }
 
-  RxBool gettingDetail=false.obs;
-  RxString terraPipeTMFScore="0.0".obs;
-  RxString wispTMFScore="0.0".obs;
+  RxBool gettingDetail = false.obs;
+  RxString terraPipeTMFScore = "0.0".obs;
+  RxString wispTMFScore = "0.0".obs;
+
   /// Main function to handle API calls and navigate to the new page
   Future<void> handleAccessData() async {
-    gettingDetail.value=true;
+    gettingDetail.value = true;
     update();
-    final terraPipeScore = await fetchTerraPipeTmfDeforestationScore(fieldData['JSON Response']['GEO Id']);
-    final wispScore = await fetchWispTmfDeforestationScore(fieldData['JSON Response']);
-    gettingDetail.value=false;
+    final terraPipeScore = await fetchTerraPipeTmfDeforestationScore(
+        fieldData['JSON Response']['GEO Id']);
+    final wispScore =
+        await fetchWispTmfDeforestationScore(fieldData['JSON Response']);
+    gettingDetail.value = false;
     update();
     if (wispScore != null || terraPipeScore != null) {
-      terraPipeTMFScore.value="${terraPipeScore}";
-      wispTMFScore.value="$wispScore";
+      terraPipeTMFScore.value = "${terraPipeScore}";
+      wispTMFScore.value = "$wispScore";
       update();
       Get.dialog(ScoreDialog());
-
     } else {
       // print("Failed to fetch scores.");
+    }
+  }
+
+  /// all functions related to locally fetched data
+  List<PolygonModel> locallyPolygonList = <PolygonModel>[].obs;
+
+  Future<void> getLocalSavedData() async {
+    var result = await dbHelper.getUnsyncedPolygons();
+    print("Locally Data Fetched ::::>>>  ${result}");
+    locallyPolygonList = result.map<PolygonModel>((json) => PolygonModel.fromJson(json)).toList();
+    loadPolygonsFromDB(locallyPolygonList);
+  }
+  List<Polygon> localPolygons = [];
+  void parseAndAddPolygon(String wktPolygon) {
+    if (!wktPolygon.startsWith("POLYGON")) return;
+
+    // Extract coordinates
+    String coordinatesString =
+        wktPolygon.replaceAll("POLYGON((", "").replaceAll("))", "");
+
+    List<LatLng> polygonPoints = coordinatesString.split(",").map((point) {
+      List<String> latLng = point.trim().split(" ");
+      double lng = double.parse(latLng[0]); // Longitude first
+      double lat = double.parse(latLng[1]); // Latitude second
+      return LatLng(lat, lng);
+    }).toList();
+
+    // Create polygon
+    Polygon newPolygon = Polygon(
+      points: polygonPoints,
+      color: Colors.blue.withOpacity(0.3),
+      borderColor: Colors.blue,
+      borderStrokeWidth: 3,
+    );
+
+    // Add to list and update UI
+    localPolygons.add(newPolygon);
+    update();
+  }
+  void loadPolygonsFromDB(List<PolygonModel> fetchedPolygons) {
+    localPolygons.clear();
+    for (var polygonModel in fetchedPolygons) {
+      parseAndAddPolygon(polygonModel.polygonData);
     }
   }
 }

@@ -19,12 +19,9 @@ class PolygonBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration:  const BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(32),
-          topLeft: Radius.circular(32)
-        )
-      ),
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(32), topLeft: Radius.circular(32))),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -93,36 +90,43 @@ class PolygonBottomSheet extends StatelessWidget {
             SizedBox(
               height: Get.height * 0.02,
             ),
-            const Text(
-              "Domain (optional):",
-              style: AppTextStyles.labelMedium,
-            ),
-            SizedBox(
-              height: Get.height * 0.01,
-            ),
-            CustomDropdown<String>(
-              hintText: 'Select Domain',
-              items: homeController.domainList,
-              initialItem: homeController.domainList[0],
-              decoration: CustomDropdownDecoration(
-                  closedBorder: Border.all(
-                    color: Colors.black,
+            if (homeController.domainList.isNotEmpty)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Domain (optional):",
+                    style: AppTextStyles.labelMedium,
                   ),
-                  expandedBorder: Border.all(
-                    color: Colors.black38,
-                  )),
-              disabledDecoration: CustomDropdownDisabledDecoration(
-                border: Border.all(
-                  color: Colors.black,
-                ),
+                  SizedBox(
+                    height: Get.height * 0.01,
+                  ),
+                  CustomDropdown<String>(
+                    hintText: 'Select Domain',
+                    items: homeController.domainList,
+                    initialItem: homeController.domainList[0],
+                    decoration: CustomDropdownDecoration(
+                        closedBorder: Border.all(
+                          color: Colors.black,
+                        ),
+                        expandedBorder: Border.all(
+                          color: Colors.black38,
+                        )),
+                    disabledDecoration: CustomDropdownDisabledDecoration(
+                      border: Border.all(
+                        color: Colors.black,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      log('changing value to: $value');
+                    },
+                  ),
+                  SizedBox(
+                    height: Get.height * 0.02,
+                  ),
+                ],
               ),
-              onChanged: (value) {
-                log('changing value to: $value');
-              },
-            ),
-            SizedBox(
-              height: Get.height * 0.02,
-            ),
             const Text(
               "Boundary Type:",
               style: AppTextStyles.labelMedium,
