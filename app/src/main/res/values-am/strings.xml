@@ -178,7 +178,8 @@
     <string name="total_farms_with_incomplete_data">%1$d የማይሞላ ዳታ አለበት</string>
     <string name="error_loading_more_sites">ተጨማሪ ቦታዎችን ማስገባት ላይ ስህተት</string>
     <string name="press_back_again">ወጣሁ የሚል ለመውጣት ደግሞ ይጫኑ</string>
-
+    <string name="permission_required">ፈቃድ ያስፈልጋል</string>
+    <string name="go_to_settings_msg">የአንተን የአካባቢ ፈቃድ በቋሚነት ስላስረዳኸው፡፡ እባኮትን ወደ ቅንብሮች ሄደው እንዲሆን ያድርጉ፡፡</string>
 
 
 </resources>

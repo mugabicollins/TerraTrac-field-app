@@ -178,6 +178,8 @@
     <string name="error_loading_more_sites">Erreur de chargement de sites supplémentaires</string>
 
     <string name="press_back_again">Appuyez à nouveau sur retour pour quitter</string>
+    <string name="permission_required">Autorisation requise</string>
+    <string name="go_to_settings_msg">Vous avez définitivement refusé l\'autorisation de localisation.Veuillez aller dans les paramètres pour l\'activer.</string>
 
 
 
