@@ -183,6 +183,8 @@
     <string name="map_tiles_cached">የካርታ ጥልፍ በተሳካ ሁኔታ ተከማቹበታል።</string>
     <string name="unable_to_get_location">አካባቢ ማግኘት አልተቻለም። የካርታ ማስቀመጥ ተወል.</string>
     <string name="no_internet">የኢንተርኔት ግንኙነት የለም። የካርታ ማስቀመጥ ተወል.</string>
+    <string name="include_farmer_names_title">የገበያ ስሞችን ይያዙ?</string>
+    <string name="include_farmer_names_text">የገበያ ስሞችን በውጭ ላይ መላክ ይፈልጋሉ?</string>
 
 
 </resources>

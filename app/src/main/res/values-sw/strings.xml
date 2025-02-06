@@ -185,6 +185,8 @@
     <string name="map_tiles_cached">Vigae vya ramani vimehifadhiwa kwenye kache kwa mafanikio.</string>
     <string name="unable_to_get_location">Imeshindikana kupata eneo. Uhifadhi wa ramani umepitwa.</string>
     <string name="no_internet">Hakuna muunganisho wa intaneti. Uhifadhi wa ramani umepitwa.</string>
+    <string name="include_farmer_names_title">Je, ujumuishwe majina ya wakulima?</string>
+    <string name="include_farmer_names_text">Je, unataka kujumuisha majina ya wakulima katika usafirishaji wa data?</string>
 
 
 

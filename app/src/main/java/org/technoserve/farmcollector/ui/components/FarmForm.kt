@@ -74,7 +74,7 @@ import org.technoserve.farmcollector.ui.screens.farms.addFarm
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
 import org.technoserve.farmcollector.ui.screens.farms.isLocationEnabled
 import org.technoserve.farmcollector.ui.screens.farms.promptEnableLocation
-import org.technoserve.farmcollector.ui.screens.farms.readStoredValue
+//import org.technoserve.farmcollector.ui.screens.farms.readStoredValue
 import org.technoserve.farmcollector.ui.screens.farms.toLatLngList
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import org.technoserve.farmcollector.ui.screens.farms.validateNumber

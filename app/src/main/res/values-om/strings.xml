@@ -184,6 +184,8 @@
     <string name="map_tiles_cached">Kaartaan fayyadamaa milkaa’inaan kuufame.</string>
     <string name="unable_to_get_location">Iddoo argachuu hin dandeenye. Kuufama kaartaa dhiisame.</string>
     <string name="no_internet">Toora interneetii hin jiru. Kuufama kaartaa dhiisame.</string>
+    <string name="include_farmer_names_title">Maqaa qonnaan bultoota dabaluu?</string>
+    <string name="include_farmer_names_text">Maqaa qonnaan bultoota erguuf dabaluuf barbaadaa?</string>
 
 
 

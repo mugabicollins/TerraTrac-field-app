@@ -32,6 +32,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -152,6 +153,9 @@ fun FarmList(
     var exportFormat by remember { mutableStateOf("") }
     var showImportDialog by remember { mutableStateOf(false) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
+    var includeFarmerNames by remember { mutableStateOf(true) } // Default: Include names
+    var showIncludeFarmerNamesDialog by remember { mutableStateOf(false) }
+
     val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
 
     val tabs =
@@ -191,13 +195,15 @@ fun FarmList(
         delay(2000)
         isLoading.value = false
     }
+    // State to store the final list before export
+    var finalList by remember { mutableStateOf(listItems) }
 
     val createDocumentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
                     if (createFile(
-                           context, uri,listItems,
+                           context, uri,finalList,
                                 exportFormat,
                                 siteID ,
                                 cwsListItems
@@ -209,22 +215,42 @@ fun FarmList(
             }
         }
 
-    fun initiateFileCreation() {
-        val mimeType = if (exportFormat == "CSV") "text/csv" else "application/geo+json"
-        val intent =
-            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = mimeType
-                val getSiteById = cwsListItems.find { it.siteId == siteID }
-                val siteName = getSiteById?.name ?: "SiteName"
-                val timestamp =
-                    SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-                val filename =
-                    if (exportFormat == "CSV") "farms_${siteName}_$timestamp.csv" else "farms_${siteName}_$timestamp.geojson"
-                putExtra(Intent.EXTRA_TITLE, filename)
-            }
-        createDocumentLauncher.launch(intent)
-    }
+//    fun initiateFileCreation() {
+//        val mimeType = if (exportFormat == "CSV") "text/csv" else "application/geo+json"
+//        val intent =
+//            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+//                addCategory(Intent.CATEGORY_OPENABLE)
+//                type = mimeType
+//                val getSiteById = cwsListItems.find { it.siteId == siteID }
+//                val siteName = getSiteById?.name ?: "SiteName"
+//                val timestamp =
+//                    SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+//                val filename =
+//                    if (exportFormat == "CSV") "farms_${siteName}_$timestamp.csv" else "farms_${siteName}_$timestamp.geojson"
+//                putExtra(Intent.EXTRA_TITLE, filename)
+//            }
+//        createDocumentLauncher.launch(intent)
+//    }
+// Function to initiate file creation with the selected data
+fun initiateFileCreation(selectedList: List<Farm>) {
+    finalList = selectedList // Store the filtered list before export
+
+    val mimeType = if (exportFormat == "CSV") "text/csv" else "application/geo+json"
+    val intent =
+        Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = mimeType
+            val getSiteById = cwsListItems.find { it.siteId == siteID }
+            val siteName = getSiteById?.name ?: "SiteName"
+            val timestamp =
+                SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val filename =
+                if (exportFormat == "CSV") "farms_${siteName}_$timestamp.csv" else "farms_${siteName}_$timestamp.geojson"
+            putExtra(Intent.EXTRA_TITLE, filename)
+        }
+    createDocumentLauncher.launch(intent)
+}
+
 
     // Function to share the file
     fun shareFile(file: File) {
@@ -264,41 +290,109 @@ fun FarmList(
             onFormatSelected = { format ->
                 exportFormat = format
                 showFormatDialog = false
-                when (action) {
-                    Action.Export -> exportFile()
-                    Action.Share -> shareFileAction()
-                    else -> {}
-                }
+                showIncludeFarmerNamesDialog = true // Show the next dialog
+//                when (action) {
+//                    Action.Export -> exportFile()
+//                    Action.Share -> shareFileAction()
+//                    else -> {}
+//                }
             },
         )
     }
+
+    if (showIncludeFarmerNamesDialog) {
+        AlertDialog(
+            onDismissRequest = { showIncludeFarmerNamesDialog = false },
+            title = { Text(stringResource(id = R.string.include_farmer_names_title)) },
+            text = { Text(stringResource(id = R.string.include_farmer_names_text)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        includeFarmerNames = true
+                        showIncludeFarmerNamesDialog = false
+                        showConfirmationDialog = true
+                    }
+                ) { Text(stringResource(id = R.string.yes))  }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        includeFarmerNames = false
+                        showIncludeFarmerNamesDialog = false
+                        showConfirmationDialog = true
+                    }
+                ) { Text(stringResource(id = R.string.no)) }
+            }
+        )
+    }
+
+//    if (showConfirmationDialog) {
+//        CustomizedConfirmationDialog(
+//            listItems,
+//            action = action!!, // Ensure action is not null
+//            onConfirm = {
+//                when (action) {
+//                    Action.Export -> initiateFileCreation()
+//                    Action.Share -> {
+//                        // file = createFileForSharing()
+//                        val file = createFileForSharing(
+//                            context,
+//                            listItems,
+//                        exportFormat,
+//                        siteID,
+//                        cwsListItems
+//                        )
+//                        if (file != null) {
+//                            shareFile(file)
+//                        }
+//                    }
+//
+//                    else -> {}
+//                }
+//            },
+//            onDismiss = { showConfirmationDialog = false },
+//        )
+//    }
+
+    fun List<Farm>.filterWithoutFarmerNames(): List<Farm> {
+        return this.map { dataItem ->
+            dataItem.copy(farmerName = "") // Exclude farmer names if the user chooses
+        }
+    }
+
+
     if (showConfirmationDialog) {
         CustomizedConfirmationDialog(
             listItems,
             action = action!!, // Ensure action is not null
             onConfirm = {
+                val selectedList  = if (!includeFarmerNames) {
+                    listItems.filterWithoutFarmerNames() // Remove farmer names
+                } else {
+                    listItems // Keep original list
+                }
+
                 when (action) {
-                    Action.Export -> initiateFileCreation()
+                    Action.Export -> initiateFileCreation(selectedList)
                     Action.Share -> {
-                        // file = createFileForSharing()
                         val file = createFileForSharing(
                             context,
-                            listItems,
-                        exportFormat,
-                        siteID,
-                        cwsListItems
+                            selectedList, // Use user-selected data
+                            exportFormat,
+                            siteID,
+                            cwsListItems
                         )
                         if (file != null) {
                             shareFile(file)
                         }
                     }
-
                     else -> {}
                 }
             },
             onDismiss = { showConfirmationDialog = false },
         )
     }
+
     if (showImportDialog) {
         ImportFileDialog(
             siteId,
