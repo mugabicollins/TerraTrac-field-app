@@ -181,6 +181,9 @@
     <string name="press_back_again">Presiona atrás otra vez para salir</string>
     <string name="permission_required">Permiso Requerido</string>
     <string name="go_to_settings_msg">Has denegado permanentemente el permiso de ubicación. Por favor, ve a la configuración para habilitarlo.</string>
+    <string name="map_tiles_cached">Los mosaicos del mapa se almacenaron en caché con éxito.</string>
+    <string name="unable_to_get_location">No se pudo obtener la ubicación. Se omitió el almacenamiento en caché del mapa.</string>
+    <string name="no_internet">Sin conexión a Internet. Se omitió el almacenamiento en caché del mapa.</string>
 
 
 

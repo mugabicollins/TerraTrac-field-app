@@ -182,6 +182,9 @@
     <string name="press_back_again">Bonyeza nyuma tena ili utoke</string>
     <string name="permission_required">Ruhusa Inahitajika</string>
     <string name="go_to_settings_msg">Umezuia ruhusa ya eneo kabisa. Tafadhali nenda kwenye mipangilio ili kuiwezesha.</string>
+    <string name="map_tiles_cached">Vigae vya ramani vimehifadhiwa kwenye kache kwa mafanikio.</string>
+    <string name="unable_to_get_location">Imeshindikana kupata eneo. Uhifadhi wa ramani umepitwa.</string>
+    <string name="no_internet">Hakuna muunganisho wa intaneti. Uhifadhi wa ramani umepitwa.</string>
 
 
 

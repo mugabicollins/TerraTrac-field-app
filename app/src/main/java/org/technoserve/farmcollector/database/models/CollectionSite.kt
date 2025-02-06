@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import org.technoserve.farmcollector.database.converters.DateConverter
-/*
+/**
  *
  * This class represents a collection site, with additional fields for agent name, phone number, email, village,
  * district, and timestamps for created and updated at.

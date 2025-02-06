@@ -180,7 +180,9 @@
     <string name="press_back_again">Appuyez à nouveau sur retour pour quitter</string>
     <string name="permission_required">Autorisation requise</string>
     <string name="go_to_settings_msg">Vous avez définitivement refusé l\'autorisation de localisation.Veuillez aller dans les paramètres pour l\'activer.</string>
-
+    <string name="map_tiles_cached">Les tuiles de la carte ont été mises en cache avec succès.</string>
+    <string name="unable_to_get_location">Impossible d\'obtenir l\'emplacement. Mise en cache de la carte ignorée.</string>
+    <string name="no_internet">Pas de connexion Internet. Mise en cache de la carte ignorée.</string>
 
 
 </resources>

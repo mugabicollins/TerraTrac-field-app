@@ -180,6 +180,9 @@
 
     <string name="permission_required">Permission Required</string>
     <string name="go_to_settings_msg">You have permanently denied location permission. Please go to settings to enable it.</string>
+    <string name="map_tiles_cached">Map tiles cached successfully.</string>
+    <string name="unable_to_get_location">Unable to get location. Map caching skipped.</string>
+    <string name="no_internet">No internet connection. Map caching skipped.</string>
 
 
 

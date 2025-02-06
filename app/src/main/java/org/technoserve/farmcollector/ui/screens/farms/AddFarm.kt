@@ -105,12 +105,12 @@ fun truncateToDecimalPlaces(value: String, decimalPlaces: Int): String {
     }
 }
 
-// Function to read and format stored value
-fun readStoredValue(sharedPref: SharedPreferences): String {
-    val storedValue = sharedPref.getString("plot_size", "") ?: ""
-    val formattedValue = truncateToDecimalPlaces(storedValue, 9)
-    return formattedValue
-}
+//// Function to read and format stored value
+//fun readStoredValue(sharedPref: SharedPreferences): String {
+//    val storedValue = sharedPref.getString("plot_size", "") ?: ""
+//    val formattedValue = truncateToDecimalPlaces(storedValue, 9)
+//    return formattedValue
+//}
 
 fun formatInput(input: String): String {
     return try {

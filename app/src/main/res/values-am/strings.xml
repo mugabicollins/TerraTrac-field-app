@@ -180,6 +180,9 @@
     <string name="press_back_again">ወጣሁ የሚል ለመውጣት ደግሞ ይጫኑ</string>
     <string name="permission_required">ፈቃድ ያስፈልጋል</string>
     <string name="go_to_settings_msg">የአንተን የአካባቢ ፈቃድ በቋሚነት ስላስረዳኸው፡፡ እባኮትን ወደ ቅንብሮች ሄደው እንዲሆን ያድርጉ፡፡</string>
+    <string name="map_tiles_cached">የካርታ ጥልፍ በተሳካ ሁኔታ ተከማቹበታል።</string>
+    <string name="unable_to_get_location">አካባቢ ማግኘት አልተቻለም። የካርታ ማስቀመጥ ተወል.</string>
+    <string name="no_internet">የኢንተርኔት ግንኙነት የለም። የካርታ ማስቀመጥ ተወል.</string>
 
 
 </resources>

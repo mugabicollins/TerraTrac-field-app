@@ -181,6 +181,9 @@
     <string name="press_back_again">Dubbii duubatti deebi’aa ba’uu</string>
     <string name="permission_required">Hayyama Barbaachisa</string>
     <string name="go_to_settings_msg">Hayyama bakka argachuu idilee dhoorkiteetta. Maaloo gara settings deemi itti dabaluu.</string>
+    <string name="map_tiles_cached">Kaartaan fayyadamaa milkaa’inaan kuufame.</string>
+    <string name="unable_to_get_location">Iddoo argachuu hin dandeenye. Kuufama kaartaa dhiisame.</string>
+    <string name="no_internet">Toora interneetii hin jiru. Kuufama kaartaa dhiisame.</string>
 
 
 

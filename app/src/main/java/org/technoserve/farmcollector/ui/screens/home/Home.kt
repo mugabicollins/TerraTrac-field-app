@@ -164,9 +164,6 @@ fun Home(
         Spacer(modifier = Modifier.fillMaxHeight(0.2f))
 
         Box(
-//            modifier = Modifier
-//                .fillMaxWidth(0.8f)
-//                .padding(20.dp)
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .padding(when (LocalConfiguration.current.screenWidthDp) {
@@ -177,10 +174,6 @@ fun Home(
         ) {
             Text(
                 text = stringResource(id = R.string.app_intro),
-//                style = TextStyle(
-//                    fontWeight = FontWeight.Bold,
-//                    color = MaterialTheme.colorScheme.onBackground
-//                ),
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -210,9 +203,6 @@ fun Home(
             Image(
                 painter = painterResource(id = R.drawable.tns_labs),
                 contentDescription = null,
-//                modifier = Modifier
-//                    .width(130.dp)
-//                    .height(20.dp)
                 modifier = Modifier
                     .width(when (LocalConfiguration.current.screenWidthDp) {
                         in 0..320 -> 100.dp

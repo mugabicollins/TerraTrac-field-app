@@ -17,6 +17,7 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import org.technoserve.farmcollector.R
 
 
 @RequiresApi(Build.VERSION_CODES.M)
@@ -110,7 +111,7 @@ fun cacheMapInBackground(context: Context, mapUrl: String) {
                             sharedPreferences.edit().putBoolean("MapCached", true).apply()
                             Toast.makeText(
                                 context,
-                                "Map tiles cached successfully.",
+                                context.getString(R.string.map_tiles_cached),
                                 Toast.LENGTH_LONG
                             ).show()
                             println("Map tiles cached successfully.")
@@ -123,10 +124,10 @@ fun cacheMapInBackground(context: Context, mapUrl: String) {
                     loadUrl(centeredMapUrl)
                 }
             } else {
-                Toast.makeText(context, "Unable to get location. Map caching skipped.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.unable_to_get_location), Toast.LENGTH_LONG).show()
             }
         } else {
-            Toast.makeText(context, "No internet connection. Map caching skipped.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.no_internet), Toast.LENGTH_LONG).show()
         }
     }
 }
