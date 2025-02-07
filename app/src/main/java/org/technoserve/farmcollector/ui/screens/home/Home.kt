@@ -22,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -36,10 +39,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.Language
+import org.technoserve.farmcollector.ui.components.BackupPromptDialog
 import org.technoserve.farmcollector.ui.theme.Teal
 import org.technoserve.farmcollector.ui.theme.Turquoise
 import org.technoserve.farmcollector.ui.theme.White
 import org.technoserve.farmcollector.ui.screens.settings.LanguageSelector
+import org.technoserve.farmcollector.utils.BackupPreferences
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 import java.util.Locale
 
@@ -62,6 +67,10 @@ fun Home(
 
     val currentLanguage by languageViewModel.currentLanguage.collectAsState()
     val context = LocalContext.current
+    var showBackupDialog by remember { mutableStateOf(false) } // State to control dialog visibility
+    // Observe if the user has already made a backup decision
+    val isBackupDecisionMade by BackupPreferences.isBackupDecisionMade(context)
+        .collectAsState(initial = false)
 
 
     LaunchedEffect(currentLanguage) {
@@ -139,6 +148,28 @@ fun Home(
 
         }
 
+//        Box(
+//            modifier = Modifier
+//                .padding(30.dp)
+//                .background(
+//                    color = Teal,
+//                    shape = RoundedCornerShape(10.dp)
+//                )
+//                .clickable {
+//                    navController.navigate("siteList")
+//                }
+//                .padding(16.dp)
+//        ) {
+//            Text(
+//                text = stringResource(id = R.string.get_started),
+//                style = TextStyle(
+//                    fontWeight = FontWeight.Bold,
+//                    color = White
+//                ),
+//                modifier = Modifier.align(Alignment.Center)
+//            )
+//        }
+
         Box(
             modifier = Modifier
                 .padding(30.dp)
@@ -147,17 +178,29 @@ fun Home(
                     shape = RoundedCornerShape(10.dp)
                 )
                 .clickable {
-                    navController.navigate("siteList")
+                    if (!isBackupDecisionMade) {
+                        showBackupDialog = true // Show the backup prompt if it's the first time
+                    } else {
+                        navController.navigate("siteList") // Directly navigate if the user has already chosen
+                    }
                 }
-                .padding(16.dp)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = stringResource(id = R.string.get_started),
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     color = White
-                ),
-                modifier = Modifier.align(Alignment.Center)
+                )
+            )
+
+            // Show Backup Dialog if it's the first time
+            BackupPromptDialog(
+                context = context,
+                navController = navController,
+                showDialog = showBackupDialog,
+                onDismiss = { showBackupDialog = false }
             )
         }
 

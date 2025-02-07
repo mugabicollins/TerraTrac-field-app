@@ -49,6 +49,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
@@ -77,6 +78,7 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.database.models.ParcelableFarmData
 import org.technoserve.farmcollector.database.models.ParcelablePair
+import org.technoserve.farmcollector.ui.components.BackupConfirmationDialog
 
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
@@ -91,6 +93,7 @@ import org.technoserve.farmcollector.ui.components.FormatSelectionDialog
 import org.technoserve.farmcollector.ui.components.ImportFileDialog
 import org.technoserve.farmcollector.ui.components.RestoreDataAlert
 import org.technoserve.farmcollector.ui.composes.isValidPhoneNumber
+import org.technoserve.farmcollector.utils.BackupPreferences
 
 import org.technoserve.farmcollector.utils.createFile
 import org.technoserve.farmcollector.utils.createFileForSharing
@@ -176,6 +179,23 @@ fun FarmList(
     var showFinalMessage by remember { mutableStateOf(false) }
 
     var showRestoreAlert by remember { mutableStateOf(false) }
+
+
+    // val coroutineScope = rememberCoroutineScope()
+
+    // ✅ Observe backup state
+    val isBackupEnabled by BackupPreferences.isBackupEnabled(context).collectAsState(initial = false)
+
+    // ✅ Observe last sync time
+    val lastSyncTime by BackupPreferences.getLastBackupTime(context).collectAsState(initial = "Never")
+
+    // ✅ Boolean state to control if Last Sync Time is shown
+    var showLastSync by remember { mutableStateOf(true) } // Default is true, can be toggled
+
+    // ✅ State for Confirmation Dialog
+    var showDialog by remember { mutableStateOf(false) }
+    var pendingBackupState by remember { mutableStateOf(isBackupEnabled) }
+
 
 
     val isDarkTheme = isSystemInDarkTheme()
@@ -618,6 +638,13 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                 showSearch = listItems.isNotEmpty(),
                 onRestoreClicked = {
                     showRestoreAlert = true
+                },
+                isBackupEnabled = isBackupEnabled, // ✅ Pass backup state
+                showLastSync = showLastSync, // ✅ Boolean to toggle visibility
+                lastSyncTime = lastSyncTime, // ✅ Pass last sync timestamp
+                onBackupToggleClicked = { newState ->
+                    pendingBackupState = newState // Store user's choice before confirmation
+                    showDialog = true // Show confirmation dialog
                 }
 
             )
@@ -669,6 +696,24 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                     deviceId = deviceId,
                     farmViewModel = farmViewModel
                 )
+
+
+                // ✅ Show Confirmation Dialog when toggling backup
+                if (showDialog) {
+                    BackupConfirmationDialog(
+                        isEnablingBackup = pendingBackupState,
+                        onConfirm = {
+                            coroutineScope.launch {
+                                BackupPreferences.setBackupEnabled(context, pendingBackupState) // Save choice
+                                if (pendingBackupState) {
+                                    BackupPreferences.setLastBackupTime(context) // Update sync time
+                                }
+                            }
+                            showDialog = false
+                        },
+                        onCancel = { showDialog = false }
+                    )
+                }
 
                 showDataContent()
             }

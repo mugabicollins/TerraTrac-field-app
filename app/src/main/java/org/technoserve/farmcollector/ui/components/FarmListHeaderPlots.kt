@@ -3,10 +3,13 @@ package org.technoserve.farmcollector.ui.components
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -34,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,7 +70,11 @@ fun FarmListHeaderPlots(
     showExport: Boolean,
     showShare: Boolean,
     showSearch: Boolean,
-    onRestoreClicked: () -> Unit
+    onRestoreClicked: () -> Unit,
+    isBackupEnabled: Boolean, // ✅ Backup toggle state
+    showLastSync: Boolean, // ✅ Boolean to show/hide last sync time
+    lastSyncTime: String, // ✅ Last sync timestamp
+    onBackupToggleClicked: (Boolean) -> Unit // ✅ Callback for toggling backup
 ) {
 
     var searchQuery by remember { mutableStateOf("") }
@@ -72,14 +82,52 @@ fun FarmListHeaderPlots(
     var isImportDisabled by remember { mutableStateOf(false) }
 
     TopAppBar(
+//        title = {
+//            Text(
+//                text = title,
+//                fontSize = 22.sp,
+//                maxLines = 1,
+//                overflow = TextOverflow.Ellipsis
+//            )
+//        },
         title = {
-            Text(
-                text = title,
-                fontSize = 22.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween // ✅ Ensures Last Sync doesn’t overlap Back Icon
+            ) {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f) // ✅ Prevents overlap with actions
+                )
+
+                // ✅ Show last sync info only if enabled
+                if (showLastSync) {
+                    Column(
+                        modifier = Modifier.padding(end = 12.dp),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Last Synced:",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text(
+                            text = lastSyncTime,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
         },
+
         navigationIcon = {
             IconButton(onClick = {
                 if (isSearchVisible) {
@@ -103,6 +151,31 @@ fun FarmListHeaderPlots(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.horizontalScroll(rememberScrollState())
             ) {
+
+                // ✅ Backup Toggle (Green when ON, Red when OFF)
+                if (showLastSync) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 12.dp)
+                    ) {
+                        Text(
+                            "Backup",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Switch(
+                            checked = isBackupEnabled,
+                            onCheckedChange = onBackupToggleClicked,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.primary, // Green when enabled
+                                checkedTrackColor = MaterialTheme.colorScheme.tertiary,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.error, // Red when disabled
+                                uncheckedTrackColor = MaterialTheme.colorScheme.errorContainer
+                            )
+                        )
+                    }
+                }
                 IconButton(
                     onClick = { onRestoreClicked() },
                     modifier = Modifier.size(36.dp)
@@ -219,9 +292,19 @@ fun FarmListHeaderPlots(
                         cursorColor = MaterialTheme.colorScheme.onSurface,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         errorCursorColor = Color.Red,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        errorIndicatorColor = Color.Red
+//                        focusedIndicatorColor = Color.Transparent,
+//                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        errorIndicatorColor = Color.Red
+                        // ✅ Ensure Border Always Stays Visible
+                        focusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when focused
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when unfocused
+                        errorIndicatorColor = Color.Red, // Border when error state
+
+
+                        // ✅ Add Background Colors
+                        focusedContainerColor = MaterialTheme.colorScheme.background,  // Background when focused
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background, // Background when not focused
+                        errorContainerColor =  Color.Red// Light red for error state
                     ),
                     shape = RoundedCornerShape(0.dp)
                 )

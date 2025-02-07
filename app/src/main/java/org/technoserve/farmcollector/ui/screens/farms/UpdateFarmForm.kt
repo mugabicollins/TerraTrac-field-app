@@ -371,7 +371,11 @@ fun UpdateFarmForm(
             onBackClicked = { navController.popBackStack() },
             showSearch = false,
             showRestore = false,
-            onRestoreClicked = {}
+            onRestoreClicked = {},
+            isBackupEnabled = false,
+            showLastSync = false,
+            lastSyncTime="",
+            onBackupToggleClicked= {}
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
