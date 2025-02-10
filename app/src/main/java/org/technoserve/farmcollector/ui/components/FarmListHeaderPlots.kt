@@ -432,17 +432,21 @@ fun FarmListHeaderPlots(
     val screenWidth = configuration.screenWidthDp.dp
 
     // Adjust sizes based on screen width
-    val iconSize = if (screenWidth < 360.dp) 24.dp else 36.dp
-    val switchScale = if (screenWidth < 360.dp) 0.6f else 0.8f
-    val horizontalPadding = if (screenWidth < 360.dp) 8.dp else 12.dp
-    val titleFontSize = if (screenWidth < 360.dp) 16.sp else 18.sp
-    val backupTextStyle = if (screenWidth < 360.dp) {
+    val iconSize = if (screenWidth < 380.dp) 24.dp else 36.dp
+    val switchScale = if (screenWidth < 380.dp) 0.6f else 0.8f
+    val horizontalPadding = if (screenWidth < 380.dp) 8.dp else 12.dp
+    val titleFontSize = if (screenWidth < 380.dp) 16.sp else 18.sp
+    val backupTextStyle = if (screenWidth < 380.dp) {
         MaterialTheme.typography.bodySmall
     } else {
         MaterialTheme.typography.bodyMedium
     }
 
     TopAppBar(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(horizontal = horizontalPadding),
         title = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -541,7 +545,7 @@ fun FarmListHeaderPlots(
             if (showLastSync) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(end = 6.dp) // ✅ Reduced spacing
+                    modifier = Modifier.padding(end = 4.dp) // ✅ Reduced spacing
                 ) {
                     Text(
                         text = stringResource(id = R.string.backup_now),
@@ -606,10 +610,11 @@ fun FarmListHeaderPlots(
                     }
                 }
 
-                IconButton(onClick = onRestoreClicked, modifier = Modifier.size(iconSize)) {
+                IconButton(onClick = onRestoreClicked, modifier = Modifier.size(36.dp)) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = stringResource(id = R.string.restore),
+                        modifier = Modifier.size(iconSize),
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
@@ -619,11 +624,12 @@ fun FarmListHeaderPlots(
                 if (showSearch) {
                     IconButton(
                         onClick = { isSearchVisible = !isSearchVisible },
-                        modifier = Modifier.size(iconSize)
+                        modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = stringResource(id = R.string.search),
+                            modifier = Modifier.size(iconSize),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
