@@ -352,7 +352,6 @@ fun FarmListHeader(
                                     modifier = Modifier.size(iconSize)
                                 )
                             }
-
                             DropdownMenu(
                                 expanded = isLastSyncDropdownVisible,
                                 onDismissRequest = { isLastSyncDropdownVisible = false },
