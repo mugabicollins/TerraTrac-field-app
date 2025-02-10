@@ -271,6 +271,7 @@ fun promptEnableLocation(context: Context) {
 fun LocationPermissionRequest(
     onLocationEnabled: () -> Unit,
     onPermissionsGranted: () -> Unit,
+    onPermissionsDenied: () -> Unit,
     showLocationDialogNew: MutableState<Boolean>,
     hasToShowDialog: Boolean
 ) {
@@ -281,6 +282,7 @@ fun LocationPermissionRequest(
             Manifest.permission.ACCESS_FINE_LOCATION
         )
     )
+
 
     LaunchedEffect(Unit) {
         if (isLocationEnabled(context)) {
@@ -316,6 +318,7 @@ fun LocationPermissionRequest(
             dismissButton = {
                 Button(onClick = {
                     showLocationDialogNew.value = false
+                    onPermissionsDenied()
                     Toast.makeText(
                         context,
                         context.getString(R.string.location_permission_denied_message),

@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,9 +16,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,7 +41,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -135,23 +142,164 @@ fun FarmListHeader(
 //        },
 //    )
 
+//    TopAppBar(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .background(MaterialTheme.colorScheme.primary)
+//            .padding(horizontal = 12.dp),
+//        navigationIcon = {
+//            IconButton(onClick = {
+//                if (isSearchVisible) {
+//                    onSearchQueryChanged("")
+//                } else {
+//                    onBackClicked()
+//                }
+//            }) {
+//                Icon(
+//                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                    contentDescription = "Back",
+//                    tint = MaterialTheme.colorScheme.onPrimary
+//                )
+//            }
+//        },
+//        title = {
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.SpaceBetween // ✅ Ensures Last Sync doesn’t overlap Back Icon
+//            ) {
+//                Text(
+//                    text = title,
+//                    color = MaterialTheme.colorScheme.onPrimary,
+//                    fontSize = 20.sp,
+//                    fontWeight = FontWeight.Bold,
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis,
+//                    modifier = Modifier.weight(1f) // ✅ Prevents overlap with actions
+//                )
+//
+//                // ✅ Show last sync info only if enabled
+//                if (showLastSync) {
+//                    Column(
+//                        modifier = Modifier.padding(end = 12.dp),
+//                        verticalArrangement = Arrangement.Center
+//                    ) {
+//                        Text(
+//                            text = "Last Synced:",
+//                            style = MaterialTheme.typography.bodySmall,
+//                            color = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                        Text(
+//                            text = lastSyncTime,
+//                            style = MaterialTheme.typography.bodySmall,
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                    }
+//                }
+//            }
+//        },
+//        actions = {
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.End
+//            ) {
+//                // ✅ Backup Toggle (Green when ON, Red when OFF)
+//                if (showLastSync) {
+//                    Row(
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        modifier = Modifier.padding(end = 6.dp)
+//                    ) {
+//                        Text(
+//                            "Backup Now",
+//                            style = MaterialTheme.typography.bodyMedium,
+//                            color = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                        Spacer(modifier = Modifier.width(6.dp))
+//                        Switch(
+//                            checked = isBackupEnabled,
+//                            onCheckedChange = onBackupToggleClicked,
+//                            modifier = Modifier.size(24.dp),
+//                            colors = SwitchDefaults.colors(
+//                                checkedThumbColor = MaterialTheme.colorScheme.primary, // Green when enabled
+//                                checkedTrackColor = MaterialTheme.colorScheme.tertiary,
+//                                uncheckedThumbColor = MaterialTheme.colorScheme.error, // Red when disabled
+//                                uncheckedTrackColor = MaterialTheme.colorScheme.errorContainer
+//                            )
+//                        )
+//                    }
+//                }
+//
+//                // ✅ Restore Button
+//                if (showRestore) {
+//                    IconButton(
+//                        onClick = onRestoreClicked,
+//                        modifier = Modifier.size(36.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Refresh,
+//                            contentDescription = "Restore",
+//                            modifier = Modifier.size(24.dp),
+//                            tint = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                    }
+//                }
+//
+//                // ✅ Search Button
+//                if (showSearch) {
+//                    IconButton(onClick = {
+//                        isSearchVisible = !isSearchVisible
+//                    }, modifier = Modifier.size(36.dp)) {
+//                        Icon(
+//                            imageVector = Icons.Default.Search,
+//                            contentDescription = "Search",
+//                            modifier = Modifier.size(24.dp),
+//                            tint = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    )
+
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    println("screenWidth $screenWidth")
+    var isLastSyncDropdownVisible by remember { mutableStateOf(false) }
+
+// Adjust sizes based on screen width
+    val iconSize = if (screenWidth < 360.dp) 20.dp else 24.dp
+    val switchScale = if (screenWidth < 360.dp) 0.6f else 0.8f
+    val horizontalPadding = if (screenWidth < 360.dp) 8.dp else 12.dp
+    val titleFontSize = if (screenWidth < 360.dp) 16.sp else 18.sp
+    val backupTextStyle = if (screenWidth < 360.dp) {
+        MaterialTheme.typography.bodySmall
+    } else {
+        MaterialTheme.typography.bodyMedium
+    }
+
     TopAppBar(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primary)
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = horizontalPadding),
         navigationIcon = {
-            IconButton(onClick = {
-                if (isSearchVisible) {
-                    onSearchQueryChanged("")
-                } else {
-                    onBackClicked()
-                }
-            }) {
+            IconButton(
+                onClick = {
+                    if (isSearchVisible) {
+                        onSearchQueryChanged("")
+                    } else {
+                        onBackClicked()
+                    }
+                },
+                modifier = Modifier.size(if (screenWidth < 360.dp) 32.dp else 36.dp)
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    contentDescription = stringResource(id = R.string.back),
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(iconSize)
                 )
             }
         },
@@ -159,35 +307,77 @@ fun FarmListHeader(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween // ✅ Ensures Last Sync doesn’t overlap Back Icon
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = title,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = titleFontSize,
+//                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f) // ✅ Prevents overlap with actions
+                    modifier = Modifier.weight(1f)
                 )
 
-                // ✅ Show last sync info only if enabled
                 if (showLastSync) {
-                    Column(
-                        modifier = Modifier.padding(end = 12.dp),
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Last Synced:",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text(
-                            text = lastSyncTime,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.Bold
-                        )
+                    if (screenWidth >= 380.dp) {
+                        // Show regular column on larger screens
+                        Column(
+                            modifier = Modifier.padding(end = 4.dp),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.last_synced),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                            Text(
+                                text = lastSyncTime,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        // Show dropdown on small screens
+                        Box {
+                            IconButton(
+                                onClick = { isLastSyncDropdownVisible = !isLastSyncDropdownVisible },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = stringResource(id = R.string.last_synced),
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.size(iconSize)
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = isLastSyncDropdownVisible,
+                                onDismissRequest = { isLastSyncDropdownVisible = false },
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .width(IntrinsicSize.Min)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(8.dp),
+                                    horizontalAlignment = Alignment.Start
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.last_synced),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = lastSyncTime,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -195,57 +385,65 @@ fun FarmListHeader(
         actions = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.padding(start = if (screenWidth < 380.dp) 2.dp else 4.dp)
             ) {
-                // ✅ Backup Toggle (Green when ON, Red when OFF)
                 if (showLastSync) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = 12.dp)
+                        modifier = Modifier.padding(end = if (screenWidth < 380.dp) 2.dp else 4.dp)
                     ) {
                         Text(
-                            "Backup",
-                            style = MaterialTheme.typography.bodyMedium,
+                            text = stringResource(id = R.string.backup_now),
+                            style = backupTextStyle,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(1.dp))
                         Switch(
                             checked = isBackupEnabled,
                             onCheckedChange = onBackupToggleClicked,
+                            thumbContent = {
+                                Icon(
+                                    imageVector = if (isBackupEnabled) Icons.Filled.Check else Icons.Filled.Close,
+                                    contentDescription = stringResource(id = R.string.backup_now),
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            },
+                            modifier = Modifier.scale(switchScale),
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary, // Green when enabled
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.tertiary,
-                                uncheckedThumbColor = MaterialTheme.colorScheme.error, // Red when disabled
+                                uncheckedThumbColor = MaterialTheme.colorScheme.error,
                                 uncheckedTrackColor = MaterialTheme.colorScheme.errorContainer
                             )
                         )
                     }
                 }
 
-                // ✅ Restore Button
+                // Rest of the actions remain the same
                 if (showRestore) {
                     IconButton(
                         onClick = onRestoreClicked,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(if (screenWidth < 380.dp) 32.dp else 36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Restore",
-                            modifier = Modifier.size(24.dp),
+                            contentDescription = stringResource(id = R.string.restore),
+                            modifier = Modifier.size(iconSize),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
 
-                // ✅ Search Button
                 if (showSearch) {
-                    IconButton(onClick = {
-                        isSearchVisible = !isSearchVisible
-                    }, modifier = Modifier.size(36.dp)) {
+                    IconButton(
+                        onClick = { isSearchVisible = !isSearchVisible },
+                        modifier = Modifier.size(if (screenWidth < 380.dp) 32.dp else 36.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            modifier = Modifier.size(24.dp),
+                            contentDescription = stringResource(id = R.string.search),
+                            modifier = Modifier.size(iconSize),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }

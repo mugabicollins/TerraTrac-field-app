@@ -5,8 +5,10 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
@@ -183,6 +185,9 @@ fun FarmForm(
     val locationHelper = LocationHelper(context)
     var locationState by remember { mutableStateOf<LocationState?>(null) }
 
+    // Add a state to track permission denial attempts
+    var permissionDenialCount by remember { mutableStateOf(0) }
+
     LaunchedEffect(locationHelper) {
         locationHelper.locationState.collect { state ->
             locationState = state
@@ -210,36 +215,6 @@ fun FarmForm(
         }
     }
 
-//    if (showLocationDialog.value) {
-//        AlertDialog(
-//            onDismissRequest = { showLocationDialog.value = false },
-//            title = { Text(stringResource(id = R.string.enable_location)) },
-//            text = { Text(stringResource(id = R.string.enable_location_msg)) },
-//            confirmButton = {
-//                Button(onClick = {
-//                    showLocationDialog.value = false
-//                    promptEnableLocation(context)
-//                }) {
-//                    Text(stringResource(id = R.string.yes))
-//                }
-//            },
-//            dismissButton = {
-//                Button(onClick = {
-//                    showLocationDialog.value = false
-//                    Toast.makeText(
-//                        context,
-//                        R.string.location_permission_denied_message,
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }) {
-//                    Text(stringResource(id = R.string.no))
-//                }
-//            },
-//            containerColor = MaterialTheme.colorScheme.background,
-//            tonalElevation = 6.dp
-//        )
-//    }
-
     if (showLocationDialog.value) {
         AlertDialog(
             onDismissRequest = { showLocationDialog.value = false },
@@ -258,14 +233,9 @@ fun FarmForm(
                     showLocationDialog.value = false
                     Toast.makeText(
                         context,
-                        context.getString(R.string.location_permission_denied_message),
+                        R.string.location_permission_denied_message,
                         Toast.LENGTH_SHORT
                     ).show()
-
-                    // Re-prompt user for permission even if they denied it before
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        showLocationDialog.value = true
-                    }, 2000) // 2-second delay before re-showing the dialog
                 }) {
                     Text(stringResource(id = R.string.no))
                 }
@@ -274,6 +244,41 @@ fun FarmForm(
             tonalElevation = 6.dp
         )
     }
+
+//    if (showLocationDialog.value) {
+//        AlertDialog(
+//            onDismissRequest = { showLocationDialog.value = false },
+//            title = { Text(stringResource(id = R.string.enable_location)) },
+//            text = { Text(stringResource(id = R.string.enable_location_msg)) },
+//            confirmButton = {
+//                Button(onClick = {
+//                    showLocationDialog.value = false
+//                    promptEnableLocation(context)
+//                }) {
+//                    Text(stringResource(id = R.string.yes))
+//                }
+//            },
+//            dismissButton = {
+//                Button(onClick = {
+//                    showLocationDialog.value = false
+//                    Toast.makeText(
+//                        context,
+//                        context.getString(R.string.location_permission_denied_message),
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//
+//                    // Re-prompt user for permission even if they denied it before
+//                    Handler(Looper.getMainLooper()).postDelayed({
+//                        showLocationDialog.value = true
+//                    }, 2000) // 2-second delay before re-showing the dialog
+//                }) {
+//                    Text(stringResource(id = R.string.no))
+//                }
+//            },
+//            containerColor = MaterialTheme.colorScheme.background,
+//            tonalElevation = 6.dp
+//        )
+//    }
 
 
     fun saveFarm() {
@@ -768,7 +773,20 @@ fun FarmForm(
                     showLocationDialog.value = true
                 },
                 onPermissionsGranted = {
+                    // Reset denial count on successful permission grant
+                    permissionDenialCount = 0
                     showPermissionRequest.value = false
+                },
+                onPermissionsDenied = {
+                    // Optional: Additional handling for denied permissions
+                    if (permissionDenialCount > 1) {
+                        // You can add a toast or snackbar explaining why permissions are needed
+                        Toast.makeText(
+                            context,
+                            R.string.location_permission_required_for_this_feature,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 },
                 showLocationDialogNew = showLocationDialogNew,
                 hasToShowDialog = showLocationDialogNew.value
@@ -808,12 +826,32 @@ fun FarmForm(
         }
 
         Button(
+//            onClick = {
+//                if (isLocationEnabled(context)) {
+//                    handleLocationAndNavigate(size, selectedUnit)
+//                }
+//                else
+//                    showPermissionRequest.value = true
+//            },
             onClick = {
                 if (isLocationEnabled(context)) {
                     handleLocationAndNavigate(size, selectedUnit)
+                } else {
+                    // Increment denial count when permission is not granted
+                    permissionDenialCount++
+
+                    // Show permission request if not denied too many times
+                    if (permissionDenialCount <= 2) {
+                        showLocationDialog.value = true
+                        showPermissionRequest.value = true
+                    } else {
+                        // After multiple denials, open app settings
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri: Uri = Uri.fromParts("package", context.packageName, null)
+                        intent.data = uri
+                        context.startActivity(intent)
+                    }
                 }
-                else
-                    showPermissionRequest.value = true
             },
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)

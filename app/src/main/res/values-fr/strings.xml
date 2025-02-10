@@ -186,5 +186,25 @@
     <string name="include_farmer_names_title">Inclure les noms des agriculteurs ?</string>
     <string name="include_farmer_names_text">Voulez-vous inclure les noms des agriculteurs dans l\'exportation ?</string>
 
+    <string name="back">Retour</string>
+    <string name="last_synced">Dernière synchronisation :</string>
+    <string name="backup_now">Sauvegarde</string>
+    <string name="restore">Restaurer</string>
+    <string name="share">Partager</string>
+    <string name="import_">Importer</string>
+    <string name="enable_backup_title">Activer la sauvegarde ?</string>
+    <string name="disable_backup_title">Désactiver la sauvegarde ?</string>
+    <string name="enable_backup_message">L\'activation de la sauvegarde stockera vos données en toute sécurité sur le serveur. Vous pouvez les restaurer en cas de perte de votre appareil.</string>
+    <string name="disable_backup_message">La désactivation de la sauvegarde signifie que vos données seront uniquement stockées sur votre appareil. Si perdues, elles ne pourront pas être restaurées.</string>
+    <string name="proceed_question">Voulez-vous continuer ?</string>
+    <string name="enable_data_backup_title">Activer la sauvegarde des données ?</string>
+    <string name="backup_prompt_message">Sauvegarder vos données garantit leur sécurité et accessibilité sur tous vos appareils.</string>
+    <string name="backup_disable_warning">Désactiver la sauvegarde signifie que vos données seront uniquement stockées sur votre appareil. En cas de perte, elles ne pourront pas être restaurées.</string>
+    <string name="enable_backup">Activer la sauvegarde</string>
+    <string name="disable_backup">Désactiver la sauvegarde</string>
+    <string name="location_permission_required_for_this_feature">Les autorisations de localisation sont requises pour cette fonctionnalité</string>
+
+
+
 
 </resources>

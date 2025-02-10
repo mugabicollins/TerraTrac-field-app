@@ -187,6 +187,26 @@
     <string name="include_farmer_names_title">¿Incluir nombres de agricultores?</string>
     <string name="include_farmer_names_text">¿Quieres incluir los nombres de los agricultores en la exportación?</string>
 
+    <string name="back">Atrás</string>
+    <string name="last_synced">Última sincronización:</string>
+    <string name="backup_now">Copia de seguridad</string>
+    <string name="restore">Restaurar</string>
+    <string name="share">Compartir</string>
+    <string name="import_">Importar</string>
+    <string name="enable_backup_title">¿Habilitar copia de seguridad?</string>
+    <string name="disable_backup_title">¿Deshabilitar copia de seguridad?</string>
+    <string name="enable_backup_message">Habilitar la copia de seguridad almacenará tus datos de forma segura en el servidor. Puedes restaurarlos si pierdes tu dispositivo.</string>
+    <string name="disable_backup_message">Deshabilitar la copia de seguridad significa que tus datos solo se almacenarán en tu dispositivo. Si se pierden, no podrán restaurarse.</string>
+    <string name="proceed_question">¿Quieres continuar?</string>
+    <string name="enable_data_backup_title">¿Habilitar copia de seguridad de datos?</string>
+    <string name="backup_prompt_message">Hacer una copia de seguridad de tus datos garantiza seguridad y accesibilidad en todos tus dispositivos.</string>
+    <string name="backup_disable_warning">Deshabilitar la copia de seguridad significa que tus datos solo se almacenarán en tu dispositivo. Si se pierden, no podrán restaurarse.</string>
+    <string name="enable_backup">Habilitar copia de seguridad</string>
+    <string name="disable_backup">Deshabilitar copia de seguridad</string>
+    <string name="location_permission_required_for_this_feature">Se requieren permisos de ubicación para esta función</string>
+
+
+
 
 
 

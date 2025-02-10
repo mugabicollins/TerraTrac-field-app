@@ -133,6 +133,9 @@ fun UpdateFarmForm(
     var selectedUnit by remember { mutableStateOf(items[0]) }
     val scientificNotationPattern = Pattern.compile("([+-]?\\d*\\.?\\d+)[eE][+-]?\\d+")
 
+    // Add a state to track permission denial attempts
+    var permissionDenialCount by remember { mutableStateOf(0) }
+
     LaunchedEffect(Unit) {
         if (!isLocationEnabled(context)) {
             showLocationDialog.value = true
@@ -346,7 +349,20 @@ fun UpdateFarmForm(
                 showLocationDialog.value = true
             },
             onPermissionsGranted = {
+                // Reset denial count on successful permission grant
+                permissionDenialCount = 0
                 showPermissionRequest.value = false
+            },
+            onPermissionsDenied = {
+                // Optional: Additional handling for denied permissions
+                if (permissionDenialCount > 1) {
+                    // You can add a toast or snackbar explaining why permissions are needed
+                    Toast.makeText(
+                        context,
+                        R.string.location_permission_required_for_this_feature,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             },
             showLocationDialogNew = showLocationDialogNew,
             hasToShowDialog = showLocationDialogNew.value,

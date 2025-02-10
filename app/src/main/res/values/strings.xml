@@ -183,6 +183,35 @@
     <string name="include_farmer_names_title">Include Farmer Names?</string>
     <string name="include_farmer_names_text">Do you want to include farmer names in the export?</string>
 
+    <string name="back">Back</string>
+    <string name="last_synced">Last Synced:</string>
+    <string name="backup_now">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="share">Share</string>
+    <string name="import_">Import</string>
+
+    <string name="enable_backup_title">Enable Backup?</string>
+    <string name="disable_backup_title">Disable Backup?</string>
+    <string name="enable_backup_message">Enabling backup will store your data securely on the server. You can restore it if your device is lost.</string>
+    <string name="disable_backup_message">Disabling backup means your data will only be stored on your device. If lost, it cannot be restored.</string>
+    <string name="proceed_question">Do you want to proceed?</string>
+
+    <string name="enable_data_backup_title">Enable Data Backup?</string>
+    <string name="backup_prompt_message">Backing up your data ensures safety and accessibility across devices.</string>
+    <string name="backup_disable_warning">Disabling backup means your data will only be stored on your device. If lost, it cannot be restored.</string>
+    <string name="enable_backup">Enable Backup</string>
+    <string name="disable_backup">Disable Backup</string>
+    <string name="location_permission_required_for_this_feature">Location permissions are required for this feature</string>
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -188,6 +188,26 @@
     <string name="include_farmer_names_title">Je, ujumuishwe majina ya wakulima?</string>
     <string name="include_farmer_names_text">Je, unataka kujumuisha majina ya wakulima katika usafirishaji wa data?</string>
 
+    <string name="back">Rudi</string>
+    <string name="last_synced">Mwisho kusawazishwa:</string>
+    <string name="backup_now">Hifadhi</string>
+    <string name="restore">Rejesha</string>
+    <string name="share">Shiriki</string>
+    <string name="import_">Ingiza</string>
+    <string name="enable_backup_title">Washa chelezo?</string>
+    <string name="disable_backup_title">Zima chelezo?</string>
+    <string name="enable_backup_message">Kuwasha chelezo kutahifadhi data yako salama kwenye seva. Unaweza kuirejesha ikiwa kifaa chako kitapotea.</string>
+    <string name="disable_backup_message">Kuzima chelezo kunamaanisha kuwa data yako itahifadhiwa kwenye kifaa chako pekee. Ikiwa itapotea, haiwezi kurejeshwa.</string>
+    <string name="proceed_question">Je, unataka kuendelea?</string>
+    <string name="enable_data_backup_title">Washa chelezo cha data?</string>
+    <string name="backup_prompt_message">Kuwasha chelezo kutahifadhi data yako salama na kuifanya ipatikane kwenye vifaa vyote.</string>
+    <string name="backup_disable_warning">Kuzima chelezo kunamaanisha kuwa data yako itahifadhiwa kwenye kifaa chako pekee. Ikiwa itapotea, haiwezi kurejeshwa.</string>
+    <string name="enable_backup">Washa chelezo</string>
+    <string name="disable_backup">Zima chelezo</string>
+    <string name="location_permission_required_for_this_feature">Ruhusa ya mahali inahitajika kwa kipengele hiki</string>
+
+
+
 
 
 
