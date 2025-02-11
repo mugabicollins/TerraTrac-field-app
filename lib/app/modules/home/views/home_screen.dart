@@ -11,6 +11,7 @@ import 'package:terrapipe/app/modules/home/components/search_bottom_sheet.dart';
 import 'package:terrapipe/utils/constants/app_colors.dart';
 import 'package:terrapipe/widgets/loader/bounce_loader.dart';
 import 'package:terrapipe/widgets/textfields/custom_text_field.dart';
+import '../../../../widgets/customMap/custom_map_view.dart';
 import '../controllers/home_controller.dart';
 import 'walk_traking/walk_tracking_view.dart';
 
@@ -24,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   final HomeController controller = Get.put(HomeController());
+
   // String mapPath = "";
 
   Future<String> getPath() async {
@@ -43,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen>
       curve: Curves.easeInOut,
       parent: controller.animationController,
     );
-    controller.animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
+    controller.animation =
+        Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
   Future<void> loadLocation() async {
@@ -79,76 +82,50 @@ class _HomeScreenState extends State<HomeScreen>
                       height: MediaQuery.of(context).size.height,
                       child: Stack(
                         children: [
-                          Obx(
-                            () => FlutterMap(
-                              mapController: controller.mapController,
-                              options: MapOptions(
-                                  center: controller.cameraPosition.value ?? const LatLng(51.5, -0.09),
-                                  onPositionChanged: (MapPosition position, bool hasGesture) {
-                                    setState(
-                                        () {}); // Force a rebuild to reflect polygon changes
-                                  },
-                                  initialZoom: 12.0,
-                                  onTap: (_, LatLng point) {
-                                    FocusScope.of(context).unfocus();
-                                    controller.addPointToShape(point);
-                                  }),
-                              children: [
-                                TileLayer(
-                                  urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                                  subdomains: ['a', 'b', 'c'],
-                                  errorTileCallback: (tile, error, stackTrace) {
-                                    print("Tile loading failed for ${tile.coordinates}: $error");
-                                  },
-                                  tileProvider: CachedTileProvider(
-                                    maxStale: const Duration(days: 30),
-                                    store: HiveCacheStore(
-                                      controller.mapPath.value,
-                                      hiveBoxName: 'HiveCacheStore',
+                          Obx(() => CustomFlutterMap(
+                                mapController: controller.mapController,
+                                polygons: [
+                                  ...controller.drawnPolygons,
+                                  if (controller.isDrawPolygon.value &&
+                                      controller.shapePoints.isNotEmpty)
+                                    Polygon(
+                                      points: [
+                                        ...controller.shapePoints,
+                                        controller.shapePoints[0]
+                                      ],
+                                      borderColor: controller.selectedColor,
+                                      borderStrokeWidth: 2.0,
+                                      isDotted: true,
+                                      color: controller.selectedColor
+                                          .withOpacity(0.3),
+                                      isFilled: true,
                                     ),
-                                  ),
-                                ),
-
-                                /// polygon
-                                Obx(
-                                  () => PolygonLayer(
-                                    polygons: [
-                                      ...controller.drawnPolygons,
-                                      if (controller.isDrawPolygon.value &&
-                                          controller.shapePoints.isNotEmpty)
-                                        Polygon(
-                                          points: [
-                                            ...controller.shapePoints,
-                                            controller.shapePoints[0]
-                                          ],
-                                          borderColor: controller.selectedColor,
-                                          borderStrokeWidth: 2.0,
-                                          isDotted: true,
-                                          color: controller.selectedColor
-                                              .withOpacity(0.3),
-                                          isFilled: true,
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                /// marker
-                                MarkerLayer(
-                                  markers:  controller.shapePoints
-                                              .map((point) => Marker(
-                                                    point: point,
-                                                    width: 20,
-                                                    height: 20,
-                                                    child: const Icon(
-                                                        Icons.circle,
-                                                        color: AppColor.red,
-                                                        size: 12),
-                                                  ))
-                                              .toList(),
-                                ),
-
-                              ],
-                            ),
-                          ),
+                                ],
+                                // List of polygons
+                                markers: controller.shapePoints,
+                                mapOptions: MapOptions(
+                                    center: controller.cameraPosition.value ??
+                                        const LatLng(51.5, -0.09),
+                                    onPositionChanged: (MapPosition position,
+                                        bool hasGesture) {
+                                      setState(
+                                          () {}); // Force a rebuild to reflect polygon changes
+                                    },
+                                    initialZoom: 12.0,
+                                    onTap: (_, LatLng point) {
+                                      FocusScope.of(context).unfocus();
+                                      controller.addPointToShape(point);
+                                      setState(() {});
+                                    }),
+                                // List of markers (LatLng points)
+                                markerColor: Colors.red,
+                                mapPath: controller.mapPath.value,
+                                // Custom marker color
+                                onMapTap: (LatLng point) {
+                                  controller.addPointToShape(
+                                      point); // Add point when tapping the map
+                                },
+                              )),
 
                           /// search field
                           Positioned(
@@ -315,6 +292,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 ],
                               ),
                             ),
+
                           /// side menu button is here
                           Positioned(
                             bottom: Get.height * 0.25,
@@ -350,7 +328,6 @@ class _HomeScreenState extends State<HomeScreen>
                                       SizedBox(
                                         height: Get.height * 0.01,
                                       ),
-
                                       ElevatedButton.icon(
                                         icon: Icon(Icons.polyline,
                                             color: AppColor.white),
@@ -381,8 +358,6 @@ class _HomeScreenState extends State<HomeScreen>
                                       SizedBox(
                                         height: Get.height * 0.01,
                                       ),
-
-
                                       ElevatedButton.icon(
                                         icon: Icon(Icons.delete_outline,
                                             color: AppColor.white),

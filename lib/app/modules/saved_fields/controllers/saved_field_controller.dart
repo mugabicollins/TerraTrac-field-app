@@ -13,7 +13,7 @@ import 'package:terrapipe/widgets/dialogs/score_dialog.dart';
 import 'package:terrapipe/widgets/dialogs/session_out_dialog.dart';
 import '../../../data/models/polygoneModel.dart';
 import '../../../data/repositories/terratrac_db.dart';
-
+import 'package:http/http.dart' as http;
 class SavedFieldController extends GetxController {
   final TerraTracDataBaseHelper dbHelper = TerraTracDataBaseHelper();
   final HomeController homeController = Get.put(HomeController());
@@ -157,7 +157,6 @@ class SavedFieldController extends GetxController {
         var jsonData = response.data;
         // log('Response Data: $jsonData');
         fieldData.value = jsonData;
-        log('fieldData.value ${fieldData}');
         var geoJson = jsonData['JSON Response']?['Geo JSON'];
         if (geoJson != null && geoJson['geometry'] != null) {
           final geometry = geoJson['geometry'];
@@ -170,7 +169,8 @@ class SavedFieldController extends GetxController {
                 title: "Success",
                 message: "Field Map Opened successfully",
               );
-              Get.to(() => SaveFieldMap(), arguments: {
+              Get.to(() => SaveFieldMap(),
+                  arguments: {
                 'geoId': geoId,
                 'polygonPoints': points,
               });
@@ -390,6 +390,12 @@ class SavedFieldController extends GetxController {
     loadPolygonsFromDB(locallyPolygonList);
   }
   List<Polygon> localPolygons = [];
+  void loadPolygonsFromDB(List<PolygonModel> fetchedPolygons) {
+    localPolygons.clear();
+    for (var polygonModel in fetchedPolygons) {
+      parseAndAddPolygon(polygonModel.polygonData);
+    }
+  }
   void parseAndAddPolygon(String wktPolygon) {
     if (!wktPolygon.startsWith("POLYGON")) return;
 
@@ -416,10 +422,112 @@ class SavedFieldController extends GetxController {
     localPolygons.add(newPolygon);
     update();
   }
-  void loadPolygonsFromDB(List<PolygonModel> fetchedPolygons) {
-    localPolygons.clear();
-    for (var polygonModel in fetchedPolygons) {
-      parseAndAddPolygon(polygonModel.polygonData);
+
+
+
+  /// upload local data to server
+  List<PolygonModel> uploadLocallyPolygonList = <PolygonModel>[].obs;
+  List<Polygon> uploadedPolygons = [];
+  Future<void> uploadLocalSavedData() async {
+    var result = await dbHelper.getUnsyncedPolygons();
+    print("Locally Data Fetched For Upload: ${result}");
+
+    uploadLocallyPolygonList = result.map<PolygonModel>((json) => PolygonModel.fromJson(json)).toList();
+
+    for (var polygon in uploadLocallyPolygonList) {
+      bool success = await savePolygonTeraTrac(polygonData: polygon.polygonData);
+      if (success) {
+        await dbHelper.updatePolygonStatus(polygon.id, 1); // Mark as uploaded
+      }
     }
+
+    // Reload only successfully uploaded polygons
+    loadUpLoadedPolygonsFromDB(await dbHelper.getSyncedPolygons());
+  }
+  // Function to load uploaded polygons
+  void loadUpLoadedPolygonsFromDB(List<Map<String, dynamic>> fetchedPolygons) {
+    uploadedPolygons.clear();
+    for (var polygonJson in fetchedPolygons) {
+      PolygonModel polygonModel = PolygonModel.fromJson(polygonJson);
+      parseAndAddUploadPolygon(polygonModel.polygonData);
+    }
+  }
+  // Parse Polygon and Add to Map
+  void parseAndAddUploadPolygon(String wktPolygon) {
+    if (!wktPolygon.startsWith("POLYGON")) return;
+
+    String coordinatesString =
+    wktPolygon.replaceAll("POLYGON((", "").replaceAll("))", "");
+    List<LatLng> polygonPoints = coordinatesString.split(",").map((point) {
+      List<String> latLng = point.trim().split(" ");
+      double lng = double.parse(latLng[0]);
+      double lat = double.parse(latLng[1]);
+      return LatLng(lat, lng);
+    }).toList();
+
+    Polygon newPolygon = Polygon(
+      points: polygonPoints,
+      color: Colors.blue.withOpacity(0.3),
+      borderColor: Colors.blue,
+      borderStrokeWidth: 3,
+    );
+
+    uploadedPolygons.add(newPolygon);
+    update();
+  }
+  // API Call to Upload Polygon
+  Future<bool> savePolygonTeraTrac({required String polygonData}) async {
+    const baseUrl = 'https://api-ar.agstack.org';
+    final url = Uri.parse('$baseUrl/register-field-boundary');
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+
+    print("here is the polygone data ${polygonData}");
+    final body1 = jsonEncode({
+      "wkt": polygonData,
+      "s2_index": "8,13",  // Ensure this is a STRING, not an array or number
+      "threshold": 100
+    });
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: body1,
+      );
+      debugPrint("Locally Saved Upload Body:::${body1}");
+      debugPrint("Locally Saved Upload Response:::${response.body}");
+      if (response.statusCode == 200) {
+        return true; // Upload successful
+      }
+      else {
+        var result = jsonDecode(response.body);
+        showSnackBar(
+          color: Colors.red,
+          title: "Exception",
+          message: result['message'],
+        );
+        return false;
+      }
+    } catch (e) {
+      print("Error uploading polygon: $e");
+      return false;
+    }
+  }
+
+  List<LatLng> extractLatLngFromPolygon(String polygon) {
+    // Remove "POLYGON((" and "))"
+    String cleaned = polygon.replaceAll("POLYGON((", "").replaceAll("))", "");
+
+    // Split by commas to get each coordinate pair
+    List<String> coordinatePairs = cleaned.split(", ");
+
+    // Convert to List<LatLng>
+    return coordinatePairs.map((pair) {
+      List<String> coords = pair.split(" ");
+      double lng = double.parse(coords[0]); // Longitude first
+      double lat = double.parse(coords[1]); // Latitude second
+      return LatLng(lat, lng);
+    }).toList();
   }
 }

@@ -64,6 +64,7 @@ class TerraTracDataBaseHelper {
   static const userEmail = 'user_email';
   static const phoneNumber = 'phone_number';
   static const deviceId = 'device_id';
+  static const isSaved = 'is_saved';
 
 
   /// creating table here
@@ -75,7 +76,8 @@ class TerraTracDataBaseHelper {
       $timestamp TEXT NOT NULL,
       $userEmail TEXT NOT NULL,
       $phoneNumber TEXT NOT NULL,
-      $deviceId TEXT NOT NULL
+      $deviceId TEXT NOT NULL,
+      $isSaved INTEGER NOT NULL DEFAULT 0
     )
   ''');
   }
@@ -92,16 +94,33 @@ class TerraTracDataBaseHelper {
       userEmail: email,
       phoneNumber: phone,
       deviceId: deviceID,
+      isSaved:0,
     });
 
     getUnsyncedPolygons();
   }
 
+  // Get Unsynced Polygons (isSaved = 0)
   Future<List<Map<String, dynamic>>> getUnsyncedPolygons() async {
-    Database db = await dbInstance.database;
-    var result = await db.query(polygonTable);
-    print("here is DB Data::>>>> ${result}");
-    return result;
+    final db = await database;
+    return await db.query(polygonTable, where: 'is_saved = 0');
+  }
+
+  // Get Synced Polygons (isSaved = 1)
+  Future<List<Map<String, dynamic>>> getSyncedPolygons() async {
+    final db = await database;
+    return await db.query(polygonTable, where: 'is_saved = 1');
+  }
+
+  // Update Polygon isSaved Status
+  Future<void> updatePolygonStatus(int id, int isSaved) async {
+    final db = await database;
+    await db.update(
+      polygonTable,
+      {'is_saved': isSaved},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
 

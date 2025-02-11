@@ -77,11 +77,12 @@ class _BottomBarViewState extends State<BottomBarView> {
           if (connectivityResult == ConnectivityResult.mobile) {
             savedFieldController.connectionStatus.value = true;
             savedFieldController.update();
+            savedFieldController.uploadLocalSavedData();
             print("Connectivity Result 1 >>>>>>  $connectivityResult");
           } else if (connectivityResult == ConnectivityResult.wifi) {
             savedFieldController.connectionStatus.value = true;
             savedFieldController.update();
-
+            savedFieldController.uploadLocalSavedData();
           } else {
             savedFieldController.connectionStatus.value = false;
             savedFieldController.update();

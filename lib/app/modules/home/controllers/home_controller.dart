@@ -143,7 +143,13 @@ class HomeController extends GetxController {
           await Future.delayed(const Duration(seconds: 2));
           mapController.move(userLocation, 17.0);
           // Cache the map tiles
-          await cacheMapTiles(cameraPosition.value!, 100000);
+          // await cacheMapTiles(cameraPosition.value!, 100000);
+          // bool isCached = await isMapCached(cameraPosition.value!, 10000);
+          // if (isCached) {
+          //   print("Map is fully cached!");
+          // } else {
+          //   print("Map is not fully cached. Consider downloading tiles.");
+          // }
         } else {
           debugPrint("MapController is null");
         }
@@ -189,97 +195,199 @@ class HomeController extends GetxController {
 
   Future<String> getPath() async {
     final cacheDirectory = await getTemporaryDirectory();
-
     return cacheDirectory.path;
   }
 
-  Future<void> cacheMapTiles(LatLng center, double radiusInMeters) async {
-    try {
+  // Future<bool> isMapCached(LatLng center, double radiusInMeters) async {
+  //   int minZoom = 8;
+  //   int maxZoom = 16;
+  //
+  //   // Ensure latitudes are within valid Mercator range
+  //   center = LatLng(
+  //     center.latitude.clamp(-85.05112878, 85.05112878),
+  //     center.longitude.clamp(-180, 180),
+  //   );
+  //
+  //   Directory cacheDir = await getApplicationDocumentsDirectory();
+  //   mapPath.value = '${cacheDir.path}/map_tiles';
+  //
+  //   // ✅ Ensure directory exists
+  //   Directory tileDir = Directory(mapPath.value);
+  //   if (!tileDir.existsSync()) {
+  //     debugPrint("❌ Cache directory does not exist: ${mapPath.value}");
+  //     await tileDir.create(recursive: true);
+  //     debugPrint("✅ Cache directory created: ${mapPath.value}");
+  //     return false; // Cache was empty before, so return false
+  //   } else {
+  //     debugPrint("✅ Cache directory found: ${mapPath.value}");
+  //   }
+  //
+  //   for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
+  //     Point<int>? minPoint = _latLngToTileCoordinates(center, zoom);
+  //     Point<int>? maxPoint = _latLngToTileCoordinates(center, zoom);
+  //
+  //     if (minPoint == null || maxPoint == null) {
+  //       debugPrint("⚠️ Skipping zoom $zoom due to invalid tile coordinates");
+  //       continue;
+  //     }
+  //
+  //     int minX = max(0, min(minPoint.x, maxPoint.x));
+  //     int maxX = min((1 << zoom) - 1, max(minPoint.x, maxPoint.x));
+  //     int minY = max(0, min(minPoint.y, maxPoint.y));
+  //     int maxY = min((1 << zoom) - 1, max(minPoint.y, maxPoint.y));
+  //
+  //     for (int x = minX; x <= maxX; x++) {
+  //       for (int y = minY; y <= maxY; y++) {
+  //         String filePath = '${mapPath.value}/$zoom/$x/$y.png';
+  //         File file = File(filePath);
+  //
+  //         if (!await file.exists()) {
+  //           debugPrint("❌ Tile missing: $filePath");
+  //           await downloadTileIfMissing(zoom, x, y);
+  //           return false;
+  //         } else {
+  //           debugPrint("✅ Tile exists: $filePath");
+  //         }
+  //       }
+  //     }
+  //   }
+  //
+  //   debugPrint("🎉 All required tiles are cached.");
+  //   return true;
+  // }
 
-      // Define zoom levels for 100km radius
-      int minZoom = 8;  // For overview
-      int maxZoom = 15; // Detailed enough for most use cases
+  /// 🛠 Convert LatLng to tile coordinates
+  Point<int>? _latLngToTileCoordinates(LatLng latLng, int zoom) {
+    double latRad = latLng.latitude * (pi / 180);
+    int n = 1 << zoom;
+    int x = ((latLng.longitude + 180) / 360 * n).floor();
+    int y = ((1 - log(tan(latRad) + 1 / cos(latRad)) / pi) / 2 * n).floor();
+    return Point(x, y);
+  }
 
-      final geodesy = Geodesy();
-      List<LatLng> boundingBox = geodesy.calculateBoundingBox(center, radiusInMeters);
+  /// 🔽 **Download missing tile if not found**
+  Future<void> downloadTileIfMissing(int zoom, int x, int y) async {
+    String filePath = '${mapPath.value}/$zoom/$x/$y.png';
+    File file = File(filePath);
 
-      // Calculate tile coordinates for the bounding box
-      for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-        try {
-          // Convert LatLng to tile coordinates with bounds checking
-          var minPoint = _latLngToTileCoordinates(boundingBox[0], zoom);
-          var maxPoint = _latLngToTileCoordinates(boundingBox[1], zoom);
+    if (!await file.exists()) {
+      debugPrint("⬇️ Downloading tile: $filePath");
 
-          if (minPoint == null || maxPoint == null) continue;
+      // Ensure directory exists
+      Directory dir = file.parent;
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+        debugPrint("📂 Created directory: ${dir.path}");
+      }
 
-          // Ensure correct order of coordinates and apply bounds
-          int minX = max(0, min(minPoint.x, maxPoint.x));
-          int maxX = min((1 << zoom) - 1, max(minPoint.x, maxPoint.x));
-          int minY = max(0, min(minPoint.y, maxPoint.y));
-          int maxY = min((1 << zoom) - 1, max(minPoint.y, maxPoint.y));
+      try {
+        final response = await http.get(Uri.parse(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$zoom/$y/$x'));
 
-          // Limit the number of tiles per zoom level to prevent excessive caching
-          int maxTilesPerZoom = 100;
-          if ((maxX - minX + 1) * (maxY - minY + 1) > maxTilesPerZoom) {
-            debugPrint("Too many tiles at zoom level $zoom, skipping...");
-            continue;
-          }
-
-          // Cache tiles within the bounding box
-          for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-              try {
-                // Construct the URL manually
-                final url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$zoom/$y/$x';
-
-                print("Here url:::>>>>>>>>$url");
-                // Use NetworkImage to cache the tile
-                final NetworkImage image = NetworkImage(url);
-
-                // Precache the image
-                await precacheImage(image, Get.context!);
-
-                debugPrint("Cached Tile: Zoom: $zoom, X: $x, Y: $y");
-              } catch (e) {
-                debugPrint("Error caching individual tile: $e");
-                continue;
-              }
-            }
-          }
-        } catch (e) {
-          debugPrint("Error processing zoom level $zoom: $e");
-          continue;
+        if (response.statusCode == 200) {
+          await file.writeAsBytes(response.bodyBytes);
+          debugPrint("✅ Tile saved: $filePath");
+        } else {
+          debugPrint("❌ Failed to download tile: HTTP ${response.statusCode}");
         }
+      } catch (e) {
+        debugPrint("⚠️ Error downloading tile: $e");
       }
-      
-      debugPrint("Map caching completed successfully");
-    } catch (e) {
-      debugPrint("Error in cacheMapTiles: $e");
+    } else {
+      debugPrint("✅ Tile already exists: $filePath");
     }
   }
 
-  Point<int>? _latLngToTileCoordinates(LatLng point, int zoom) {
-    try {
-      double lat = point.latitude.clamp(-85.05112878, 85.05112878);
-      double lon = point.longitude.clamp(-180, 180);
-      
-      int x = ((lon + 180.0) / 360.0 * pow(2.0, zoom)).floor();
-      
-      double latRad = lat * pi / 180.0;
-      int y = ((1.0 - log(tan(latRad) + 1 / cos(latRad)) / pi) / 2.0 * pow(2.0, zoom)).floor();
-      
-      // Check for valid tile coordinates
-      if (x.isFinite && y.isFinite && 
-          x >= 0 && x < (1 << zoom) && 
-          y >= 0 && y < (1 << zoom)) {
-        return Point(x, y);
-      }
-      return null;
-    } catch (e) {
-      debugPrint("Error converting coordinates: $e");
-      return null;
-    }
-  }
+
+  /// OLD FUNCTION
+
+  // Future<void> cacheMapTiles(LatLng center, double radiusInMeters) async {
+  //   try {
+  //
+  //     // Define zoom levels for 100km radius
+  //     int minZoom = 8;  // For overview
+  //     int maxZoom = 15; // Detailed enough for most use cases
+  //
+  //     final geodesy = Geodesy();
+  //     List<LatLng> boundingBox = geodesy.calculateBoundingBox(center, radiusInMeters);
+  //
+  //     // Calculate tile coordinates for the bounding box
+  //     for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
+  //       try {
+  //         // Convert LatLng to tile coordinates with bounds checking
+  //         var minPoint = _latLngToTileCoordinates(boundingBox[0], zoom);
+  //         var maxPoint = _latLngToTileCoordinates(boundingBox[1], zoom);
+  //
+  //         if (minPoint == null || maxPoint == null) continue;
+  //
+  //         // Ensure correct order of coordinates and apply bounds
+  //         int minX = max(0, min(minPoint.x, maxPoint.x));
+  //         int maxX = min((1 << zoom) - 1, max(minPoint.x, maxPoint.x));
+  //         int minY = max(0, min(minPoint.y, maxPoint.y));
+  //         int maxY = min((1 << zoom) - 1, max(minPoint.y, maxPoint.y));
+  //
+  //         // Limit the number of tiles per zoom level to prevent excessive caching
+  //         int maxTilesPerZoom = 100;
+  //         if ((maxX - minX + 1) * (maxY - minY + 1) > maxTilesPerZoom) {
+  //           debugPrint("Too many tiles at zoom level $zoom, skipping...");
+  //           continue;
+  //         }
+  //
+  //         // Cache tiles within the bounding box
+  //         for (int x = minX; x <= maxX; x++) {
+  //           for (int y = minY; y <= maxY; y++) {
+  //             try {
+  //               // Construct the URL manually
+  //               final url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/$zoom/$y/$x';
+  //
+  //               print("Here url:::>>>>>>>>$url");
+  //               // Use NetworkImage to cache the tile
+  //               final NetworkImage image = NetworkImage(url);
+  //
+  //               // Precache the image
+  //               await precacheImage(image, Get.context!);
+  //
+  //               debugPrint("Cached Tile: Zoom: $zoom, X: $x, Y: $y");
+  //             } catch (e) {
+  //               debugPrint("Error caching individual tile: $e");
+  //               continue;
+  //             }
+  //           }
+  //         }
+  //       } catch (e) {
+  //         debugPrint("Error processing zoom level $zoom: $e");
+  //         continue;
+  //       }
+  //     }
+  //
+  //     debugPrint("Map caching completed successfully");
+  //   } catch (e) {
+  //     debugPrint("Error in cacheMapTiles: $e");
+  //   }
+  // }
+
+  // Point<int>? _latLngToTileCoordinates(LatLng point, int zoom) {
+  //   try {
+  //     double lat = point.latitude.clamp(-85.05112878, 85.05112878);
+  //     double lon = point.longitude.clamp(-180, 180);
+  //
+  //     int x = ((lon + 180.0) / 360.0 * pow(2.0, zoom)).floor();
+  //
+  //     double latRad = lat * pi / 180.0;
+  //     int y = ((1.0 - log(tan(latRad) + 1 / cos(latRad)) / pi) / 2.0 * pow(2.0, zoom)).floor();
+  //
+  //     // Check for valid tile coordinates
+  //     if (x.isFinite && y.isFinite &&
+  //         x >= 0 && x < (1 << zoom) &&
+  //         y >= 0 && y < (1 << zoom)) {
+  //       return Point(x, y);
+  //     }
+  //     return null;
+  //   } catch (e) {
+  //     debugPrint("Error converting coordinates: $e");
+  //     return null;
+  //   }
+  // }
 
   void addPointToShape(LatLng point) {
     if (!isDrawPolygon.value) return;
@@ -566,11 +674,12 @@ class HomeController extends GetxController {
 
     final headers = {
       'API-KEYS-AUTHENTICATION': '1',
-      'API-KEY': apiKey ?? '',
-      'CLIENT-SECRET': clientSecret ?? '',
+      // 'API-KEY': apiKey ?? '',
+      // 'CLIENT-SECRET': clientSecret ?? '',
       'AUTOMATED-FIELD': '0',
     };
     String wkt = convertPolygonToWKT(drawnPolygons);
+    print("here is the Wkt:::: ${wkt}");
     String? s2Index = s2IndexController.text.isNotEmpty ? s2IndexController.text : null;
     String? threshold = thresholdController.text.isNotEmpty ? thresholdController.text : null;
     final body = {
@@ -585,6 +694,7 @@ class HomeController extends GetxController {
         headers: headers,
         body: jsonEncode(body),
       );
+      print("here is the Response Data:::>>> ${response.body}");
       if (response.statusCode == 200) {
         isPolygonLoading.value = false;
         // Extract Geo Id from the response
@@ -650,6 +760,7 @@ class HomeController extends GetxController {
         );
       }
       else {
+        print("here is the Response Data:::>>> ${response.body}");
         var result = jsonDecode(response.body);
         showSnackBar(
           color: Colors.red,

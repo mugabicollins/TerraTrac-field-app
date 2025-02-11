@@ -1,5 +1,7 @@
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -8,6 +10,8 @@ import 'package:terrapipe/widgets/loader/bounce_loader.dart';
 import 'package:terrapipe/widgets/app_buttons/custom_button.dart';
 import 'package:terrapipe/widgets/app_buttons/custom_general_button.dart';
 import 'package:terrapipe/widgets/textfields/custom_text_field.dart';
+import '../../../../widgets/customMap/custom_map_view.dart';
+import '../../home/controllers/home_controller.dart';
 import '../controllers/saved_field_controller.dart';
 
 class SaveFieldMap extends StatefulWidget {
@@ -22,6 +26,7 @@ class _SaveFieldMapState extends State<SaveFieldMap> {
   final MapController mapController = MapController();
   TextEditingController renameFieldController = TextEditingController();
   SavedFieldController savedFieldController = Get.put(SavedFieldController());
+  final HomeController controller = Get.put(HomeController());
   @override
   void initState() {
     super.initState();
@@ -94,27 +99,23 @@ class _SaveFieldMapState extends State<SaveFieldMap> {
         ),
         child: Stack(
           children: [
-            FlutterMap(
+
+            CustomFlutterMap(
               mapController: mapController,
-              options: MapOptions(
+              mapOptions: MapOptions(
                 initialCenter: polygons.isNotEmpty
                     ? polygons[0].points[0] // Center on the first point
                     : const LatLng(51.5, -0.09),
-                initialZoom: 16,
+                initialZoom: 15,
               ),
-              children: [
-                // Map Tiles
-                TileLayer(
-                  urlTemplate:
-                      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                // Polygons
-                PolygonLayer(
-                  polygons: polygons,
-                ),
-              ],
+              polygons: polygons,
+              mapPath: controller.mapPath.value,
+              // Custom marker color
+              markers: [],
+              onMapTap: (LatLng point) {// Add point when tapping the map
+              },
             ),
+
             Positioned(
               left: Get.width*0.01,
               right: Get.width*0.01,
