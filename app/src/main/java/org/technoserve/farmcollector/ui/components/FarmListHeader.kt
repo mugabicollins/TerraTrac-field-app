@@ -84,11 +84,11 @@ fun FarmListHeader(
     val screenWidth = configuration.screenWidthDp.dp
     var isLastSyncDropdownVisible by remember { mutableStateOf(false) }
     // Adjust sizes based on screen width
-    val iconSize = if (screenWidth < 4000.dp) 24.dp else 36.dp
-    val switchScale = if (screenWidth < 400.dp) 0.6f else 0.8f
-    val horizontalPadding = if (screenWidth < 400.dp) 8.dp else 12.dp
-    val titleFontSize = if (screenWidth < 400.dp) 16.sp else 18.sp
-    val backupTextStyle = if (screenWidth < 400.dp) {
+    val iconSize = if (screenWidth < 450.dp) 24.dp else 24.dp
+    val switchScale = if (screenWidth < 450.dp) 0.6f else 0.8f
+    val horizontalPadding = if (screenWidth < 450.dp) 8.dp else 12.dp
+    val titleFontSize = if (screenWidth < 450.dp) 16.sp else 18.sp
+    val backupTextStyle = if (screenWidth < 450.dp) {
         MaterialTheme.typography.bodySmall
     } else {
         MaterialTheme.typography.bodyMedium
@@ -108,7 +108,7 @@ fun FarmListHeader(
                         onBackClicked()
                     }
                 },
-                modifier = Modifier.size(if (screenWidth < 360.dp) 32.dp else 36.dp)
+                modifier = Modifier.size(if (screenWidth < 450.dp) 32.dp else 32.dp)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -134,7 +134,7 @@ fun FarmListHeader(
                 )
 
                 if (showLastSync) {
-                    if (screenWidth >= 400.dp) {
+                    if (screenWidth >= 450.dp) {
                         // Show regular column on larger screens
                         Column(
                             modifier = Modifier.padding(end = 4.dp),
@@ -199,12 +199,12 @@ fun FarmListHeader(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
-                modifier = Modifier.padding(start = if (screenWidth < 400.dp) 2.dp else 4.dp)
+                modifier = Modifier.padding(start = if (screenWidth < 450.dp) 2.dp else 4.dp)
             ) {
                 if (showLastSync) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = if (screenWidth < 400.dp) 2.dp else 4.dp)
+                        modifier = Modifier.padding(end = if (screenWidth < 450.dp) 2.dp else 4.dp)
                     ) {
                         Text(
                             text = stringResource(id = R.string.backup_now),
@@ -237,7 +237,7 @@ fun FarmListHeader(
                 if (showRestore) {
                     IconButton(
                         onClick = onRestoreClicked,
-                        modifier = Modifier.size(if (screenWidth < 400.dp) 32.dp else 36.dp)
+                        modifier = Modifier.size(if (screenWidth < 450.dp) 32.dp else 32.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
@@ -251,7 +251,7 @@ fun FarmListHeader(
                 if (showSearch) {
                     IconButton(
                         onClick = { isSearchVisible = !isSearchVisible },
-                        modifier = Modifier.size(if (screenWidth < 400.dp) 32.dp else 36.dp)
+                        modifier = Modifier.size(if (screenWidth < 450.dp) 32.dp else 32.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,

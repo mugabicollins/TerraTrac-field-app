@@ -93,11 +93,11 @@ fun FarmListHeaderPlots(
     val screenWidth = configuration.screenWidthDp.dp
 
     // Adjust sizes based on screen width
-    val iconSize = if (screenWidth < 400.dp) 24.dp else 36.dp
-    val switchScale = if (screenWidth < 400.dp) 0.6f else 0.8f
-    val horizontalPadding = if (screenWidth < 400.dp) 8.dp else 12.dp
-    val titleFontSize = if (screenWidth < 400.dp) 16.sp else 18.sp
-    val backupTextStyle = if (screenWidth < 400.dp) {
+    val iconSize = if (screenWidth < 450.dp) 24.dp else 24.dp
+    val switchScale = if (screenWidth < 450.dp) 0.6f else 0.8f
+    val horizontalPadding = if (screenWidth < 450.dp) 8.dp else 12.dp
+    val titleFontSize = if (screenWidth < 450.dp) 16.sp else 18.sp
+    val backupTextStyle = if (screenWidth < 450.dp) {
         MaterialTheme.typography.bodySmall
     } else {
         MaterialTheme.typography.bodyMedium
@@ -125,7 +125,7 @@ fun FarmListHeaderPlots(
 
                 // ✅ Info Icon for Last Sync
                 if (showLastSync) {
-                    if (screenWidth >= 400.dp) {
+                    if (screenWidth >= 450.dp) {
                         // Show regular column on larger screens
                         Column(
                             modifier = Modifier.padding(end = 4.dp),
@@ -233,7 +233,7 @@ fun FarmListHeaderPlots(
                         )
                     )
                 }
-                if (screenWidth >= 400.dp) {
+                if (screenWidth >= 450.dp) {
                     if (showExport) {
                         IconButton(onClick = onExportClicked, modifier = Modifier.size(36.dp)) {
                             Icon(
@@ -296,7 +296,7 @@ fun FarmListHeaderPlots(
                     }
                 }
 
-                if (screenWidth <= 400.dp) {
+                if (screenWidth <= 450.dp) {
 
                     // ✅ Move Export, Share, and Import to a dropdown on small screens
                     Box {
