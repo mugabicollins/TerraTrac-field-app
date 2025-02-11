@@ -78,9 +78,9 @@ fun BackupPromptDialog(
             title = { Text(stringResource(id = R.string.enable_data_backup_title)) },
             text = {
                 Column {
-                    Text(stringResource(id = R.string.backup_prompt_message))
+                    Text(stringResource(id = R.string.enable_backup_message))
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(stringResource(id = R.string.backup_disable_warning))
+                    Text(stringResource(id = R.string.disable_backup_message))
                 }
             },
             confirmButton = {

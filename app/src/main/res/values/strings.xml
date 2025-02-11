@@ -192,13 +192,12 @@
 
     <string name="enable_backup_title">Enable Backup?</string>
     <string name="disable_backup_title">Disable Backup?</string>
-    <string name="enable_backup_message">Enabling backup will store your data securely on the server. You can restore it if your device is lost.</string>
-    <string name="disable_backup_message">Disabling backup means your data will only be stored on your device. If lost, it cannot be restored.</string>
     <string name="proceed_question">Do you want to proceed?</string>
-
     <string name="enable_data_backup_title">Enable Data Backup?</string>
-    <string name="backup_prompt_message">Backing up your data ensures safety and accessibility across devices.</string>
-    <string name="backup_disable_warning">Disabling backup means your data will only be stored on your device. If lost, it cannot be restored.</string>
+    <string name="enable_backup_message">Enabling backup securely stores your data on the server whenever an internet connection is available. This ensures you can restore it if your device is lost, damaged, or reset. Do you want to proceed?</string>
+    <string name="disable_backup_message">Disabling backup will stop automatically saving your data on the server when an internet connection is available. Any previously backed-up data will remain accessible for restoration, but new changes won\'t be saved. Do you want to proceed?.</string>
+<!--    <string name="backup_prompt_message">Enabling backup securely stores your data on the server whenever an internet connection is available. This ensures you can restore it if your device is lost, damaged, or reset. Do you want to proceed?</string>-->
+<!--    <string name="backup_disable_warning">Disabling backup will stop automatically saving your data on the server when an internet connection is available. Any previously backed-up data will remain accessible for restoration, but new changes won\'t be saved. Do you want to proceed?</string>-->
     <string name="enable_backup">Enable Backup</string>
     <string name="disable_backup">Disable Backup</string>
     <string name="location_permission_required_for_this_feature">Location permissions are required for this feature</string>

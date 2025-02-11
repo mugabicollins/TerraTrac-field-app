@@ -193,13 +193,15 @@
     <string name="share">አካፍል</string>
     <string name="import_">እስከ ውስጥ አስገባ</string>
     <string name="enable_backup_title">ምትኬን ማብራት?</string>
-    <string name="disable_backup_title">ምትኬን ማጥፋት?</string>
-    <string name="enable_backup_message">ምትኬን ማብራት ይህን ዳታ በሰርቨር ላይ በደህና ይቀመጣል። ስልክዎን ከጠፋስ እርስዎ ዳታዎን መልሶ ማግኘት ይችላሉ።</string>
-    <string name="disable_backup_message">ምትኬን ማጥፋት ይህ ዳታ በስልክዎ ብቻ ይቀመጣል። ከጠፋ እርስዎ ዳታዎን መልሶ ማግኘት አይችሉም።</string>
+    <string name="disable_backup_title">ምትኬን ማጥፋት?</string>\
     <string name="proceed_question">መቀጠል ይፈልጋሉ?</string>
     <string name="enable_data_backup_title">የውሂብ ምትኬን ማንቃት?</string>
-    <string name="backup_prompt_message">የውሂብ ምትኬን ማንቃት ዳታዎን በደህና እና በማንኛውም አካባቢ ትገኝ ይደረግልዎታል።</string>
-    <string name="backup_disable_warning">የውሂብ ምትኬን ማጥፋት ዳታዎን በስልክዎ ብቻ ይቀመጣል። ከጠፋ ዳታዎን እንደገና ማግኘት አይችሉም።</string>
+
+    <string name="enable_backup_message">ምትኬን ማስቻወት የእርስዎን ውሂብ በደህና በአገልግሎት አጠቃቀም ይሰናከላል እንደ የኢንተርኔት ግንኙነት ቢኖር። ይህ መረጃዎችዎን በመሳሪያዎ ሲጠፋ፣ ሲጎድል፣ ወይም ከላይ ሲያስጀምሩ እንደገና እንድትመልሱት ያረጋግጣል። ለመቀጠል ይፈልጋሉ?</string>
+    <string name="disable_backup_message">ምትኬን ማጥፋት የእርስዎን ውሂብ በአዲስ ዝማኔ ማስቀመጥ ይቆማል። ቀደም ብሎ የተሰናከለ ውሂብ እንደገና ለማስጀምር በቀላሉ ይገኛል፣ ነገር ግን አዲስ ለውጦች አይቀመጡም። ለመቀጠል ይፈልጋሉ?</string>
+
+    <!--    <string name="backup_prompt_message">የውሂብ ምትኬን ማንቃት ዳታዎን በደህና እና በማንኛውም አካባቢ ትገኝ ይደረግልዎታል።</string>-->
+<!--    <string name="backup_disable_warning">የውሂብ ምትኬን ማጥፋት ዳታዎን በስልክዎ ብቻ ይቀመጣል። ከጠፋ ዳታዎን እንደገና ማግኘት አይችሉም።</string>-->
     <string name="enable_backup">ምትኬን አንቀላፋ</string>
     <string name="disable_backup">ምትኬን አጥፋ</string>
     <string name="location_permission_required_for_this_feature">ይህን የባህሪ ስርዓት ለመጠቀም የአካባቢ ፍቃድ ያስፈልጋል</string>

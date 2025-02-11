@@ -319,6 +319,8 @@ let currentAccuracy = 0,
   watchId = null;
 let currentLatitude = null,
   currentLongitude = null;
+  let currentCountry = "",
+    currentCity = "";
 
 // ✅ Extract Language from URL (Ensure it's set before `t(key)` is used)
 function getQueryParam(param) {
@@ -564,38 +566,45 @@ function initMap() {
         )
           .then((response) => response.json())
           .then((data) => {
-            const country = data.address.country || "Unknown Location";
-            const city =
+            console.log(data);
+            const  currentCountry  = data.address.country || "Unknown Location";
+            const  currentCity =
               data.address.city ||
               data.address.town ||
-              data.address.village ||
+              data.address.village ||data.address.county
               "";
+              console.log(currentCountry + " " + currentCity);
+          // Add a marker with an updatable popup
+          locationMarker = L.marker([lat, lon])
+            .addTo(map)
+            .bindPopup(
+              `
+              <b>${t("yourLocation")}:</b><br>
+              ${ currentCity ?  currentCity + ", " : ""}${currentCountry}<br>
+              <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
+              <small id="accuracy"> ${t("accuracy")}: ${accuracy.toFixed(
+                1
+              )} meters </small>
+              `
+            )
+            .openPopup();
 
-            // Add marker with more detailed location info
-            L.marker([lat, lon])
-              .addTo(map)
-              .bindPopup(
-                `
-               <b>${t("yourLocation")}:</b><br>
-${city ? city + ", " : ""}${country}<br>
-<small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
-<small>${t("accuracy")}: ${accuracy.toFixed(1)} meters </small>
+              document.getElementById(
+    "accuracy"
+  ).textContent = `Accuracy: ${accuracy.toFixed(1)} meters`;
 
-`
-              )
-              .openPopup();
-          })
+          // Start tracking location updates
+          startLocationTracking();
+        })
           .catch((error) => {
             console.error("Error getting location info:", error);
-            L.marker([lat, lon])
-              .addTo(map)
-              .bindPopup(
-                `${t("yourLocation")}: ${lat.toFixed(4)}, ${lon.toFixed(
-                  4
-                )}`
-              )
-              .openPopup();
-          });
+             locationMarker = L.marker([lat, lon])
+            .addTo(map)
+            .bindPopup(
+              `${t("yourLocation")}: ${lat.toFixed(4)}, ${lon.toFixed(4)}`
+            )
+            .openPopup();
+        });
       },
       function (error) {
         map.spin = false; // Remove loading indicator if using
@@ -634,23 +643,44 @@ function startLocationTracking() {
   }
 }
 
-// Modify the updateLocation function to store current position
+// Function to update location and popup dynamically
 function updateLocation(position) {
   const { latitude, longitude, accuracy } = position.coords;
+
+  // Update global variables if needed
+  currentLatitude = latitude;
+  currentLongitude = longitude;
   currentAccuracy = accuracy;
-  currentLatitude = latitude; // Store current latitude
-  currentLongitude = longitude; // Store current longitude
+
+//   // Update accuracy inside the popup
+//   if (locationMarker) {
+//     locationMarker
+//       .setLatLng([latitude, longitude])
+//       .setPopupContent(`
+//         <b>${t("yourLocation")}:</b><br>
+//         ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
+//         <small>${latitude.toFixed(4)}, ${longitude.toFixed(4)}</small><br>
+//         <small>${t("accuracy")}: ${accuracy.toFixed(1)} meters</small>
+//       `)
+//       .openPopup();
+//   }
 
   document.getElementById(
     "accuracy"
-  ).textContent = `Accuracy: ${accuracy.toFixed(1)} meters`;
+  ).textContent = `Accuracy: ${currentAccuracy.toFixed(1)} meters`;
 
-  if (locationMarker) {
-    map.removeLayer(locationMarker);
-  }
+  //if (locationMarker) {
+   // map.removeLayer(locationMarker);
+  //}
 
+  // Move the map to the new location
   map.setView([latitude, longitude]);
+  // map.setView([latitude, longitude], 18, {
+ //   animate: false,
+ //  duration: 1, // 1 second animation
+ //  });
 }
+
 
 function handleLocationError(error) {
   console.error("Geolocation error:", error);
