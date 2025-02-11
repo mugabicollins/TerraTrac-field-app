@@ -204,7 +204,7 @@
     <string name="disable_backup">ምትኬን አጥፋ</string>
     <string name="location_permission_required_for_this_feature">ይህን የባህሪ ስርዓት ለመጠቀም የአካባቢ ፍቃድ ያስፈልጋል</string>
 
-
+    <string name="fetching_location">አካባቢን በማግኘት ላይ…</string>
 
 
 </resources>

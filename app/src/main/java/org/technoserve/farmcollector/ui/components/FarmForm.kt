@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -29,6 +30,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -45,6 +47,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,6 +69,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
 import org.technoserve.farmcollector.database.models.map.LocationState
@@ -187,6 +193,11 @@ fun FarmForm(
 
     // Add a state to track permission denial attempts
     var permissionDenialCount by remember { mutableStateOf(0) }
+
+    // Add loading state
+    var isLoadingLocation by remember { mutableStateOf(false) }
+    // Add rememberCoroutineScope at the start of your composable
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(locationHelper) {
         locationHelper.locationState.collect { state ->
@@ -802,50 +813,124 @@ fun FarmForm(
         /**
          * Function to handle location permission and coordinate calculation
          */
-        fun handleLocationAndNavigate(size: String, selectedUnit: String) {
+//        fun handleLocationAndNavigate(size: String, selectedUnit: String) {
+//            val enteredSize =
+//                size.toDoubleOrNull()?.let { convertSize(it, selectedUnit).toFloat() } ?: 0f
+//            if (coordinatesData?.isNotEmpty() == true && latitude.isBlank() && longitude.isBlank()) {
+//                val center = coordinatesData.toLatLngList().getCenterOfPolygon()
+//                val bounds: LatLngBounds = center
+//                latitude = roundToDecimalPlaces(bounds.northeast.longitude.toString().toDouble())
+//                longitude = roundToDecimalPlaces(bounds.southwest.latitude.toString().toDouble())
+//            }
+//            locationHelper.requestLocationPermissionAndUpdateCoordinates(
+//                enteredSize = enteredSize,
+//                navController = navController,
+//                mapViewModel = mapViewModel,
+//                onLocationResult = { newLatitude, newLongitude, accuracy ->
+//                    latitude = newLatitude
+//                    longitude = newLongitude
+//                    //accuracyArray = accuracyArray + accuracy.toFloat()
+//                    accuracyArrayData
+//
+//                }
+//            )
+//        }
+
+        suspend fun handleLocationAndNavigate(size: String, selectedUnit: String) {
             val enteredSize =
                 size.toDoubleOrNull()?.let { convertSize(it, selectedUnit).toFloat() } ?: 0f
+
             if (coordinatesData?.isNotEmpty() == true && latitude.isBlank() && longitude.isBlank()) {
                 val center = coordinatesData.toLatLngList().getCenterOfPolygon()
                 val bounds: LatLngBounds = center
                 latitude = roundToDecimalPlaces(bounds.northeast.longitude.toString().toDouble())
                 longitude = roundToDecimalPlaces(bounds.southwest.latitude.toString().toDouble())
             }
-            locationHelper.requestLocationPermissionAndUpdateCoordinates(
-                enteredSize = enteredSize,
-                navController = navController,
-                mapViewModel = mapViewModel,
-                onLocationResult = { newLatitude, newLongitude, accuracy ->
-                    latitude = newLatitude
-                    longitude = newLongitude
-                    //accuracyArray = accuracyArray + accuracy.toFloat()
-                    accuracyArrayData
 
-                }
-            )
+            // ✅ Ensure permission request runs asynchronously
+            withContext(Dispatchers.Main) { // Runs on the UI thread
+                locationHelper.requestLocationPermissionAndUpdateCoordinates(
+                    enteredSize = enteredSize,
+                    navController = navController,
+                    mapViewModel = mapViewModel,
+                    onLocationResult = { newLatitude, newLongitude, accuracy ->
+                        latitude = newLatitude
+                        longitude = newLongitude
+                        accuracyArrayData
+                    }
+                )
+            }
         }
 
-        Button(
+
+
+
+//        Button(
+////            onClick = {
+////                if (isLocationEnabled(context)) {
+////                    handleLocationAndNavigate(size, selectedUnit)
+////                }
+////                else
+////                    showPermissionRequest.value = true
+////            },
 //            onClick = {
 //                if (isLocationEnabled(context)) {
 //                    handleLocationAndNavigate(size, selectedUnit)
+//                } else {
+//                    // Increment denial count when permission is not granted
+//                    permissionDenialCount++
+//
+//                    // Show permission request if not denied too many times
+//                    if (permissionDenialCount <= 2) {
+//                        showLocationDialog.value = true
+//                        showPermissionRequest.value = true
+//                    } else {
+//                        // After multiple denials, open app settings
+//                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+//                        val uri: Uri = Uri.fromParts("package", context.packageName, null)
+//                        intent.data = uri
+//                        context.startActivity(intent)
+//                    }
 //                }
-//                else
-//                    showPermissionRequest.value = true
 //            },
+//            modifier = Modifier
+//                .background(MaterialTheme.colorScheme.background)
+//                .align(Alignment.CenterHorizontally)
+//                .fillMaxWidth(0.7f)
+//                .height(50.dp)
+//                .padding(bottom = 5.dp),
+//            enabled = size.isNotBlank()
+//        ) {
+//            val enteredSize =
+//                size.toDoubleOrNull()?.let { convertSize(it, selectedUnit).toFloat() } ?: 0f
+//
+//            Text(
+//                text = if (enteredSize >= 4f) {
+//                    stringResource(id = R.string.set_polygon)
+//                } else {
+//                    stringResource(id = R.string.get_coordinates)
+//                }
+//            )
+//        }
+
+        Button(
             onClick = {
                 if (isLocationEnabled(context)) {
-                    handleLocationAndNavigate(size, selectedUnit)
+                    isLoadingLocation = true // Start loading
+                    // Wrap the location handling in a coroutine
+                    coroutineScope.launch {
+                        try {
+                            handleLocationAndNavigate(size, selectedUnit)
+                        } finally {
+                            isLoadingLocation = false // Stop loading regardless of result
+                        }
+                    }
                 } else {
-                    // Increment denial count when permission is not granted
                     permissionDenialCount++
-
-                    // Show permission request if not denied too many times
                     if (permissionDenialCount <= 2) {
                         showLocationDialog.value = true
                         showPermissionRequest.value = true
                     } else {
-                        // After multiple denials, open app settings
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         val uri: Uri = Uri.fromParts("package", context.packageName, null)
                         intent.data = uri
@@ -859,19 +944,38 @@ fun FarmForm(
                 .fillMaxWidth(0.7f)
                 .height(50.dp)
                 .padding(bottom = 5.dp),
-            enabled = size.isNotBlank()
+            enabled = size.isNotBlank() && !isLoadingLocation // Disable button while loading
         ) {
-            val enteredSize =
-                size.toDoubleOrNull()?.let { convertSize(it, selectedUnit).toFloat() } ?: 0f
+            val enteredSize = size.toDoubleOrNull()?.let {
+                convertSize(it, selectedUnit).toFloat()
+            } ?: 0f
 
-            Text(
-                text = if (enteredSize >= 4f) {
-                    stringResource(id = R.string.set_polygon)
-                } else {
-                    stringResource(id = R.string.get_coordinates)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (isLoadingLocation) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(18.dp)
+                            .padding(end = 8.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 2.dp
+                    )
                 }
-            )
+                Text(
+                    text = if (isLoadingLocation) {
+                        stringResource(id = R.string.fetching_location)
+                    } else if (enteredSize >= 4f) {
+                        stringResource(id = R.string.set_polygon)
+                    } else {
+                        stringResource(id = R.string.get_coordinates)
+                    }
+                )
+            }
         }
+
+
         Button(
             onClick = {
                 isFormSubmitted = true

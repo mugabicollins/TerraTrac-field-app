@@ -80,200 +80,15 @@ fun FarmListHeader(
     // State to determine if the search mode is active
     var isSearchVisible by remember { mutableStateOf(false) }
 
-//    TopAppBar(
-//        modifier = Modifier
-//            .background(MaterialTheme.colorScheme.primary)
-//            .fillMaxWidth(),
-//        navigationIcon = {
-//            IconButton(onClick = {
-//                if (isSearchVisible) {
-//                    // Exit search mode, clear search query
-//                    searchQuery = ""
-//                    onSearchQueryChanged("")
-//                    isSearchVisible = false
-//                } else {
-//                    // Navigate back normally
-//                    onBackClicked()
-//                }
-//            }) {
-//                Icon(
-//                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                    contentDescription = "Back",
-//                    tint = MaterialTheme.colorScheme.onPrimary
-//                )
-//            }
-//        },
-//        title = {
-//            Text(
-//                text = title,
-//                color = MaterialTheme.colorScheme.onPrimary,
-//                fontSize = 22.sp,
-//                maxLines = 1,
-//                overflow = TextOverflow.Ellipsis
-//            )
-//        },
-//        actions = {
-//
-//            if (showRestore) {
-//                IconButton(
-//                    onClick = { onRestoreClicked() },
-//                    modifier = Modifier.size(36.dp)
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Refresh,
-//                        contentDescription = "Restore",
-//                        modifier = Modifier.size(24.dp),
-//                        tint = MaterialTheme.colorScheme.onPrimary
-//                    )
-//                }
-//            }
-//            if (showSearch) {
-//                IconButton(onClick = {
-//                    isSearchVisible = !isSearchVisible
-//                }, modifier = Modifier.size(36.dp)) {
-//                    Icon(
-//                        imageVector = Icons.Default.Search,
-//                        contentDescription = "Search",
-//                        modifier = Modifier.size(24.dp),
-//                        tint = MaterialTheme.colorScheme.onPrimary
-//                    )
-//                }
-//            }
-//        },
-//    )
-
-//    TopAppBar(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(MaterialTheme.colorScheme.primary)
-//            .padding(horizontal = 12.dp),
-//        navigationIcon = {
-//            IconButton(onClick = {
-//                if (isSearchVisible) {
-//                    onSearchQueryChanged("")
-//                } else {
-//                    onBackClicked()
-//                }
-//            }) {
-//                Icon(
-//                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                    contentDescription = "Back",
-//                    tint = MaterialTheme.colorScheme.onPrimary
-//                )
-//            }
-//        },
-//        title = {
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.SpaceBetween // ✅ Ensures Last Sync doesn’t overlap Back Icon
-//            ) {
-//                Text(
-//                    text = title,
-//                    color = MaterialTheme.colorScheme.onPrimary,
-//                    fontSize = 20.sp,
-//                    fontWeight = FontWeight.Bold,
-//                    maxLines = 1,
-//                    overflow = TextOverflow.Ellipsis,
-//                    modifier = Modifier.weight(1f) // ✅ Prevents overlap with actions
-//                )
-//
-//                // ✅ Show last sync info only if enabled
-//                if (showLastSync) {
-//                    Column(
-//                        modifier = Modifier.padding(end = 12.dp),
-//                        verticalArrangement = Arrangement.Center
-//                    ) {
-//                        Text(
-//                            text = "Last Synced:",
-//                            style = MaterialTheme.typography.bodySmall,
-//                            color = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                        Text(
-//                            text = lastSyncTime,
-//                            style = MaterialTheme.typography.bodySmall,
-//                            color = MaterialTheme.colorScheme.onPrimary,
-//                            fontWeight = FontWeight.Bold
-//                        )
-//                    }
-//                }
-//            }
-//        },
-//        actions = {
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.End
-//            ) {
-//                // ✅ Backup Toggle (Green when ON, Red when OFF)
-//                if (showLastSync) {
-//                    Row(
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        modifier = Modifier.padding(end = 6.dp)
-//                    ) {
-//                        Text(
-//                            "Backup Now",
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                        Spacer(modifier = Modifier.width(6.dp))
-//                        Switch(
-//                            checked = isBackupEnabled,
-//                            onCheckedChange = onBackupToggleClicked,
-//                            modifier = Modifier.size(24.dp),
-//                            colors = SwitchDefaults.colors(
-//                                checkedThumbColor = MaterialTheme.colorScheme.primary, // Green when enabled
-//                                checkedTrackColor = MaterialTheme.colorScheme.tertiary,
-//                                uncheckedThumbColor = MaterialTheme.colorScheme.error, // Red when disabled
-//                                uncheckedTrackColor = MaterialTheme.colorScheme.errorContainer
-//                            )
-//                        )
-//                    }
-//                }
-//
-//                // ✅ Restore Button
-//                if (showRestore) {
-//                    IconButton(
-//                        onClick = onRestoreClicked,
-//                        modifier = Modifier.size(36.dp)
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Refresh,
-//                            contentDescription = "Restore",
-//                            modifier = Modifier.size(24.dp),
-//                            tint = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                    }
-//                }
-//
-//                // ✅ Search Button
-//                if (showSearch) {
-//                    IconButton(onClick = {
-//                        isSearchVisible = !isSearchVisible
-//                    }, modifier = Modifier.size(36.dp)) {
-//                        Icon(
-//                            imageVector = Icons.Default.Search,
-//                            contentDescription = "Search",
-//                            modifier = Modifier.size(24.dp),
-//                            tint = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    )
-
-
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    println("screenWidth $screenWidth")
     var isLastSyncDropdownVisible by remember { mutableStateOf(false) }
-
     // Adjust sizes based on screen width
-    val iconSize = if (screenWidth < 380.dp) 24.dp else 36.dp
-    val switchScale = if (screenWidth < 380.dp) 0.6f else 0.8f
-    val horizontalPadding = if (screenWidth < 380.dp) 8.dp else 12.dp
-    val titleFontSize = if (screenWidth < 380.dp) 16.sp else 18.sp
-    val backupTextStyle = if (screenWidth < 380.dp) {
+    val iconSize = if (screenWidth < 4000.dp) 24.dp else 36.dp
+    val switchScale = if (screenWidth < 400.dp) 0.6f else 0.8f
+    val horizontalPadding = if (screenWidth < 400.dp) 8.dp else 12.dp
+    val titleFontSize = if (screenWidth < 400.dp) 16.sp else 18.sp
+    val backupTextStyle = if (screenWidth < 400.dp) {
         MaterialTheme.typography.bodySmall
     } else {
         MaterialTheme.typography.bodyMedium
@@ -313,14 +128,13 @@ fun FarmListHeader(
                     text = title,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = titleFontSize,
-//                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
 
                 if (showLastSync) {
-                    if (screenWidth >= 380.dp) {
+                    if (screenWidth >= 400.dp) {
                         // Show regular column on larger screens
                         Column(
                             modifier = Modifier.padding(end = 4.dp),
@@ -385,12 +199,12 @@ fun FarmListHeader(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
-                modifier = Modifier.padding(start = if (screenWidth < 380.dp) 2.dp else 4.dp)
+                modifier = Modifier.padding(start = if (screenWidth < 400.dp) 2.dp else 4.dp)
             ) {
                 if (showLastSync) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = if (screenWidth < 380.dp) 2.dp else 4.dp)
+                        modifier = Modifier.padding(end = if (screenWidth < 400.dp) 2.dp else 4.dp)
                     ) {
                         Text(
                             text = stringResource(id = R.string.backup_now),
@@ -423,7 +237,7 @@ fun FarmListHeader(
                 if (showRestore) {
                     IconButton(
                         onClick = onRestoreClicked,
-                        modifier = Modifier.size(if (screenWidth < 380.dp) 32.dp else 36.dp)
+                        modifier = Modifier.size(if (screenWidth < 400.dp) 32.dp else 36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
@@ -437,7 +251,7 @@ fun FarmListHeader(
                 if (showSearch) {
                     IconButton(
                         onClick = { isSearchVisible = !isSearchVisible },
-                        modifier = Modifier.size(if (screenWidth < 380.dp) 32.dp else 36.dp)
+                        modifier = Modifier.size(if (screenWidth < 400.dp) 32.dp else 36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -476,11 +290,6 @@ fun FarmListHeader(
                         .fillMaxWidth() // Center with a smaller width
                         .padding(8.dp)
                         .background(MaterialTheme.colorScheme.background)
-//                        .border(
-//                        width = 1.dp, // ✅ Border width
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant, // ✅ Border color
-//                        shape = MaterialTheme.shapes.medium // ✅ Rounded corners
-//                    )
                         .clip(RoundedCornerShape(0.dp)), // Add rounded corners
                     placeholder = {
                         Text(
@@ -521,23 +330,14 @@ fun FarmListHeader(
                         cursorColor = MaterialTheme.colorScheme.onSurface,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         errorCursorColor = Color.Red,
-
-//                        focusedIndicatorColor = Color.Transparent,
-//                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        errorIndicatorColor = Color.Red,
-
                         // ✅ Ensure Border Always Stays Visible
                         focusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when focused
                         unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when unfocused
                         errorIndicatorColor = Color.Red, // Border when error state
-
-
                         // ✅ Add Background Colors
                         focusedContainerColor = MaterialTheme.colorScheme.background,  // Background when focused
                         unfocusedContainerColor = MaterialTheme.colorScheme.background, // Background when not focused
                         errorContainerColor =  Color.Red// Light red for error state
-
-
                     ),
                     shape = RoundedCornerShape(0.dp)
                 )

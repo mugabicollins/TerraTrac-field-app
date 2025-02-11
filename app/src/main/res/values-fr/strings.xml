@@ -203,6 +203,7 @@
     <string name="enable_backup">Activer la sauvegarde</string>
     <string name="disable_backup">Désactiver la sauvegarde</string>
     <string name="location_permission_required_for_this_feature">Les autorisations de localisation sont requises pour cette fonctionnalité</string>
+    <string name="fetching_location">Récupération de la localisation…</string>
 
 
 

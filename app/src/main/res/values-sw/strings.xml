@@ -205,6 +205,7 @@
     <string name="enable_backup">Washa chelezo</string>
     <string name="disable_backup">Zima chelezo</string>
     <string name="location_permission_required_for_this_feature">Ruhusa ya mahali inahitajika kwa kipengele hiki</string>
+    <string name="fetching_location">Inapata eneo…</string>
 
 
 

@@ -15,7 +15,9 @@ import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.net.URLEncoder
 import java.util.UUID
 
-// JavaScript Interface
+/**
+ * This class provides a JavaScript interface for the WebView
+ */
 class JavaScriptInterface(
     private val context: Context,
     private val navController: NavController,
@@ -193,6 +195,4 @@ class JavaScriptInterface(
             return "{}" // Return an empty JSON object if no farm is found
         }
     }
-
-
 }

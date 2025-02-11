@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.technoserve.farmcollector.R
 
-/*
+/**
  *  This function is used to display the header for the farm list with search, export, share, and import buttons
  *  @param title: The title of the header
  *  @param onBackClicked: A function to be called when the back button is clicked
@@ -66,345 +66,6 @@ import org.technoserve.farmcollector.R
  * @param onRestoreClicked: A function to be called when the restore button is clicked and the restore button is clicked
  */
 @OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun FarmListHeaderPlots(
-//    title: String,
-//    onBackClicked: () -> Unit,
-//    onExportClicked: () -> Unit,
-//    onShareClicked: () -> Unit,
-//    onImportClicked: () -> Unit,
-//    onSearchQueryChanged: (String) -> Unit,
-//    showExport: Boolean,
-//    showShare: Boolean,
-//    showSearch: Boolean,
-//    onRestoreClicked: () -> Unit,
-//    isBackupEnabled: Boolean, // ✅ Backup toggle state
-//    showLastSync: Boolean, // ✅ Boolean to show/hide last sync time
-//    lastSyncTime: String, // ✅ Last sync timestamp
-//    onBackupToggleClicked: (Boolean) -> Unit // ✅ Callback for toggling backup
-//) {
-//
-//    var searchQuery by remember { mutableStateOf("") }
-//    var isSearchVisible by remember { mutableStateOf(false) }
-//    var isImportDisabled by remember { mutableStateOf(false) }
-//
-//    val configuration = LocalConfiguration.current
-//    val screenWidth = configuration.screenWidthDp.dp
-//    println("screenWidth $screenWidth")
-//    var isLastSyncDropdownVisible by remember { mutableStateOf(false) }
-//
-//// Adjust sizes based on screen width
-//    val iconSize = if (screenWidth < 360.dp) 20.dp else 24.dp
-//    val switchScale = if (screenWidth < 360.dp) 0.6f else 0.8f
-//    val horizontalPadding = if (screenWidth < 360.dp) 8.dp else 12.dp
-//    val titleFontSize = if (screenWidth < 360.dp) 16.sp else 18.sp
-//    val backupTextStyle = if (screenWidth < 360.dp) {
-//        MaterialTheme.typography.bodySmall
-//    } else {
-//        MaterialTheme.typography.bodyMedium
-//    }
-//
-//
-//
-//    TopAppBar(
-////        title = {
-////            Text(
-////                text = title,
-////                fontSize = 22.sp,
-////                maxLines = 1,
-////                overflow = TextOverflow.Ellipsis
-////            )
-////        },
-//        title = {
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.SpaceBetween // ✅ Ensures Last Sync doesn’t overlap Back Icon
-//            ) {
-//                Text(
-//                    text = title,
-//                    color = MaterialTheme.colorScheme.onPrimary,
-//                    fontSize = 20.sp,
-////                    fontWeight = FontWeight.Bold,
-//                    maxLines = 1,
-//                    overflow = TextOverflow.Ellipsis,
-//                    modifier = Modifier.weight(1f) // ✅ Prevents overlap with actions
-//                )
-//
-////                // ✅ Show last sync info only if enabled
-////                if (showLastSync) {
-////                    Column(
-////                        modifier = Modifier.padding(end = 12.dp),
-////                        verticalArrangement = Arrangement.Center
-////                    ) {
-////                        Text(
-////                            text = "Last Synced:",
-////                            style = MaterialTheme.typography.bodySmall,
-////                            color = MaterialTheme.colorScheme.onPrimary
-////                        )
-////                        Text(
-////                            text = lastSyncTime,
-////                            style = MaterialTheme.typography.bodySmall,
-////                            color = MaterialTheme.colorScheme.onPrimary,
-////                            fontWeight = FontWeight.Bold
-////                        )
-////                    }
-////                }
-//
-//                if (showLastSync) {
-//                    if (screenWidth >= 380.dp) {
-//                        // Show regular column on larger screens
-//                        Column(
-//                            modifier = Modifier.padding(end = 4.dp),
-//                            verticalArrangement = Arrangement.Center
-//                        ) {
-//                            Text(
-//                                text = stringResource(id = R.string.last_synced),
-//                                style = MaterialTheme.typography.bodySmall,
-//                                color = MaterialTheme.colorScheme.onPrimary
-//                            )
-//                            Text(
-//                                text = lastSyncTime,
-//                                style = MaterialTheme.typography.bodySmall,
-//                                color = MaterialTheme.colorScheme.onPrimary,
-//                                fontWeight = FontWeight.Bold
-//                            )
-//                        }
-//                    } else {
-//                        // Show dropdown on small screens
-//                        Box {
-//                            IconButton(
-//                                onClick = { isLastSyncDropdownVisible = !isLastSyncDropdownVisible },
-//                                modifier = Modifier.size(32.dp)
-//                            ) {
-//                                Icon(
-//                                    imageVector = Icons.Default.Info,
-//                                    contentDescription = stringResource(id = R.string.last_synced),
-//                                    tint = MaterialTheme.colorScheme.onPrimary,
-//                                    modifier = Modifier.size(iconSize)
-//                                )
-//                            }
-//
-//                            DropdownMenu(
-//                                expanded = isLastSyncDropdownVisible,
-//                                onDismissRequest = { isLastSyncDropdownVisible = false },
-//                                modifier = Modifier
-//                                    .background(MaterialTheme.colorScheme.surface)
-//                                    .width(IntrinsicSize.Min)
-//                            ) {
-//                                Column(
-//                                    modifier = Modifier.padding(8.dp),
-//                                    horizontalAlignment = Alignment.Start
-//                                ) {
-//                                    Text(
-//                                        text = stringResource(id = R.string.last_synced),
-//                                        style = MaterialTheme.typography.bodySmall,
-//                                        color = MaterialTheme.colorScheme.onSurface
-//                                    )
-//                                    Text(
-//                                        text = lastSyncTime,
-//                                        style = MaterialTheme.typography.bodySmall,
-//                                        color = MaterialTheme.colorScheme.onSurface,
-//                                        fontWeight = FontWeight.Bold
-//                                    )
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//
-//
-//            }
-//        },
-//
-//        navigationIcon = {
-//            IconButton(onClick = {
-//                if (isSearchVisible) {
-//                    searchQuery = ""
-//                    onSearchQueryChanged("")
-//                    isSearchVisible = false
-//                } else {
-//                    onBackClicked()
-//                }
-//            }) {
-//                Icon(
-//                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                    contentDescription = "Back",
-//                    tint = MaterialTheme.colorScheme.onPrimary
-//                )
-//            }
-//        },
-//        actions = {
-//            Row(
-//                horizontalArrangement = Arrangement.End,
-//                verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier.horizontalScroll(rememberScrollState())
-//            ) {
-//
-//                // ✅ Backup Toggle (Green when ON, Red when OFF)
-//                if (showLastSync) {
-//                    Row(
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        modifier = Modifier.padding(end = 12.dp)
-//                    ) {
-//                        Text(
-//                            "Backup",
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                        Spacer(modifier = Modifier.width(6.dp))
-//                        Switch(
-//                            checked = isBackupEnabled,
-//                            onCheckedChange = onBackupToggleClicked,
-//                            colors = SwitchDefaults.colors(
-//                                checkedThumbColor = MaterialTheme.colorScheme.primary, // Green when enabled
-//                                checkedTrackColor = MaterialTheme.colorScheme.tertiary,
-//                                uncheckedThumbColor = MaterialTheme.colorScheme.error, // Red when disabled
-//                                uncheckedTrackColor = MaterialTheme.colorScheme.errorContainer
-//                            )
-//                        )
-//                    }
-//                }
-//                IconButton(
-//                    onClick = { onRestoreClicked() },
-//                    modifier = Modifier.size(36.dp)
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Refresh,
-//                        contentDescription = "Restore",
-//                        modifier = Modifier.size(24.dp),
-//                        tint = MaterialTheme.colorScheme.onPrimary
-//                    )
-//                }
-//                if (showExport) {
-//                    IconButton(onClick = onExportClicked, modifier = Modifier.size(36.dp)) {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.save),
-//                            contentDescription = "Export",
-//                            modifier = Modifier.size(24.dp),
-//                            tint = MaterialTheme.colorScheme.onPrimary,
-//                        )
-//                    }
-//                }
-//                if (showShare) {
-//                    IconButton(onClick = onShareClicked, modifier = Modifier.size(36.dp)) {
-//                        Icon(
-//                            imageVector = Icons.Default.Share,
-//                            contentDescription = "Share",
-//                            modifier = Modifier.size(24.dp),
-//                            tint = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                    }
-//                }
-//                IconButton(
-//                    onClick = {
-//                        if (!isImportDisabled) {
-//                            onImportClicked()
-//                        }
-//                    },
-//                    modifier = Modifier.size(36.dp)
-//                ) {
-//                    Icon(
-//                        painter = painterResource(id = R.drawable.icons8_import_file_48),
-//                        contentDescription = "Import",
-//                        modifier = Modifier.size(24.dp),
-//                        tint = MaterialTheme.colorScheme.onPrimary,
-//                    )
-//                }
-//                if (showSearch) {
-//                    IconButton(onClick = {
-//                        isSearchVisible = !isSearchVisible
-//                    }, modifier = Modifier.size(36.dp)) {
-//                        Icon(
-//                            imageVector = Icons.Default.Search,
-//                            contentDescription = "Search",
-//                            modifier = Modifier.size(24.dp),
-//                            tint = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                    }
-//                }
-//            }
-//        },
-//    )
-//    if (isSearchVisible) {
-//        Box(
-//            modifier = Modifier
-//                .padding(top = 54.dp)
-//                .fillMaxWidth(),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                OutlinedTextField(
-//                    value = searchQuery,
-//                    onValueChange = {
-//                        searchQuery = it
-//                        onSearchQueryChanged(it)
-//                    },
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(8.dp)
-//                        .clip(RoundedCornerShape(0.dp)),
-//                    placeholder = { Text(stringResource(R.string.search)) },
-//                    leadingIcon = {
-//                        IconButton(onClick = {
-//                            searchQuery = ""
-//                            onSearchQueryChanged("")
-//                            isSearchVisible = false
-//                        }) {
-//                            Icon(
-//                                Icons.AutoMirrored.Filled.ArrowBack,
-//                                contentDescription = "Back",
-//                                tint = MaterialTheme.colorScheme.onSurface
-//                            )
-//                        }
-//                    },
-//                    trailingIcon = {
-//                        if (searchQuery != "") {
-//                            IconButton(onClick = {
-//                                searchQuery = ""
-//                                onSearchQueryChanged("")
-//                            }) {
-//                                Icon(
-//                                    Icons.Default.Clear,
-//                                    contentDescription = "Clear",
-//                                    tint = MaterialTheme.colorScheme.onSurface
-//                                )
-//                            }
-//                        }
-//                    },
-//                    singleLine = true,
-//                    colors = TextFieldDefaults.colors(
-//                        cursorColor = MaterialTheme.colorScheme.onSurface,
-//                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-//                        errorCursorColor = Color.Red,
-////                        focusedIndicatorColor = Color.Transparent,
-////                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
-////                        errorIndicatorColor = Color.Red
-//                        // ✅ Ensure Border Always Stays Visible
-//                        focusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when focused
-//                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when unfocused
-//                        errorIndicatorColor = Color.Red, // Border when error state
-//
-//
-//                        // ✅ Add Background Colors
-//                        focusedContainerColor = MaterialTheme.colorScheme.background,  // Background when focused
-//                        unfocusedContainerColor = MaterialTheme.colorScheme.background, // Background when not focused
-//                        errorContainerColor =  Color.Red// Light red for error state
-//                    ),
-//                    shape = RoundedCornerShape(0.dp)
-//                )
-//
-//            }
-//        }
-//    }
-//}
-
-
 @Composable
 fun FarmListHeaderPlots(
     title: String,
@@ -432,11 +93,11 @@ fun FarmListHeaderPlots(
     val screenWidth = configuration.screenWidthDp.dp
 
     // Adjust sizes based on screen width
-    val iconSize = if (screenWidth < 380.dp) 24.dp else 36.dp
-    val switchScale = if (screenWidth < 380.dp) 0.6f else 0.8f
-    val horizontalPadding = if (screenWidth < 380.dp) 8.dp else 12.dp
-    val titleFontSize = if (screenWidth < 380.dp) 16.sp else 18.sp
-    val backupTextStyle = if (screenWidth < 380.dp) {
+    val iconSize = if (screenWidth < 400.dp) 24.dp else 36.dp
+    val switchScale = if (screenWidth < 400.dp) 0.6f else 0.8f
+    val horizontalPadding = if (screenWidth < 400.dp) 8.dp else 12.dp
+    val titleFontSize = if (screenWidth < 400.dp) 16.sp else 18.sp
+    val backupTextStyle = if (screenWidth < 400.dp) {
         MaterialTheme.typography.bodySmall
     } else {
         MaterialTheme.typography.bodyMedium
@@ -464,7 +125,7 @@ fun FarmListHeaderPlots(
 
                 // ✅ Info Icon for Last Sync
                 if (showLastSync) {
-                    if (screenWidth >= 380.dp) {
+                    if (screenWidth >= 400.dp) {
                         // Show regular column on larger screens
                         Column(
                             modifier = Modifier.padding(end = 4.dp),
@@ -572,7 +233,7 @@ fun FarmListHeaderPlots(
                         )
                     )
                 }
-                if (screenWidth >= 380.dp) {
+                if (screenWidth >= 400.dp) {
                     if (showExport) {
                         IconButton(onClick = onExportClicked, modifier = Modifier.size(36.dp)) {
                             Icon(
@@ -635,7 +296,7 @@ fun FarmListHeaderPlots(
                     }
                 }
 
-                if (screenWidth <= 380.dp) {
+                if (screenWidth <= 400.dp) {
 
                     // ✅ Move Export, Share, and Import to a dropdown on small screens
                     Box {
@@ -764,15 +425,10 @@ fun FarmListHeaderPlots(
                         cursorColor = MaterialTheme.colorScheme.onSurface,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         errorCursorColor = Color.Red,
-//                        focusedIndicatorColor = Color.Transparent,
-//                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        errorIndicatorColor = Color.Red
                         // ✅ Ensure Border Always Stays Visible
                         focusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when focused
                         unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border when unfocused
                         errorIndicatorColor = Color.Red, // Border when error state
-
-
                         // ✅ Add Background Colors
                         focusedContainerColor = MaterialTheme.colorScheme.background,  // Background when focused
                         unfocusedContainerColor = MaterialTheme.colorScheme.background, // Background when not focused

@@ -204,7 +204,7 @@
     <string name="enable_backup">Kuusdeebi’aa bana</string>
     <string name="disable_backup">Kuusdeebi’aa cufaa</string>
     <string name="location_permission_required_for_this_feature">Ijaarsa kana fayyadamuuf eeyyama iddoo barbaachisa</string>
-
+    <string name="fetching_location">Bakka argachaa jira…</string>
 
 
 

@@ -204,7 +204,7 @@
     <string name="enable_backup">Habilitar copia de seguridad</string>
     <string name="disable_backup">Deshabilitar copia de seguridad</string>
     <string name="location_permission_required_for_this_feature">Se requieren permisos de ubicación para esta función</string>
-
+    <string name="fetching_location">Obteniendo ubicación…</string>
 
 
 

@@ -202,6 +202,7 @@
     <string name="enable_backup">Enable Backup</string>
     <string name="disable_backup">Disable Backup</string>
     <string name="location_permission_required_for_this_feature">Location permissions are required for this feature</string>
+    <string name="fetching_location">Fetching location…</string>
 
 
 

@@ -52,7 +52,7 @@ import org.technoserve.farmcollector.viewmodels.FarmViewModel
 import org.technoserve.farmcollector.viewmodels.FarmViewModelFactory
 import org.technoserve.farmcollector.viewmodels.UpdateAlert
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
-import org.technoserve.farmcollector.database.mappers.CoordinatesDeserializer
+//import org.technoserve.farmcollector.database.mappers.CoordinatesDeserializer
 import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import org.technoserve.farmcollector.ui.screens.farms.AddFarm
