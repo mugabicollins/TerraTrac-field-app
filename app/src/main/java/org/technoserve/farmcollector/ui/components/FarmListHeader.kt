@@ -268,12 +268,12 @@ fun FarmListHeader(
     println("screenWidth $screenWidth")
     var isLastSyncDropdownVisible by remember { mutableStateOf(false) }
 
-// Adjust sizes based on screen width
-    val iconSize = if (screenWidth < 360.dp) 20.dp else 24.dp
-    val switchScale = if (screenWidth < 360.dp) 0.6f else 0.8f
-    val horizontalPadding = if (screenWidth < 360.dp) 8.dp else 12.dp
-    val titleFontSize = if (screenWidth < 360.dp) 16.sp else 18.sp
-    val backupTextStyle = if (screenWidth < 360.dp) {
+    // Adjust sizes based on screen width
+    val iconSize = if (screenWidth < 380.dp) 24.dp else 36.dp
+    val switchScale = if (screenWidth < 380.dp) 0.6f else 0.8f
+    val horizontalPadding = if (screenWidth < 380.dp) 8.dp else 12.dp
+    val titleFontSize = if (screenWidth < 380.dp) 16.sp else 18.sp
+    val backupTextStyle = if (screenWidth < 380.dp) {
         MaterialTheme.typography.bodySmall
     } else {
         MaterialTheme.typography.bodyMedium
