@@ -754,26 +754,86 @@ updateTranslations(currentLanguage);
             .openPopup();
         });
       },
-      function (error) {
-        map.spin = false; // Remove loading indicator if using
-        console.error("Error getting location:", error);
+     //  function (error) {
+     //    map.spin = false; // Remove loading indicator if using
+      //  console.error("Error getting location:", error);
         // Set a default view if location access is denied
-        map.setView([0, 0], 2);
-        alert(t("unableToGetLocation"));
-      },
+     //   map.setView([0, 0], 2);
+     //   alert(t("unableToGetLocation"));
+    //  },
+
+    function (error) {
+    map.spin = false; // Remove loading indicator
+
+    console.error("Error getting location:", error);
+
+    // Set a default view if location access is denied
+    map.setView([0, 0], 2);
+
+    // Remove default "Page Says" alert
+    const errorMessage = t("unableToGetLocation");
+
+    // Display a custom modal/dialog instead of alert
+    showCustomLocationError(errorMessage);
+
+    // Try to open location settings if possible
+    openLocationSettings();
+},
       {
         enableHighAccuracy: true,
-        timeout: 5000,
+        timeout: 10000,
         maximumAge: 0,
       }
     );
   } else {
-    alert(t("geolocationNotSupported"));
+    // alert(t("geolocationNotSupported"));
+    // Display a custom modal/dialog instead of alert
+    showCustomLocationError(errorMessage);
     // Set a default view if geolocation is not supported
     map.setView([0, 0], 2);
   }
 
   startLocationTracking();
+}
+
+      // Function to display a custom error message instead of alert
+function showCustomLocationError(message) {
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "location-error-popup";
+    errorDiv.innerHTML = `
+        <div class="error-content">
+            <p>${message}</p>
+            <button onclick="openLocationSettings()">Open Location Settings</button>
+            <button onclick="closeErrorPopup()">Close</button>
+        </div>
+    `;
+    document.body.appendChild(errorDiv);
+}
+
+// Function to attempt opening location settings
+function openLocationSettings() {
+    if (navigator.permissions) {
+        navigator.permissions.query({ name: "geolocation" }).then((result) => {
+            if (result.state === "denied") {
+                // If location access is denied, try opening settings
+                if (navigator.userAgent.includes("Android")) {
+                    window.location.href = "android.settings.LOCATION_SOURCE_SETTINGS";
+                } else if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+                    window.location.href = "App-Prefs:Privacy&path=LOCATION";
+                } else {
+                    alert("Please enable location settings manually in your browser.");
+                }
+            }
+        });
+    }
+}
+
+// Function to close the error popup
+function closeErrorPopup() {
+    const popup = document.querySelector(".location-error-popup");
+    if (popup) {
+        popup.remove();
+    }
 }
 
 // Function to update accuracy in the info panel
