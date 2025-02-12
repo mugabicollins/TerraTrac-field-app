@@ -45,94 +45,84 @@
           height: auto;
         }
 
-          .map-types {
-        position: absolute;
-        display: inline-block;
-        top: 10px;
-        right: 10px;
-        z-index: 1000;
-        background-color: rgba(255, 255, 255, 0.9);
-        padding: 5px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      }
+                /* Container for the button */
+.map-types {
+    position: absolute;
+    top: 10px; /* Align to the top */
+    right: 10px; /* Align to the right */
+    z-index: 1100;
+}
 
-      #mapTypesDropdown {
-        border: none;
-        border-radius: 4px;
-        background-color: #000000;
-        padding: 10px;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
+/* Styling for the button with a gray background */
+#mapTypesDropdown {
+    background:white; /* Gray box */
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Box effect */
+    width: 40px;
+    height: 40px;
+}
 
-      .dropdown-content {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        color: #000000;
-        background-color: #cccccc;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-        border-radius: 4px;
-        flex-direction: column;
-        padding: 0;
-        box-sizing: border-box;
-        width: 150px;
-      }
+/* Ensure the icon remains unchanged */
+#mapTypesDropdown i {
+    font-size: 22px;
+    color: gray; /* White icon color */
+}
 
-      .dropdown-content button {
-        background: none;
-        border: none;
-        padding: 10px;
-        color: #000000;
-        background-color: #cccccc;
-        text-align: left;
-        display: flex;
-        align-items: center;
-        width: 100%;
-        cursor: pointer;
-        box-sizing: border-box;
-      }
+/* Hover effect */
+#mapTypesDropdown:hover {
+    background: white;
+}
 
-      .dropdown-toggle {
-        margin-left: auto;
-        background: none;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-        padding: 0;
-      }
+/* Dropdown content styles */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 45px; /* Position below the button */
+    right: 0; /* Align to the right */
+    background-color: rgba(134, 131, 131, 0.9);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    min-width: 140px;
+    z-index: 1101; /* 🔥 Ensures dropdown is in front of everything */
+}
 
-      .dropdown-content button:hover {
-        background: #f0f0f0;
-      }
+/* Dropdown items */
+.dropdown-content button {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: white;
+    display: flex;
+    align-items: center;
+}
 
-      .dropdown-content button i {
-        margin-right: 8px;
-        font-size: 16px;
-      }
+.dropdown-content button i {
+    margin-right: 8px; /* Spacing between icon and text */
+}
 
-      .map-types:hover .dropdown-content {
-        display: block;
-      }
-/*
-        .info-panel {
-          position: fixed;
-          top: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 1000;
-          background-color: rgba(255, 255, 255, 0.9);
-          padding: 10px;
-          border-radius: 5px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-          text-align: center;
-          min-width: 200px;
-          max-width: 90%;
-          box-sizing: border-box;
-        } */
+/* Hover effect */
+.dropdown-content button:hover {
+    background-color: #7a1800;
+}
+
+/* Show dropdown when button is clicked */
+.show {
+    display: block;
+}
+
+
 
         .info-panel {
     position: fixed;
@@ -150,6 +140,8 @@
     box-sizing: border-box;
     pointer-events: none; /* Makes it non-interactive */
 }
+
+
 
 
         /* Add spacing to ensure it doesn't overlap with other elements */
@@ -685,13 +677,14 @@ function initMap() {
   // Add terrain layer as the default layer
   window.terrainLayer.addTo(map);
 
-  // Add layer controls
-  const baseLayers = {
-    [t("street")]: window.streetLayer,
-    [t("satellite")]: window.satelliteLayer,
-    [t("terrain")]: window.terrainLayer,
-  };
-  L.control.layers(baseLayers).addTo(map);
+   // Add layer controls
+  // const baseLayers = {
+//    [t("street")]: window.streetLayer,
+//    [t("satellite")]: window.satelliteLayer,
+//    [t("terrain")]: window.terrainLayer,
+ // };
+ // L.control.layers(baseLayers).addTo(map);
+
     // Example: Automatically set to French
 updateTranslations(currentLanguage);
 
