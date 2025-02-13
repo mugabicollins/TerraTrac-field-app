@@ -27,12 +27,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,6 +52,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,16 +61,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.gson.Gson
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.helpers.map.JavaScriptInterface
@@ -70,6 +83,7 @@ import org.technoserve.farmcollector.ui.composes.AreaDialog
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import org.technoserve.farmcollector.utils.convertSize
+import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.io.File
@@ -236,6 +250,14 @@ fun WebViewPage(
         },
         modifier = Modifier
             .fillMaxSize()
+//            // Respect safe areas but do not hide the time and batterywindow
+//            .padding(
+//                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // Add space for the status bar
+//                start = WindowInsets.safeDrawing.asPaddingValues().calculateStartPadding(LayoutDirection.Ltr),
+//                end = WindowInsets.safeDrawing.asPaddingValues().calculateEndPadding(LayoutDirection.Ltr),
+//                bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
+//            )
+          //   .padding(WindowInsets.safeContent.asPaddingValues()) // Respect safe areas
             .semantics { contentDescription = "Web View" },
         update = { webView ->
             webView.evaluateJavascript("if(map){map.invalidateSize(true);}", null)
@@ -351,7 +373,9 @@ fun WebViewWithVisualization(
                 webView = this
             }
         },
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
+//            .padding(WindowInsets.systemBars.asPaddingValues()), // Respect safe areas,,
         update = { webView ->
             webView.evaluateJavascript(
                 """
@@ -474,8 +498,22 @@ fun PlotVisualizationApp(
         viewSelectFarm = true
     }
 
+    // This will make the status bar visible with a light theme
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !isSystemInDarkTheme()
+
+    DisposableEffect(systemUiController, useDarkIcons) {
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = useDarkIcons,
+            isNavigationBarContrastEnforced = false
+        )
+        systemUiController.isSystemBarsVisible = true
+        onDispose {}
+    }
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().statusBarsPadding(),
         verticalArrangement = Arrangement.Center,
     ) {
         // Top Section: Map Visualization

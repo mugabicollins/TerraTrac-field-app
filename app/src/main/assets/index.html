@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <!--<html lang="en">-->
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Plot Visualization</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<!--    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
         body {
@@ -12,11 +16,28 @@
         }
 
         #header {
-          text-align: center;
-          padding: 10px;
-          background-color: #f4f4f4;
-          border-bottom: 1px solid #ddd;
-        }
+    position: fixed; /* Keeps the header fixed at the top */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full-width header */
+    background-color: white; /* Gray background */
+    padding: 5px 0; /* Padding to give spacing inside the header */
+    text-align: center; /* Centers the title */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Adds slight shadow */
+    z-index: 1000; /* Ensures it's above other elements */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px; /* Set a fixed height for the header */
+}
+
+/* Title inside the header */
+#header-title {
+    font-size: 16px; /* Reduce text size */
+    color: black; /* White text for contrast */
+    padding: 5px 10px; /* Add padding inside the text box */
+}
+
 
         #map {
           height: 90vh;
@@ -36,6 +57,102 @@
           background-color: #fbeaea;
           color: #a94442;
         }
+
+
+        /* Container for the button */
+        .map-types {
+            position: absolute;
+            top: 10px;
+            /* Align to the top */
+            right: 10px;
+            /* Align to the right */
+            z-index: 1100;
+        }
+
+        /* Styling for the button with a gray background */
+
+        #mapTypesDropdown {
+            background: white;
+            /* Gray background */
+            border: 3px solid gray;
+            /* Thicker gray border */
+            padding: 12px;
+            /* Increase padding for a larger button */
+            cursor: pointer;
+            font-size: 22px;
+            /* Increase font size */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            /* More rounded corners */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            /* Stronger shadow for visibility */
+            width: 50px;
+            /* Increase width */
+            height: 50px;
+            /* Increase height */
+        }
+
+        /* Ensure the icon remains unchanged */
+        #mapTypesDropdown i {
+            font-size: 22px;
+            color: gray;
+            /* White icon color */
+        }
+
+        /* Hover effect */
+        #mapTypesDropdown:hover {
+            background: white;
+        }
+
+
+
+        /* Dropdown content styles */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            /* Position below the button */
+            right: 0;
+            /* Align to the right */
+            background-color: rgba(134, 131, 131, 0.9);
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 5px;
+            min-width: 140px;
+            z-index: 1101;
+            /* 🔥 Ensures dropdown is in front of everything */
+        }
+
+        /* Dropdown items */
+        .dropdown-content button {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            color: black;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-content button i {
+            margin-right: 8px;
+            /* Spacing between icon and text */
+        }
+
+        /* Hover effect */
+        .dropdown-content button:hover {
+            background-color: rgb(11, 233, 233);
+        }
+
+        /* Show dropdown when button is clicked */
+        .show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -43,6 +160,22 @@
     <h1 id="header-title">Plot Visualization</h1>
 </div>
 <div id="map"></div>
+<div class="map-types">
+    <button id="mapTypesDropdown" class="dropdown-toggle">
+        <i class="fas fa-layer-group"></i>
+    </button>
+    <div id="dropdownContent" class="dropdown-content">
+        <button id="streetView">
+            <i class="fas fa-street-view"></i> <span id="streetViewText"></span>
+        </button>
+        <button id="satelliteView">
+            <i class="fas fa-satellite"></i> <span id="satelliteViewText"></span>
+        </button>
+        <button id="terrainView">
+            <i class="fas fa-mountain"></i> <span id="terrainViewText"></span>
+        </button>
+    </div>
+</div>
 <div id="status">Loading map...</div>
 
 <script>
@@ -97,7 +230,61 @@
           "Coordinates are missing or empty. Using latitude and longitude instead.",
         header: "Plot Visualization",
         loadingMap: "Loading map...",
+        streetView: "Street View",
+        satelliteView: "Satellite View",
+        terrainView: "Terrain View",
       },
+      fr: {
+    serviceWorkerSuccess:
+      "Service Worker enregistré pour la mise en cache de la carte hors ligne.",
+    serviceWorkerError: "L'enregistrement du Service Worker a échoué :",
+    mapLoaded: "Carte chargée avec succès !",
+    errorLoadingMap: "Erreur lors du chargement de la carte :",
+    centroidInfo: "Informations sur le centroïde",
+    latitude: "Latitude",
+    longitude: "Longitude",
+    farmInfo: "Informations sur la ferme",
+    siteId: "ID du site",
+    farmer: "Agriculteur",
+    village: "Village",
+    district: "District",
+    size: "Taille",
+    accuracy: "Précision",
+    hectares: "unités carrées",
+    missingCoordinates:
+      "Les coordonnées sont manquantes ou vides. Utilisation de la latitude et de la longitude à la place.",
+    header: "Visualisation de la parcelle",
+    loadingMap: "Chargement de la carte...",
+    streetView: "Vue de la rue",
+    satelliteView: "Vue satellite",
+    terrainView: "Vue du terrain",
+  },
+  es: {
+    serviceWorkerSuccess:
+      "Service Worker registrado para la caché del mapa sin conexión.",
+    serviceWorkerError: "Falló el registro del Service Worker:",
+    mapLoaded: "¡Mapa cargado con éxito!",
+    errorLoadingMap: "Error al cargar el mapa:",
+    centroidInfo: "Información del centroide",
+    latitude: "Latitud",
+    longitude: "Longitud",
+    farmInfo: "Información de la granja",
+    siteId: "ID del sitio",
+    farmer: "Agricultor",
+    village: "Pueblo",
+    district: "Distrito",
+    size: "Tamaño",
+    accuracy: "Precisión",
+    hectares: "unidades cuadradas",
+    missingCoordinates:
+      "Faltan las coordenadas o están vacías. Se utilizarán latitud y longitud en su lugar.",
+    header: "Visualización de parcelas",
+    loadingMap: "Cargando mapa...",
+    streetView: "Vista de calle",
+    satelliteView: "Vista satelital",
+    terrainView: "Vista de terreno",
+  },
+
       sw: {
         serviceWorkerSuccess:
           "Huduma ya Mtandaoni imesajiliwa kwa uhifadhi nje ya mtandao.",
@@ -119,6 +306,9 @@
           "Hakuna viwianishi. Inatumia latitudo na longitudo badala yake.",
         header: "Taswira ya Kiwanja",
         loadingMap: "Ramani inapakia...",
+        streetView: "Mtazamo wa barabara",
+                satelliteView: "Mtazamo wa setilaiti",
+                terrainView: "Mtazamo wa ardhi",
       },
       am: {
         serviceWorkerSuccess: "አገልግሎት ሠራተኛ ለኦፍላይን መሰብሰብ ተመዝግቧል።",
@@ -139,6 +329,9 @@
         missingCoordinates: "አካባቢ የለም። ላቲትዱን እና ሎንግቲዱን በመጠቀም ቀጥሏል።",
         header: "የመሬት ምስል",
         loadingMap: "ካርታ በመጫን ላይ...",
+        streetView: "የጎዳና እይታ",
+                satelliteView: "የሳተላይት እይታ",
+                terrainView: "የመሬት እይታ",
       },
       om: {
         serviceWorkerSuccess:
@@ -161,6 +354,9 @@
           "Hirriba hin qabu. Laatiitiiyuudii fi Loongitiiyuudii fayyadamuun hojjatame.",
         header: "Ilaalcha Qonnaa",
         loadingMap: "Kaartaa fe'amaa jira...",
+        streetView: "Mul'ata Daandii",
+                satelliteView: "Mul'ata Satellite",
+                terrainView: "Mul'ata Lafaa",
       },
     };
 
@@ -168,6 +364,13 @@
     function t(key) {
       return translations[lang]?.[key] || translations["en"][key]; // Default to English
     }
+
+      // Function to update translations
+      function updateTranslations(language) {
+            document.getElementById("streetViewText").textContent = translations[language].streetView;
+            document.getElementById("satelliteViewText").textContent = translations[language].satelliteView;
+            document.getElementById("terrainViewText").textContent = translations[language].terrainView;
+        }
 
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -196,6 +399,25 @@
         );
       }
     });
+
+
+    document
+            .getElementById("mapTypesDropdown")
+            .addEventListener("click", function () {
+                const dropdown = document.getElementById("dropdownContent");
+                dropdown.style.display =
+                    dropdown.style.display === "block" ? "none" : "block";
+            });
+
+        // Close dropdown when clicking outside
+        window.addEventListener("click", function (event) {
+            const dropdown = document.getElementById("dropdownContent");
+            if (!event.target.matches("#mapTypesDropdown")) {
+                dropdown.style.display = "none";
+            }
+        });
+
+
 
     function visualizeData(data) {
       const statusElement = document.getElementById("status");
@@ -250,13 +472,38 @@
         // Add terrain layer as the default layer
         window.terrainLayer.addTo(map);
 
-        // Add layer controls
-        const baseLayers = {
-          Street: window.streetLayer,
-          Satellite: window.satelliteLayer,
-          Terrain: window.terrainLayer,
-        };
-        L.control.layers(baseLayers).addTo(map);
+        // // Add layer controls
+        // const baseLayers = {
+        //   Street: window.streetLayer,
+        //   Satellite: window.satelliteLayer,
+        //   Terrain: window.terrainLayer,
+        // };
+        // L.control.layers(baseLayers).addTo(map);
+
+        updateTranslations(lang);
+
+
+         // Map view controls
+         document.getElementById("streetView").addEventListener("click", () => {
+                map.removeLayer(window.satelliteLayer);
+                map.removeLayer(window.terrainLayer);
+                window.streetLayer.addTo(map);
+            });
+
+            document
+                .getElementById("satelliteView")
+                .addEventListener("click", () => {
+                    map.removeLayer(window.streetLayer);
+                    map.removeLayer(window.terrainLayer);
+                    window.satelliteLayer.addTo(map);
+                });
+
+            document.getElementById("terrainView").addEventListener("click", () => {
+                map.removeLayer(window.streetLayer);
+                map.removeLayer(window.satelliteLayer);
+                window.terrainLayer.addTo(map);
+            });
+
 
         // Handle coordinates
         let latlngs = [];
