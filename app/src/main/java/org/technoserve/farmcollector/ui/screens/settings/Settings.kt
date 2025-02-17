@@ -56,7 +56,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding(),
+//            .statusBarsPadding(),
 //            .padding(WindowInsets.safeDrawing.asPaddingValues()) // Respect safe areas,
     ) {
         Row(

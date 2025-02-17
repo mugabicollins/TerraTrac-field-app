@@ -73,7 +73,7 @@ fun AddSite(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
+//            .statusBarsPadding()
 //            .padding(WindowInsets.safeDr awing.asPaddingValues()) // Respect safe areas,
             .fillMaxWidth()
     ) {

@@ -84,7 +84,7 @@ fun AddFarm(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
+//            .statusBarsPadding()
 //            .padding(WindowInsets.safeDrawing.asPaddingValues()) // Respect safe areas,
             .fillMaxWidth()
     ) {
