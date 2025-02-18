@@ -4,6 +4,10 @@ package org.technoserve.farmcollector.viewmodels
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.webkit.WebView
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -67,6 +71,161 @@ class MapViewModel @Inject constructor() : ViewModel() {
 //    fun updatePlotData(newData: Farm) {
 //        _plotData.value = newData
 //    }
+
+    private val _showClearMapDialog: MutableState<Boolean> = mutableStateOf(false)
+    val showClearMapDialog: MutableState<Boolean> = _showClearMapDialog
+
+
+    fun showClearDialog() {
+        _showClearMapDialog.value = true
+    }
+
+    fun dismissClearDialog() {
+        _showClearMapDialog.value = false
+    }
+
+    fun clearMap(webView: WebView ?) {
+
+        if (webView == null) {
+            Log.e("MapViewModel", "WebView is null! Cannot execute JavaScript.")
+            return
+        }
+
+        Log.d("MapViewModel", "Clearing map...")
+
+        Handler(Looper.getMainLooper()).post {
+            Handler(Looper.getMainLooper()).post {
+                webView.evaluateJavascript(
+                    """ 
+        (function() {
+            if (typeof window.clearMapConfirmed === "function") {
+                window.clearMapConfirmed();
+                console.log("clearMapConfirmed() executed successfully");
+                return "success";
+            } else {
+                console.error("clearMapConfirmed() is not defined");
+                return "error: function not found";
+            }
+        })();
+        """
+                ) { result ->
+                    Log.d("MapViewModel", "JavaScript execution result: $result")
+                }
+                Log.d("MapViewModel", "Clear map request sent to WebView")
+            }
+        }
+            _showClearMapDialog.value = false
+    }
+
+
+    private val _showConfirmDialog = mutableStateOf(false)
+    val showConfirmDialog: MutableState<Boolean> = _showConfirmDialog
+
+
+    // Show Dialogs
+    fun showConfirmPolygonDialog() {
+        _showConfirmDialog.value = true
+    }
+
+    fun dismissConfirmPolygonDialog() {
+        _showConfirmDialog.value = false
+    }
+
+
+    private val _showInvalidPolygonDialog = mutableStateOf(false)
+    val showInvalidPolygonDialog: MutableState<Boolean> = _showInvalidPolygonDialog
+
+    fun showInvalidPolygonDialog() {
+        _showInvalidPolygonDialog.value = true
+    }
+
+    fun dismissInvalidPolygonDialog() {
+        _showInvalidPolygonDialog.value = false
+    }
+
+//    fun confirmFinishPolygon(webView: WebView?) {
+////        webView?.post {
+////            Log.d("MapViewModel", "stop button clicked")
+////            webView.evaluateJavascript("stopCaptureConfirmed()", null)
+////            Log.d("MapViewModel", "Confirm Polygon request sent to WebView")
+////        }
+//
+//        Log.d("MapViewModel", "Stop Polygon request")
+//        Handler(Looper.getMainLooper()).post {
+//            Handler(Looper.getMainLooper()).post {
+//                webView?.evaluateJavascript(
+//                    """
+//        (function() {
+//            if (typeof window.stopCaptureConfirmed === "function") {
+//                window.stopCaptureConfirmed();
+//                console.log("stopCaptureConfirmed() executed successfully");
+//                return "success";
+//            } else {
+//                console.error("stopCaptureConfirmed() is not defined");
+//                return "error: function not found";
+//            }
+//        })();
+//        """) { result ->
+//                    Log.d("MapViewModel", "JavaScript execution result: $result")
+//                }
+//                Log.d("MapViewModel", " stopCapture Polygon request sent to WebView")
+//            }
+//        }
+//        dismissConfirmPolygonDialog()
+//    }
+
+
+    fun confirmFinishPolygon(webView: WebView?) {
+        Log.d("MapViewModel", "confirmFinishPolygon() called")
+
+        if (webView == null) {
+            Log.e("MapViewModel", "WebView is null! Cannot execute JavaScript.")
+            return
+        }
+
+        Handler(Looper.getMainLooper()).post {
+            Log.d("MapViewModel", "Sending JavaScript execution request...")
+
+            webView.evaluateJavascript(
+                """ 
+            (function() {
+                if (typeof window.stopCaptureConfirmed === "function") {
+                    console.log("Calling stopCaptureConfirmed()");
+                    window.stopCaptureConfirmed();
+                    return "success";
+                } else {
+                    console.error("stopCaptureConfirmed() is not defined");
+                    return "error: function not found";
+                }
+            })();
+            """
+            ) { result ->
+                Log.d("MapViewModel", "JavaScript execution result: $result")
+            }
+
+            Log.d("MapViewModel", "JavaScript execution request sent to WebView.")
+        }
+
+        dismissConfirmPolygonDialog()
+        Log.d("MapViewModel", "confirmFinishPolygon() finished execution")
+    }
+
+
+    private val _showAlertDialog = mutableStateOf(false)
+    val showAlertDialog: MutableState<Boolean> = _showAlertDialog
+
+    fun showAlertDialog() {
+        _showAlertDialog.value = true
+    }
+
+    fun dismissAlertDialog() {
+        _showAlertDialog.value = false
+    }
+
+
+
+
+
 
 
     private val _plotData = MutableStateFlow(Farm()) // ✅ Ensure non-null default value

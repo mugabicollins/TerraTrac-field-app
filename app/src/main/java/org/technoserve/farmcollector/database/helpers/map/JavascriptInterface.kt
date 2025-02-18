@@ -5,11 +5,16 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import org.json.JSONObject
+import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.AppDatabase
 import org.technoserve.farmcollector.database.models.Farm
+import org.technoserve.farmcollector.ui.composes.ConfirmDialog
 import org.technoserve.farmcollector.utils.convertSize
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import java.net.URLEncoder
@@ -195,4 +200,37 @@ class JavaScriptInterface(
             return "{}" // Return an empty JSON object if no farm is found
         }
     }
+
+
+    @JavascriptInterface
+    fun showClearMapDialog() {
+        Handler(Looper.getMainLooper()).post {
+            mapViewModel.showClearDialog()
+        }
+    }
+
+    @JavascriptInterface
+    fun showConfirmPolygonDialog() {
+        Log.d("JavaScriptInterface", "showConfirmPolygonDialog triggered")
+        Handler(Looper.getMainLooper()).post {
+            mapViewModel.showConfirmPolygonDialog()
+            Log.d("MapViewModel", "showConfirmPolygonDialog() executed in ViewModel")
+        }
+    }
+
+    @JavascriptInterface
+    fun showInsufficientPointsDialog() {
+        Handler(Looper.getMainLooper()).post {
+            mapViewModel.showAlertDialog()
+        }
+    }
+
+    @JavascriptInterface
+    fun showPolygonTooSmallDialog() {
+        Handler(Looper.getMainLooper()).post {
+            mapViewModel.showInvalidPolygonDialog()
+        }
+    }
+
+
 }

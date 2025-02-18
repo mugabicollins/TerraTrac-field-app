@@ -392,18 +392,18 @@
 
 <script>
     let map,
-        polygon,
-        points = [],
-        polyline,
-        isCapturing = false;
+    polygon,
+    points = [],
+    polyline,
+    isCapturing = false;
     let currentAccuracy = 0,
-        accuracyArray = [],
-        locationMarker = null,
-        watchId = null;
+    accuracyArray = [],
+    locationMarker = null,
+    watchId = null;
     let currentLatitude = null,
-        currentLongitude = null;
+    currentLongitude = null;
     let currentCountry = "",
-        currentCity = "";
+    currentCity = "";
 
     // ✅ Extract Language from URL (Ensure it's set before `t(key)` is used)
     function getQueryParam(param) {
@@ -419,18 +419,18 @@
             yourLocation: "Your Location",
             accuracy: "Accuracy",
             unableToGetLocation:
-                "Unable to get your location. Please enable location services.",
+            "Unable to get your location. Please enable location services.",
             geolocationNotSupported:
-                "Geolocation is not supported by your browser",
+            "Geolocation is not supported by your browser",
             street: "Street",
             satellite: "Satellite",
             terrain: "Terrain",
             plotSize: "Plot Size",
             hectares: "hectares",
             largePlotWarning:
-                "Plot is larger than 4 hectares - polygon capture required",
+            "Plot is larger than 4 hectares - polygon capture required",
             smallPlotWarning:
-                "Polygon capture optional for plots under 4 hectares",
+            "Polygon capture optional for plots under 4 hectares",
             startCapture: "Start Capture",
             stopCapture: "Stop Capture",
             savePlot: "Save Plot",
@@ -444,18 +444,18 @@
             yourLocation: "Tu Ubicación",
             accuracy: "Precisión",
             unableToGetLocation:
-                "No se puede obtener tu ubicación. Por favor, habilita los servicios de ubicación.",
+            "No se puede obtener tu ubicación. Por favor, habilita los servicios de ubicación.",
             geolocationNotSupported:
-                "La geolocalización no es compatible con tu navegador",
+            "La geolocalización no es compatible con tu navegador",
             street: "Calle",
             satellite: "Satélite",
             terrain: "Terreno",
             plotSize: "Tamaño del terreno",
             hectares: "hectáreas",
             largePlotWarning:
-                "El terreno es mayor de 4 hectáreas - se requiere captura de polígono",
+            "El terreno es mayor de 4 hectáreas - se requiere captura de polígono",
             smallPlotWarning:
-                "La captura de polígono es opcional para terrenos menores de 4 hectáreas",
+            "La captura de polígono es opcional para terrenos menores de 4 hectáreas",
             startCapture: "Iniciar Captura",
             stopCapture: "Detener Captura",
             savePlot: "Guardar Parcela",
@@ -469,18 +469,18 @@
             yourLocation: "Votre Position",
             accuracy: "Précision",
             unableToGetLocation:
-                "Impossible d'obtenir votre position. Veuillez activer les services de localisation.",
+            "Impossible d'obtenir votre position. Veuillez activer les services de localisation.",
             geolocationNotSupported:
-                "La géolocalisation n'est pas prise en charge par votre navigateur",
+            "La géolocalisation n'est pas prise en charge par votre navigateur",
             street: "Rue",
             satellite: "Satellite",
             terrain: "Terrain",
             plotSize: "Taille du terrain",
             hectares: "hectares",
             largePlotWarning:
-                "Le terrain est supérieur à 4 hectares - capture du polygone requise",
+            "Le terrain est supérieur à 4 hectares - capture du polygone requise",
             smallPlotWarning:
-                "La capture du polygone est facultative pour les terrains de moins de 4 hectares",
+            "La capture du polygone est facultative pour les terrains de moins de 4 hectares",
             startCapture: "Démarrer la capture",
             stopCapture: "Arrêter la capture",
             savePlot: "Enregistrer la parcelle",
@@ -494,18 +494,18 @@
             yourLocation: "Eneo Lako",
             accuracy: "Usahihi",
             unableToGetLocation:
-                "Imeshindikana kupata eneo lako. Tafadhali wezesha huduma za eneo.",
+            "Imeshindikana kupata eneo lako. Tafadhali wezesha huduma za eneo.",
             geolocationNotSupported:
-                "Jiografia haitegemezwi na kivinjari chako",
+            "Jiografia haitegemezwi na kivinjari chako",
             street: "Mtaa",
             satellite: "Satelaiti",
             terrain: "Ardhi",
             plotSize: "Ukubwa wa Kiwanja",
             hectares: "hekta",
             largePlotWarning:
-                "Kiwanja ni kikubwa zaidi ya hekta 4 - unahitaji kuchukua poligoni",
+            "Kiwanja ni kikubwa zaidi ya hekta 4 - unahitaji kuchukua poligoni",
             smallPlotWarning:
-                "Kuchukua poligoni ni hiari kwa viwanja vidogo vya chini ya hekta 4",
+            "Kuchukua poligoni ni hiari kwa viwanja vidogo vya chini ya hekta 4",
             startCapture: "Anza Kuchukua",
             stopCapture: "Acha Kuchukua",
             savePlot: "Hifadhi Kiwanja",
@@ -519,18 +519,18 @@
             yourLocation: "የእርስዎ አካባቢ",
             accuracy: "ትክክለኛነት",
             unableToGetLocation:
-                "አካባቢዎን ማግኘት አልተቻለም። እባኮትን የአካባቢ አገልግሎቶችን አንቀሳቅስ።",
+            "አካባቢዎን ማግኘት አልተቻለም። እባኮትን የአካባቢ አገልግሎቶችን አንቀሳቅስ።",
             geolocationNotSupported:
-                "የጂኦሎኬሽን አገልግሎት በእርስዎ አንቀሳቅስ አይደለም።",
+            "የጂኦሎኬሽን አገልግሎት በእርስዎ አንቀሳቅስ አይደለም።",
             street: "መንገድ",
             satellite: "ሳተላይት",
             terrain: "መሬት",
             plotSize: "የመሬት መጠን",
             hectares: "ሄክተር",
             largePlotWarning:
-                "መሬቱ ከ 4 ሄክተር በላይ ነው። የፖሊጎን መረጃ ያስፈልጋል።",
+            "መሬቱ ከ 4 ሄክተር በላይ ነው። የፖሊጎን መረጃ ያስፈልጋል።",
             smallPlotWarning:
-                "ከ 4 ሄክተር በታች የሆኑ መሬቶች የፖሊጎን መረጃ የትራንዚት ነው።",
+            "ከ 4 ሄክተር በታች የሆኑ መሬቶች የፖሊጎን መረጃ የትራንዚት ነው።",
             startCapture: "መያዝ ጀምር",
             stopCapture: "መያዝ አቁም",
             savePlot: "መሬቱን አስቀምጥ",
@@ -544,18 +544,18 @@
             yourLocation: "Iddoo Kee",
             accuracy: "Sirrii",
             unableToGetLocation:
-                "Iddoo kee argachuu hin dandeenye. Mee tajaajila iddoo tokkoon tokkoo bana.",
+            "Iddoo kee argachuu hin dandeenye. Mee tajaajila iddoo tokkoon tokkoo bana.",
             geolocationNotSupported:
-                "Baay'ina iddoo hin deeggaramu mul'ata kee",
+            "Baay'ina iddoo hin deeggaramu mul'ata kee",
             street: "Daandii",
             satellite: "Sataalaayitii",
             terrain: "Lafa",
             plotSize: "Giddu Gala Lafaa",
             hectares: "heektaara",
             largePlotWarning:
-                "Lafti heektaara 4 caalaa jira - poligooni fudhatamuu qaba",
+            "Lafti heektaara 4 caalaa jira - poligooni fudhatamuu qaba",
             smallPlotWarning:
-                "Lafti xiqqaan 4 heektaara gadi kan poligooni fudhatamuu danda'uudha",
+            "Lafti xiqqaan 4 heektaara gadi kan poligooni fudhatamuu danda'uudha",
             startCapture: "Ka'umsa Fudhachuu",
             stopCapture: "Dhiisi Fudhachuu",
             savePlot: "Lafa Galmeessi",
@@ -607,10 +607,10 @@
     document
         .getElementById("mapTypesDropdown")
         .addEventListener("click", function () {
-            const dropdown = document.getElementById("dropdownContent");
-            dropdown.style.display =
-                dropdown.style.display === "block" ? "none" : "block";
-        });
+        const dropdown = document.getElementById("dropdownContent");
+        dropdown.style.display =
+        dropdown.style.display === "block" ? "none" : "block";
+    });
 
     // Close dropdown when clicking outside
     window.addEventListener("click", function (event) {
@@ -659,15 +659,7 @@
         // Add terrain layer as the default layer
         window.terrainLayer.addTo(map);
 
-        // Add layer controls
-        // const baseLayers = {
-        //    [t("street")]: window.streetLayer,
-        //    [t("satellite")]: window.satelliteLayer,
-        //    [t("terrain")]: window.terrainLayer,
-        // };
-        // L.control.layers(baseLayers).addTo(map);
-
-        // Example: Automatically set to French
+        // Update Dropdown Translations
         updateTranslations(currentLanguage);
 
         // Get current location with better centering
@@ -696,53 +688,46 @@
                     )
                         .then((response) => response.json())
                         .then((data) => {
-                            console.log(data);
-                            const currentCountry = data.address.country || "Unknown Location";
-                            const currentCity =
-                                data.address.city ||
-                                data.address.town ||
-                                data.address.village || data.address.county
-                            "";
-                            console.log(currentCountry + " " + currentCity);
-                            // Add a marker with an updatable popup
-                            locationMarker = L.marker([lat, lon])
-                                .addTo(map)
-                                .bindPopup(
-                                    `
-          <b>${t("yourLocation")}:</b><br>
-          ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
-          <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
-          <small id="accuracy"> ${t("accuracy")}: ${accuracy.toFixed(
-                                        1
-                                    )} meters </small>
-          `
-                                )
-                                .openPopup();
+                        console.log(data);
+                        const currentCountry = data.address.country || "Unknown Location";
+                        const currentCity =
+                        data.address.city ||
+                        data.address.town ||
+                        data.address.village || data.address.county
+                        "";
+                        console.log(currentCountry + " " + currentCity);
+                        // Add a marker with an updatable popup
+                        locationMarker = L.marker([lat, lon])
+                            .addTo(map)
+                            .bindPopup(
+                            `
+  <b>${t("yourLocation")}:</b><br>
+  ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
+  <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
+  <small id="accuracy"> ${t("accuracy")}: ${accuracy.toFixed(
+                                1
+                            )} meters </small>
+  `
+                        )
+                            .openPopup();
 
-                            document.getElementById(
-                                "accuracy"
-                            ).textContent = `Accuracy: ${accuracy.toFixed(1)} meters`;
+                        document.getElementById(
+                            "accuracy"
+                        ).textContent = `Accuracy: ${accuracy.toFixed(1)} meters`;
 
-                            // Start tracking location updates
-                            startLocationTracking();
-                        })
+                        // Start tracking location updates
+                        startLocationTracking();
+                    })
                         .catch((error) => {
-                            console.error("Error getting location info:", error);
-                            locationMarker = L.marker([lat, lon])
-                                .addTo(map)
-                                .bindPopup(
-                                    `${t("yourLocation")}: ${lat.toFixed(4)}, ${lon.toFixed(4)}`
-                                )
-                                .openPopup();
-                        });
+                        console.error("Error getting location info:", error);
+                        locationMarker = L.marker([lat, lon])
+                            .addTo(map)
+                            .bindPopup(
+                            `${t("yourLocation")}: ${lat.toFixed(4)}, ${lon.toFixed(4)}`
+                        )
+                            .openPopup();
+                    });
                 },
-                //  function (error) {
-                //    map.spin = false; // Remove loading indicator if using
-                //  console.error("Error getting location:", error);
-                // Set a default view if location access is denied
-                //   map.setView([0, 0], 2);
-                //   alert(t("unableToGetLocation"));
-                //  },
 
                 function (error) {
                     map.spin = false; // Remove loading indicator
@@ -763,7 +748,7 @@
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 10000,
+                    timeout: 10000, // delay of 10 seconds
                     maximumAge: 0,
                 }
             );
@@ -854,40 +839,20 @@
         currentLongitude = longitude;
         currentAccuracy = accuracy;
 
-        //   // Update accuracy inside the popup
-        //   if (locationMarker) {
-        //     locationMarker
-        //       .setLatLng([latitude, longitude])
-        //       .setPopupContent(`
-        //         <b>${t("yourLocation")}:</b><br>
-        //         ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
-        //         <small>${latitude.toFixed(4)}, ${longitude.toFixed(4)}</small><br>
-        //         <small>${t("accuracy")}: ${accuracy.toFixed(1)} meters</small>
-        //       `)
-        //       .openPopup();
-        //   }
 
         document.getElementById(
             "accuracy"
         ).textContent = `Accuracy: ${currentAccuracy.toFixed(1)} meters`;
 
-        //if (locationMarker) {
-        // map.removeLayer(locationMarker);
-        //}
-
         // Move the map to the new location
         map.setView([latitude, longitude]);
-        // map.setView([latitude, longitude], 18, {
-        //   animate: false,
-        //  duration: 1, // 1 second animation
-        //  });
     }
 
 
     function handleLocationError(error) {
         console.error("Geolocation error:", error);
         document.getElementById("accuracy").textContent =
-            "Accuracy: Unable to determine";
+        "Accuracy: Unable to determine";
     }
 
     // Calculate area of polygon in hectares
@@ -918,7 +883,7 @@
         if (coords.length === 0) return null;
 
         let x = 0,
-            y = 0;
+        y = 0;
         for (const coord of coords) {
             x += coord.lat;
             y += coord.lng;
@@ -946,12 +911,27 @@
 
         if (area > 4) {
             document.getElementById("warning").textContent =
-                t("largePlotWarning");
+            t("largePlotWarning");
         } else {
             document.getElementById("warning").textContent =
-                t("smallPlotWarning");
+            t("smallPlotWarning");
         }
     }
+
+//    // Function to be called from Android when the user confirms clearing the map
+//    function clearMapConfirmed() {
+//        console.log("Clearing map...");
+//        points = [];
+//        map.eachLayer((layer) => {
+//            if (layer instanceof L.Marker && layer !== locationMarker) {
+//                map.removeLayer(layer);
+//            }
+//        });
+//        if (polygon) map.removeLayer(polygon);
+//        if (polyline) map.removeLayer(polyline);
+//        updatePlotInfo();
+//        console.log("Map cleared successfully");
+//    }
 
     // Initialize the map
     document.addEventListener("DOMContentLoaded", function () {
@@ -967,8 +947,6 @@
 
         initMap();
 
-
-
         // Map view controls
         document.getElementById("streetView").addEventListener("click", () => {
             map.removeLayer(window.satelliteLayer);
@@ -979,10 +957,10 @@
         document
             .getElementById("satelliteView")
             .addEventListener("click", () => {
-                map.removeLayer(window.streetLayer);
-                map.removeLayer(window.terrainLayer);
-                window.satelliteLayer.addTo(map);
-            });
+            map.removeLayer(window.streetLayer);
+            map.removeLayer(window.terrainLayer);
+            window.satelliteLayer.addTo(map);
+        });
 
         document.getElementById("terrainView").addEventListener("click", () => {
             map.removeLayer(window.streetLayer);
@@ -991,30 +969,63 @@
         });
 
         // Polygon capture controls
+        //        document
+        //            .getElementById("startCapture")
+        //            .addEventListener("click", () => {
+        //            isCapturing = !isCapturing;
+        //
+        //            const startButton = document.getElementById("startCapture");
+        //            const saveButton = document.getElementById("savePlot");
+        //
+        //            if (isCapturing) {
+        //                points = [];
+        //                if (polygon) map.removeLayer(polygon);
+        //                if (polyline) map.removeLayer(polyline);
+        //                polygon = L.polygon([]).addTo(map);
+        //                polyline = L.polyline([]).addTo(map);
+        //
+        //                // Set Start/Stop button to Stop state
+        //                startButton.innerHTML = '<i class="fas fa-stop"></i>';
+        //                startButton.style.backgroundColor = "#000000";
+        //            } else {
+        //                // Hide Start/Stop button and show Save button
+        //                startButton.style.display = "none";
+        //                saveButton.style.display = "block";
+        //            }
+        //        });
+
+
+        // Polygon capture controls
         document
             .getElementById("startCapture")
             .addEventListener("click", () => {
-                isCapturing = !isCapturing;
 
-                const startButton = document.getElementById("startCapture");
-                const saveButton = document.getElementById("savePlot");
 
-                if (isCapturing) {
-                    points = [];
-                    if (polygon) map.removeLayer(polygon);
-                    if (polyline) map.removeLayer(polyline);
-                    polygon = L.polygon([]).addTo(map);
-                    polyline = L.polyline([]).addTo(map);
+            console.log("Start Capture || Stop button clicked");
+            console.log("Android Interface:", window.Android);
+            const startButton = document.getElementById("startCapture");
+            const saveButton = document.getElementById("savePlot");
 
-                    // Set Start/Stop button to Stop state
-                    startButton.innerHTML = '<i class="fas fa-stop"></i>';
-                    startButton.style.backgroundColor = "#000000";
-                } else {
-                    // Hide Start/Stop button and show Save button
-                    startButton.style.display = "none";
-                    saveButton.style.display = "block";
+            if (!isCapturing) {
+                // Start capturing
+                isCapturing = true;
+                points = [];
+                if (polygon) map.removeLayer(polygon);
+                if (polyline) map.removeLayer(polyline);
+                polygon = L.polygon([]).addTo(map);
+                polyline = L.polyline([]).addTo(map);
+
+                // Change button to Stop state
+                startButton.innerHTML = '<i class="fas fa-stop"></i>';
+                startButton.style.backgroundColor = "#000000";
+            } else {
+                // Ask for confirmation before stopping
+                if (window.Android) {
+                    window.Android.showConfirmPolygonDialog();
                 }
-            });
+            }
+        });
+
 
         // Modify the addPoint click handler
         document.getElementById("addPoint").addEventListener("click", () => {
@@ -1043,9 +1054,9 @@
 
             // Optional: Add a small animation or feedback
             const feedbackDiv = document.getElementById("accuracy");
-            feedbackDiv.textContent = `Point added at current location (Accuracy: ${accuracy.toFixed(
-                1
-            )}m)`;
+//            feedbackDiv.textContent = `Point added at current location (Accuracy: ${accuracy.toFixed(
+//                1
+//            )}m)`;
 
             // Optional: Add a fade-in animation
             feedbackDiv.style.transition = "opacity 0.5s";
@@ -1078,7 +1089,33 @@
             }
         });
 
+//        document.getElementById("clearMap").addEventListener("click", () => {
+//            points = [];
+//            map.eachLayer((layer) => {
+//                if (layer instanceof L.Marker && layer !== locationMarker) {
+//                    map.removeLayer(layer);
+//                }
+//            });
+//            if (polygon) map.removeLayer(polygon);
+//            if (polyline) map.removeLayer(polyline);
+//            updatePlotInfo();
+//        });
+
+
         document.getElementById("clearMap").addEventListener("click", () => {
+            console.log("Clear Map button clicked");
+            console.log("Android Interface:", window.Android);
+            // Show confirmation dialog on Android
+
+
+            // Call the JavaScript Interface to show the confirmation dialog
+            if (window.Android) {
+                window.Android.showClearMapDialog();
+            }
+        });
+
+        window.clearMapConfirmed = function() {
+            console.log("Clearing map...");
             points = [];
             map.eachLayer((layer) => {
                 if (layer instanceof L.Marker && layer !== locationMarker) {
@@ -1088,16 +1125,92 @@
             if (polygon) map.removeLayer(polygon);
             if (polyline) map.removeLayer(polyline);
             updatePlotInfo();
-        });
+            console.log("Map cleared successfully");
+        };
+
+//        // Function to be called from Android when the user confirms stopping the capture
+//        window.stopCaptureConfirmed = function() {
+//            console.log(' stopping capture is called from Android')
+//            const startButton = document.getElementById("startCapture");
+//            const saveButton = document.getElementById("savePlot");
+//
+//            isCapturing = false;
+//
+//            // Hide Start button and show Save button
+//            startButton.style.display = "none";
+//            saveButton.style.display = "block";
+//            console.log("Stop Capture Confirmed successfully");
+//        }
+
+        // Define stopCaptureConfirmed globally
+        window.stopCaptureConfirmed = function() {
+            console.log("Stop capturing polygon...");
+            isCapturing = false;
+
+            const startButton = document.getElementById("startCapture");
+            const saveButton = document.getElementById("savePlot");
+
+            startButton.style.display = "none";
+            saveButton.style.display = "block";
+
+            console.log("Polygon capture stopped successfully.");
+        };
+
+
+
+
+
+
 
         // Save plot functionality
         document.getElementById("savePlot").addEventListener("click", () => {
+//            if (points.length < 3) {
+//                alert("Please capture at least 3 points to form a valid polygon");
+//                return;
+//            }
+            const startButton = document.getElementById("startCapture");
+            const saveButton = document.getElementById("savePlot");
+
             if (points.length < 3) {
-                alert("Please capture at least 3 points to form a valid polygon");
+                if (window.Android) {
+                    window.Android.showInsufficientPointsDialog();
+                }
+                // Reset and start capturing new coordinates
+                isCapturing = false;
+                points = [];
+
+                // Change "Save" button back to "Start Capture"
+                saveButton.innerHTML = '<i class="fas fa-play"></i>'; // Change icon to "Start"
+                saveButton.style.backgroundColor = "#4CAF50"; // Change color to indicate restart
+                saveButton.style.display = "none"; // Hide Save button
+
+                startButton.style.display = "block"; // Show Start button
+                return;
+
+            }
+            console.log("Saving the plot...");
+            const area = calculateArea(points);
+
+
+            if(area < 0.000000001){
+                if (window.Android) {
+                    window.Android.showPolygonTooSmallDialog();
+                }
+
+
+                // Reset and start capturing new coordinates
+                isCapturing = false;
+                points = [];
+
+                // Change "Save" button back to "Start Capture"
+                saveButton.innerHTML = '<i class="fas fa-play"></i>'; // Change icon to "Start"
+                saveButton.style.backgroundColor = "#4CAF50"; // Change color to indicate restart
+                saveButton.style.display = "none"; // Hide Save button
+
+                startButton.style.display = "block"; // Show Start button
+
                 return;
             }
-
-            const area = calculateArea(points);
             const centroid = calculateCentroid(points);
 
             // Create plot data with only the map-captured fields filled
@@ -1129,8 +1242,7 @@
             }
 
             // Reset buttons after saving
-            const startButton = document.getElementById("startCapture");
-            const saveButton = document.getElementById("savePlot");
+
 
             saveButton.style.display = "none"; // Hide Save button
             startButton.style.display = "block"; // Show Start button again

@@ -23,6 +23,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -45,6 +46,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,6 +56,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,7 +82,9 @@ import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.helpers.map.JavaScriptInterface
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
 import org.technoserve.farmcollector.database.models.ParcelableFarmData
+import org.technoserve.farmcollector.ui.components.InvalidPolygonDialog
 import org.technoserve.farmcollector.ui.composes.AreaDialog
+import org.technoserve.farmcollector.ui.composes.ConfirmDialog
 import org.technoserve.farmcollector.ui.screens.farms.formatInput
 import org.technoserve.farmcollector.ui.screens.farms.truncateToDecimalPlaces
 import org.technoserve.farmcollector.utils.convertSize
@@ -95,6 +100,9 @@ import java.net.URLEncoder
  *
  */
 
+
+
+
 @RequiresApi(Build.VERSION_CODES.M)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -106,11 +114,16 @@ fun WebViewPage(
 ) {
     val context = LocalContext.current
     var backEnabled by remember { mutableStateOf(false) }
-    var webView: WebView? = null
+    val webViewState = remember { mutableStateOf<WebView?>(null) }  // Store WebView instanc
+    // var webView: WebView? = null
     val sharedPref = context.getSharedPreferences("FarmCollector", Context.MODE_PRIVATE)
 
     // Observe dialog state
     val showDialog by viewModel.showDialog.collectAsState()
+
+
+
+//    val showClearMapDialog by viewModel.showClearMapDialog.collectAsState()
 
     val plotData by viewModel.plotData.collectAsState()
     Log.d("Data in web view page", "Data in web view page: $plotData")
@@ -162,6 +175,8 @@ fun WebViewPage(
             enteredArea = enteredAreaConverted
         )
     }
+
+    println("showclearmap: ${viewModel.showClearMapDialog.value}")
 
 
     AndroidView(
@@ -244,28 +259,98 @@ fun WebViewPage(
                         loadUrl(url)
                     }
                 }
+
+                // Save WebView instance in the remembered state
+                webViewState.value = this
                 //webView = this
                 onWebViewCreated(this) // Pass the WebView instance
             }
         },
         modifier = Modifier
             .fillMaxSize()
-//            // Respect safe areas but do not hide the time and batterywindow
-//            .padding(
-//                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // Add space for the status bar
-//                start = WindowInsets.safeDrawing.asPaddingValues().calculateStartPadding(LayoutDirection.Ltr),
-//                end = WindowInsets.safeDrawing.asPaddingValues().calculateEndPadding(LayoutDirection.Ltr),
-//                bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
-//            )
-          //   .padding(WindowInsets.safeContent.asPaddingValues()) // Respect safe areas
             .semantics { contentDescription = "Web View" },
         update = { webView ->
             webView.evaluateJavascript("if(map){map.invalidateSize(true);}", null)
         }
     )
 
+    // Confirm Clear Map Dialog
+    if (viewModel.showClearMapDialog.value) {
+        ConfirmDialog(
+            title = stringResource(id = R.string.set_polygon),
+            message = stringResource(id = R.string.clear_map),
+            showDialog = viewModel.showClearMapDialog,
+            onProceedFn = {
+               // viewModel.clearMap(webView)
+                viewModel.clearMap(webViewState.value) // Use stored WebView instance
+            },
+            onCancelFn = {
+                viewModel.dismissClearDialog()
+            }
+        )
+    }
+
+    // Confirm dialog for setting the polygon
+    if (viewModel.showConfirmDialog.value) {
+        ConfirmDialog(
+            title = stringResource(id = R.string.set_polygon),
+            message = stringResource(id = R.string.confirm_set_polygon),
+            showDialog = viewModel.showConfirmDialog,
+            onProceedFn = {
+                //viewModel.finalizePolygon(mapViewModel)
+                // viewModel.confirmFinishPolygon(webView)
+                viewModel.confirmFinishPolygon(webViewState.value) // Use stored WebView instance
+            },
+            onCancelFn = {
+                viewModel.dismissConfirmPolygonDialog()
+            }
+        )
+    }
+
+
+    // Alert dialog for insufficient coordinates
+    if (viewModel.showAlertDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.showAlertDialog.value = false
+            },
+            title = {
+                Text(text = stringResource(id = R.string.insufficient_coordinates_title))
+            },
+            text = {
+                Text(text = stringResource(id = R.string.insufficient_coordinates_message))
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.showAlertDialog.value = false
+                    },
+                ) {
+                    Text(text = stringResource(id = R.string.ok))
+                    viewModel.showConfirmDialog.value = false
+                    viewModel.clearMap(webViewState.value)
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 6.dp
+        )
+    }
+
+   if(viewModel.showInvalidPolygonDialog.value) {
+       // Invalid Polygon Dialog
+       InvalidPolygonDialog(
+           showDialog = viewModel.showInvalidPolygonDialog,
+           onDismiss = { viewModel.showInvalidPolygonDialog.value = false }
+       )
+   }
+
+
+//    BackHandler(enabled = backEnabled) {
+//        webView?.goBack()
+//    }
+
     BackHandler(enabled = backEnabled) {
-        webView?.goBack()
+        webViewState.value?.goBack()
     }
 }
 

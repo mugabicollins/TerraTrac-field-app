@@ -10,52 +10,52 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
         body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         #header {
-    position: fixed; /* Keeps the header fixed at the top */
-    top: 0;
-    left: 0;
-    width: 100%; /* Full-width header */
-    background-color: white; /* Gray background */
-    padding: 5px 0; /* Padding to give spacing inside the header */
-    text-align: center; /* Centers the title */
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Adds slight shadow */
-    z-index: 1000; /* Ensures it's above other elements */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50px; /* Set a fixed height for the header */
-}
+            position: fixed; /* Keeps the header fixed at the top */
+            top: 0;
+            left: 0;
+            width: 100%; /* Full-width header */
+            background-color: white; /* Gray background */
+            padding: 5px 0; /* Padding to give spacing inside the header */
+            text-align: center; /* Centers the title */
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Adds slight shadow */
+            z-index: 1000; /* Ensures it's above other elements */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px; /* Set a fixed height for the header */
+        }
 
-/* Title inside the header */
-#header-title {
-    font-size: 16px; /* Reduce text size */
-    color: black; /* White text for contrast */
-    padding: 5px 10px; /* Add padding inside the text box */
-}
+        /* Title inside the header */
+        #header-title {
+            font-size: 16px; /* Reduce text size */
+            color: black; /* White text for contrast */
+            padding: 5px 10px; /* Add padding inside the text box */
+        }
 
 
         #map {
-          height: 90vh;
-          width: 100%;
+            height: 90vh;
+            width: 100%;
         }
 
         #status {
-          text-align: center;
-          padding: 10px;
-          background-color: #e7f5e9;
-          border-top: 1px solid #ddd;
-          color: #333;
-          font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            background-color: #e7f5e9;
+            border-top: 1px solid #ddd;
+            color: #333;
+            font-weight: bold;
         }
 
         #status.error {
-          background-color: #fbeaea;
-          color: #a94442;
+            background-color: #fbeaea;
+            color: #a94442;
         }
 
 
