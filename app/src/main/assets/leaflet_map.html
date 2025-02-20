@@ -299,7 +299,7 @@
           color: #ffffff;
           font-size: 18px;
         ">
-<!--        <i class="fas fa-undo"></i>-->
+        <!--        <i class="fas fa-undo"></i>-->
         <i class="material-icons">undo</i>
     </button>
     <button id="clearMap" title="Clear Map" style="
@@ -701,13 +701,13 @@
                             .addTo(map)
                             .bindPopup(
                             `
-  <b>${t("yourLocation")}:</b><br>
-  ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
-  <small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
-  <small id="accuracy"> ${t("accuracy")}: ${accuracy.toFixed(
+<b>${t("yourLocation")}:</b><br>
+${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
+<small>${lat.toFixed(4)}, ${lon.toFixed(4)}</small><br>
+<small id="accuracy"> ${t("accuracy")}: ${accuracy.toFixed(
                                 1
                             )} meters </small>
-  `
+`
                         )
                             .openPopup();
 
@@ -898,16 +898,16 @@
     function updatePlotInfo() {
         if (points.length < 3) {
             document.getElementById("plotInfo").textContent = `${t(
-                "plotSize"
-            )}: 0 ${t("hectares")}`;
+                    "plotSize"
+                )}: 0 ${t("hectares")}`;
             document.getElementById("warning").textContent = "";
             return;
         }
 
         const area = calculateArea(points);
         document.getElementById("plotInfo").textContent = `${t(
-            "plotSize"
-        )}: ${area.toFixed(2)} ${t("hectares")}`;
+                "plotSize"
+            )}: ${area.toFixed(2)} ${t("hectares")}`;
 
         if (area > 4) {
             document.getElementById("warning").textContent =
@@ -918,20 +918,20 @@
         }
     }
 
-//    // Function to be called from Android when the user confirms clearing the map
-//    function clearMapConfirmed() {
-//        console.log("Clearing map...");
-//        points = [];
-//        map.eachLayer((layer) => {
-//            if (layer instanceof L.Marker && layer !== locationMarker) {
-//                map.removeLayer(layer);
-//            }
-//        });
-//        if (polygon) map.removeLayer(polygon);
-//        if (polyline) map.removeLayer(polyline);
-//        updatePlotInfo();
-//        console.log("Map cleared successfully");
-//    }
+    //    // Function to be called from Android when the user confirms clearing the map
+    //    function clearMapConfirmed() {
+    //        console.log("Clearing map...");
+    //        points = [];
+    //        map.eachLayer((layer) => {
+    //            if (layer instanceof L.Marker && layer !== locationMarker) {
+    //                map.removeLayer(layer);
+    //            }
+    //        });
+    //        if (polygon) map.removeLayer(polygon);
+    //        if (polyline) map.removeLayer(polyline);
+    //        updatePlotInfo();
+    //        console.log("Map cleared successfully");
+    //    }
 
     // Initialize the map
     document.addEventListener("DOMContentLoaded", function () {
@@ -1054,9 +1054,9 @@
 
             // Optional: Add a small animation or feedback
             const feedbackDiv = document.getElementById("accuracy");
-//            feedbackDiv.textContent = `Point added at current location (Accuracy: ${accuracy.toFixed(
-//                1
-//            )}m)`;
+            //            feedbackDiv.textContent = `Point added at current location (Accuracy: ${accuracy.toFixed(
+            //                1
+            //            )}m)`;
 
             // Optional: Add a fade-in animation
             feedbackDiv.style.transition = "opacity 0.5s";
@@ -1064,8 +1064,8 @@
 
             setTimeout(() => {
                 feedbackDiv.textContent = `Accuracy: ${currentAccuracy.toFixed(
-                    1
-                )} meters`;
+                        1
+                    )} meters`;
             }, 2000);
 
             // Optional: Add a fade-out effect after 5 seconds
@@ -1089,17 +1089,17 @@
             }
         });
 
-//        document.getElementById("clearMap").addEventListener("click", () => {
-//            points = [];
-//            map.eachLayer((layer) => {
-//                if (layer instanceof L.Marker && layer !== locationMarker) {
-//                    map.removeLayer(layer);
-//                }
-//            });
-//            if (polygon) map.removeLayer(polygon);
-//            if (polyline) map.removeLayer(polyline);
-//            updatePlotInfo();
-//        });
+        //        document.getElementById("clearMap").addEventListener("click", () => {
+        //            points = [];
+        //            map.eachLayer((layer) => {
+        //                if (layer instanceof L.Marker && layer !== locationMarker) {
+        //                    map.removeLayer(layer);
+        //                }
+        //            });
+        //            if (polygon) map.removeLayer(polygon);
+        //            if (polyline) map.removeLayer(polyline);
+        //            updatePlotInfo();
+        //        });
 
 
         document.getElementById("clearMap").addEventListener("click", () => {
@@ -1114,7 +1114,7 @@
             }
         });
 
-        window.clearMapConfirmed = function() {
+        window.clearMapConfirmed = function () {
             console.log("Clearing map...");
             points = [];
             map.eachLayer((layer) => {
@@ -1128,22 +1128,22 @@
             console.log("Map cleared successfully");
         };
 
-//        // Function to be called from Android when the user confirms stopping the capture
-//        window.stopCaptureConfirmed = function() {
-//            console.log(' stopping capture is called from Android')
-//            const startButton = document.getElementById("startCapture");
-//            const saveButton = document.getElementById("savePlot");
-//
-//            isCapturing = false;
-//
-//            // Hide Start button and show Save button
-//            startButton.style.display = "none";
-//            saveButton.style.display = "block";
-//            console.log("Stop Capture Confirmed successfully");
-//        }
+        //        // Function to be called from Android when the user confirms stopping the capture
+        //        window.stopCaptureConfirmed = function() {
+        //            console.log(' stopping capture is called from Android')
+        //            const startButton = document.getElementById("startCapture");
+        //            const saveButton = document.getElementById("savePlot");
+        //
+        //            isCapturing = false;
+        //
+        //            // Hide Start button and show Save button
+        //            startButton.style.display = "none";
+        //            saveButton.style.display = "block";
+        //            console.log("Stop Capture Confirmed successfully");
+        //        }
 
         // Define stopCaptureConfirmed globally
-        window.stopCaptureConfirmed = function() {
+        window.stopCaptureConfirmed = function () {
             console.log("Stop capturing polygon...");
             isCapturing = false;
 
@@ -1164,10 +1164,10 @@
 
         // Save plot functionality
         document.getElementById("savePlot").addEventListener("click", () => {
-//            if (points.length < 3) {
-//                alert("Please capture at least 3 points to form a valid polygon");
-//                return;
-//            }
+            //            if (points.length < 3) {
+            //                alert("Please capture at least 3 points to form a valid polygon");
+            //                return;
+            //            }
             const startButton = document.getElementById("startCapture");
             const saveButton = document.getElementById("savePlot");
 
@@ -1192,7 +1192,7 @@
             const area = calculateArea(points);
 
 
-            if(area < 0.000000001){
+            if (area < 0.000000001) {
                 if (window.Android) {
                     window.Android.showPolygonTooSmallDialog();
                 }
