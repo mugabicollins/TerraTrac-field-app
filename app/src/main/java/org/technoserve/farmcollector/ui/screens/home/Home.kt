@@ -130,7 +130,6 @@ fun Home(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = stringResource(id = R.string.settings),
-                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(iconSize)
                 )
             }

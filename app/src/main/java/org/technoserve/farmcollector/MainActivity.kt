@@ -263,7 +263,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("userGuideScreen"){
-                            UserGuideScreen()
+                            UserGuideScreen(navController)
                         }
 
                         composable(Routes.SITE_LIST) {

@@ -20,8 +20,8 @@ android {
         applicationId "org.technoserve.farmcollector"
         minSdk 21
         targetSdk 35
-        versionCode 64
-        versionName "2.43.1"
+        versionCode 66
+        versionName "2.44"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -51,15 +51,37 @@ android {
             }
         }
 
+        def debugUserGuideUrl = project.rootProject.file("local.properties").with { propertiesFile ->
+            if (propertiesFile.exists()) {
+                def properties = new Properties()
+                properties.load(propertiesFile.newInputStream())
+                properties.getProperty("USER_GUIDE_URL", "default_debug_user_guide_url")
+            } else {
+                "default_debug_user_guide_url"
+            }
+        }
+
+        def releaseUserGuideUrl = project.rootProject.file("local.properties").with { propertiesFile ->
+            if (propertiesFile.exists()) {
+                def properties = new Properties()
+                properties.load(propertiesFile.newInputStream())
+                properties.getProperty("USER_GUIDE_URL", "default_release_user_guide_url")
+            } else {
+                "default_release_user_guide_url"
+            }
+        }
+
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard'
             buildConfigField "String", "BASE_URL", "\"$debugBaseUrl\""
+            buildConfigField "String", "USER_GUIDE_URL", "\"$debugUserGuideUrl\""
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField "String", "BASE_URL", "\"$releaseBaseUrl\""
+            buildConfigField "String", "USER_GUIDE_URL", "\"$releaseUserGuideUrl\""
         }
     }
 
