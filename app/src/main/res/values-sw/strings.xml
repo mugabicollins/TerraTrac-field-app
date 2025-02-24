@@ -200,12 +200,20 @@
     <string name="enable_data_backup_title">Washa chelezo cha data?</string>
     <string name="enable_backup_message">Kuwasha chelezo huhifadhi data yako salama kwenye seva kila wakati unapo kuwa na muunganisho wa intaneti. Hii inahakikisha kuwa unaweza kuirejesha ikiwa kifaa chako kitapotea, kuharibika, au kurejeshwa upya. Je, unataka kuendelea?</string>
     <string name="disable_backup_message">Kuzima chelezo kutazuia kuhifadhi data yako moja kwa moja kwenye seva wakati kuna muunganisho wa intaneti. Data zilizochelezwa hapo awali zitaendelea kupatikana kwa urejeshaji, lakini mabadiliko mapya hayatahifadhiwa. Je, unataka kuendelea?</string>
-    <!--    <string name="backup_prompt_message">Kuwasha chelezo kutahifadhi data yako salama na kuifanya ipatikane kwenye vifaa vyote.</string>-->
-<!--    <string name="backup_disable_warning">Kuzima chelezo kunamaanisha kuwa data yako itahifadhiwa kwenye kifaa chako pekee. Ikiwa itapotea, haiwezi kurejeshwa.</string>-->
+
     <string name="enable_backup">Washa chelezo</string>
     <string name="disable_backup">Zima chelezo</string>
     <string name="location_permission_required_for_this_feature">Ruhusa ya mahali inahitajika kwa kipengele hiki</string>
     <string name="fetching_location">Inapata eneo…</string>
+
+    <string name="user_guide_title">Mwongozo wa Mtumiaji</string>
+    <string name="welcome_message">
+        Karibu kwenye Mwongozo wa Mtumiaji! Mwongozo huu unatoa muhtasari wa vipengele na utendaji wa programu. Kwa maelekezo kamili, pakua mwongozo kamili kutoka rasilimali zetu.
+    </string>
+    <string name="download_user_guide">Pakua Mwongozo wa Mtumiaji</string>
+    <string name="download_success">Mwongozo wa Mtumiaji umefanikiwa kupakuliwa.</string>
+    <string name="download_failed">Pakua imeshindwa: %1$s</string>
+    <string name="no_location_selected">Hakuna eneo lililochaguliwa.</string>
 
 
 

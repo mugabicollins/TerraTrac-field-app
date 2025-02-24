@@ -208,5 +208,16 @@
 
     <string name="fetching_location">አካባቢን በማግኘት ላይ…</string>
 
+    <string name="user_guide_title">የተጠቃሚ መመሪያ</string>
+    <string name="welcome_message">
+        ወደ የተጠቃሚ መመሪያ እንኳን ደህና መጡ! ይህ መመሪያ የመተግበሪያውን ባህላዊ ባለሞያነት እና ስርዓተ ስራዎችን ይገልጻል። ሙሉ መመሪያ ለማውሰድ ከአሳሽ ምንጮቻችን ይውሰዱ።
+    </string>
+    <string name="download_user_guide">የተጠቃሚ መመሪያ አውርድ</string>
+    <string name="download_success">የተጠቃሚ መመሪያ በተሳካ ሁኔታ ተወስዷል።</string>
+    <string name="download_failed">ማውሰድ አልተሳካም: %1$s</string>
+    <string name="no_location_selected">ምንም ቦታ አልተመረጠም።</string>
+
+
+
 
 </resources>

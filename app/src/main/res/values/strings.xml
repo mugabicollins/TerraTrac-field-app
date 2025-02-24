@@ -203,6 +203,15 @@
     <string name="location_permission_required_for_this_feature">Location permissions are required for this feature</string>
     <string name="fetching_location">Fetching location…</string>
 
+    <string name="user_guide_title">User Guide</string>
+    <string name="welcome_message">
+        Welcome to the User Guide! This guide provides a brief overview of the app\'s features and functionalities. For detailed instructions, download the complete guide from our assets.
+    </string>
+    <string name="download_user_guide">Download User Guide</string>
+    <string name="download_success">User Guide downloaded successfully.</string>
+    <string name="download_failed">Download failed: %1$s</string>
+    <string name="no_location_selected">No location selected.</string>
+
 
 
 

@@ -198,12 +198,19 @@
     <string name="disable_backup_message">Disabling backup will stop automatically saving your data on the server when an internet connection is available. Any previously backed-up data will remain accessible for restoration, but new changes won\'t be saved. Do you want to proceed?.</string>
     <string name="proceed_question">Do you want to proceed?</string>
     <string name="enable_data_backup_title">Enable Data Backup?</string>
-<!--    <string name="backup_prompt_message">Backing up your data ensures safety and accessibility across devices.</string>-->
-<!--    <string name="backup_disable_warning">Disabling backup means your data will only be stored on your device. If lost, it cannot be restored.</string>-->
     <string name="enable_backup">Enable Backup</string>
     <string name="disable_backup">Disable Backup</string>
     <string name="location_permission_required_for_this_feature">Location permissions are required for this feature</string>
     <string name="fetching_location">Fetching location…</string>
+
+    <string name="user_guide_title">User Guide</string>
+    <string name="welcome_message">
+        Welcome to the User Guide! This guide provides a brief overview of the app\'s features and functionalities. For detailed instructions, download the complete guide from our assets.
+    </string>
+    <string name="download_user_guide">Download User Guide</string>
+    <string name="download_success">User Guide downloaded successfully.</string>
+    <string name="download_failed">Download failed: %1$s</string>
+    <string name="no_location_selected">No location selected.</string>
 
 
 

@@ -13,10 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,10 +49,10 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.Language
 import org.technoserve.farmcollector.ui.components.BackupPromptDialog
+import org.technoserve.farmcollector.ui.screens.settings.LanguageSelector
 import org.technoserve.farmcollector.ui.theme.Teal
 import org.technoserve.farmcollector.ui.theme.Turquoise
 import org.technoserve.farmcollector.ui.theme.White
-import org.technoserve.farmcollector.ui.screens.settings.LanguageSelector
 import org.technoserve.farmcollector.utils.BackupPreferences
 import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 import org.technoserve.farmcollector.viewmodels.LanguageViewModel
@@ -86,6 +91,11 @@ fun Home(
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = !isSystemInDarkTheme()
 
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    // Adjust sizes based on screen width
+    val iconSize = if (screenWidth < 450.dp) 24.dp else 24.dp
+
     DisposableEffect(systemUiController, useDarkIcons) {
         systemUiController.setSystemBarsColor(
             color = Color.Transparent,
@@ -98,25 +108,38 @@ fun Home(
 
     Column(
         Modifier
-//            .padding(top = 20.dp)
             .fillMaxSize()
             .statusBarsPadding(),
-//            .padding(WindowInsets.safeDrawing.asPaddingValues()), // Respect safe areas,
         verticalArrangement = Arrangement.spacedBy(16.dp, alignment = Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Add language selector here and align on the right
         Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.End
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+
         ) {
+            IconButton(
+                onClick = {
+                    navController.navigate("userGuideScreen")
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = stringResource(id = R.string.settings),
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(iconSize)
+                )
+            }
             LanguageSelector(viewModel = languageViewModel, languages = languages)
         }
 
         Column(
             Modifier
                 .fillMaxWidth()
-               // .fillMaxHeight(0.4f)
                 .weight(0.4f)
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -134,20 +157,21 @@ fun Home(
                     Image(
                         painter = painterResource(id = R.drawable.app_icon),
                         contentDescription = null,
-//                        modifier = Modifier
-//                            .width(80.dp)
-//                            .height(80.dp)
                         modifier = Modifier
-                            .width(when (LocalConfiguration.current.screenWidthDp) {
-                                in 0..320 -> 60.dp // Small screens
-                                in 321..600 -> 80.dp // Medium screens
-                                else -> 100.dp // Large screens
-                            })
-                            .height(when (LocalConfiguration.current.screenWidthDp) {
-                                in 0..320 -> 60.dp
-                                in 321..600 -> 80.dp
-                                else -> 100.dp
-                            })
+                            .width(
+                                when (LocalConfiguration.current.screenWidthDp) {
+                                    in 0..320 -> 60.dp // Small screens
+                                    in 321..600 -> 80.dp // Medium screens
+                                    else -> 100.dp // Large screens
+                                }
+                            )
+                            .height(
+                                when (LocalConfiguration.current.screenWidthDp) {
+                                    in 0..320 -> 60.dp
+                                    in 321..600 -> 80.dp
+                                    else -> 100.dp
+                                }
+                            )
                             .padding(bottom = 10.dp)
                     )
 
@@ -168,29 +192,6 @@ fun Home(
             }
 
         }
-
-//        Box(
-//            modifier = Modifier
-//                .padding(30.dp)
-//                .background(
-//                    color = Teal,
-//                    shape = RoundedCornerShape(10.dp)
-//                )
-//                .clickable {
-//                    navController.navigate("siteList")
-//                }
-//                .padding(16.dp)
-//        ) {
-//            Text(
-//                text = stringResource(id = R.string.get_started),
-//                style = TextStyle(
-//                    fontWeight = FontWeight.Bold,
-//                    color = White
-//                ),
-//                modifier = Modifier.align(Alignment.Center)
-//            )
-//        }
-
         Box(
             modifier = Modifier
                 .padding(30.dp)
@@ -230,11 +231,13 @@ fun Home(
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
-                .padding(when (LocalConfiguration.current.screenWidthDp) {
-                    in 0..320 -> 12.dp
-                    in 321..600 -> 16.dp
-                    else -> 20.dp
-                })
+                .padding(
+                    when (LocalConfiguration.current.screenWidthDp) {
+                        in 0..320 -> 12.dp
+                        in 321..600 -> 16.dp
+                        else -> 20.dp
+                    }
+                )
         ) {
             Text(
                 text = stringResource(id = R.string.app_intro),
@@ -268,16 +271,20 @@ fun Home(
                 painter = painterResource(id = R.drawable.tns_labs),
                 contentDescription = null,
                 modifier = Modifier
-                    .width(when (LocalConfiguration.current.screenWidthDp) {
-                        in 0..320 -> 100.dp
-                        in 321..600 -> 120.dp
-                        else -> 130.dp
-                    })
-                    .height(when (LocalConfiguration.current.screenWidthDp) {
-                        in 0..320 -> 15.dp
-                        in 321..600 -> 20.dp
-                        else -> 20.dp
-                    })
+                    .width(
+                        when (LocalConfiguration.current.screenWidthDp) {
+                            in 0..320 -> 100.dp
+                            in 321..600 -> 120.dp
+                            else -> 130.dp
+                        }
+                    )
+                    .height(
+                        when (LocalConfiguration.current.screenWidthDp) {
+                            in 0..320 -> 15.dp
+                            in 321..600 -> 20.dp
+                            else -> 20.dp
+                        }
+                    )
             )
         }
 

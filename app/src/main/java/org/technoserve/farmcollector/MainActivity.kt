@@ -54,6 +54,7 @@ import org.technoserve.farmcollector.viewmodels.UpdateAlert
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
 //import org.technoserve.farmcollector.database.mappers.CoordinatesDeserializer
 import org.technoserve.farmcollector.database.models.Farm
+import org.technoserve.farmcollector.ui.components.UserGuideScreen
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import org.technoserve.farmcollector.ui.screens.farms.AddFarm
 import org.technoserve.farmcollector.ui.screens.collectionsites.AddSite
@@ -259,6 +260,10 @@ class MainActivity : ComponentActivity() {
 
                             // Display Home Screen
                             Home(navController, languageViewModel, languages)
+                        }
+
+                        composable("userGuideScreen"){
+                            UserGuideScreen()
                         }
 
                         composable(Routes.SITE_LIST) {

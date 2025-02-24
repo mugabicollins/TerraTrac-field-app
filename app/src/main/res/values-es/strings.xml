@@ -200,12 +200,18 @@
     <string name="enable_backup_message">Habilitar la copia de seguridad almacena de forma segura tus datos en el servidor siempre que haya conexión a Internet. Esto garantiza que puedas restaurarlos si tu dispositivo se pierde, se daña o se restablece. ¿Quieres continuar?</string>
     <string name="disable_backup_message">Deshabilitar la copia de seguridad detendrá el guardado automático de tus datos en el servidor cuando haya conexión a Internet. Los datos previamente respaldados seguirán estando disponibles para su restauración, pero los cambios nuevos no se guardarán. ¿Quieres continuar?</string>
 
-    <!--    <string name="backup_prompt_message">Hacer una copia de seguridad de tus datos garantiza seguridad y accesibilidad en todos tus dispositivos.</string>-->
-<!--    <string name="backup_disable_warning">Deshabilitar la copia de seguridad significa que tus datos solo se almacenarán en tu dispositivo. Si se pierden, no podrán restaurarse.</string>-->
     <string name="enable_backup">Habilitar copia de seguridad</string>
     <string name="disable_backup">Deshabilitar copia de seguridad</string>
     <string name="location_permission_required_for_this_feature">Se requieren permisos de ubicación para esta función</string>
     <string name="fetching_location">Obteniendo ubicación…</string>
+    <string name="user_guide_title">Guía del Usuario</string>
+    <string name="welcome_message">
+        ¡Bienvenido a la Guía del Usuario! Esta guía ofrece una breve visión general de las características y funcionalidades de la aplicación. Para instrucciones detalladas, descarga la guía completa de nuestros recursos.
+    </string>
+    <string name="download_user_guide">Descargar Guía del Usuario</string>
+    <string name="download_success">La Guía del Usuario se descargó correctamente.</string>
+    <string name="download_failed">Fallo en la descarga: %1$s</string>
+    <string name="no_location_selected">No se seleccionó ubicación.</string>
 
 
 

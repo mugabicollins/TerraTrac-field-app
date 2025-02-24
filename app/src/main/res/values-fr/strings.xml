@@ -198,14 +198,21 @@
     <string name="enable_data_backup_title">Activer la sauvegarde des données ?</string>
     <string name="enable_backup_message">L\'activation de la sauvegarde stocke en toute sécurité vos données sur le serveur dès qu\'une connexion Internet est disponible. Cela vous permet de les restaurer en cas de perte, de dommage ou de réinitialisation de votre appareil. Voulez-vous continuer ?</string>
     <string name="disable_backup_message">La désactivation de la sauvegarde empêchera l\'enregistrement automatique de vos données sur le serveur lorsque vous êtes connecté à Internet. Les données précédemment sauvegardées resteront accessibles pour la restauration, mais les nouvelles modifications ne seront pas enregistrées. Voulez-vous continuer ?</string>
-    <!--    <string name="backup_prompt_message">Sauvegarder vos données garantit leur sécurité et accessibilité sur tous vos appareils.</string>-->
-<!--    <string name="backup_disable_warning">Désactiver la sauvegarde signifie que vos données seront uniquement stockées sur votre appareil. En cas de perte, elles ne pourront pas être restaurées.</string>-->
+
     <string name="enable_backup">Activer la sauvegarde</string>
     <string name="disable_backup">Désactiver la sauvegarde</string>
     <string name="location_permission_required_for_this_feature">Les autorisations de localisation sont requises pour cette fonctionnalité</string>
     <string name="fetching_location">Récupération de la localisation…</string>
 
+    <string name="user_guide_title">Guide d\'utilisation</string>
+    <string name="welcome_message">
+        Bienvenue dans le guide d\'utilisation ! Ce guide vous offre un aperçu des fonctionnalités de l\'application. Pour des instructions détaillées, téléchargez le guide complet depuis nos ressources.
+    </string>
+    <string name="download_user_guide">Télécharger le guide d\'utilisation</string>
 
+    <string name="download_success">Guide d\'utilisation téléchargé avec succès.</string>
+    <string name="download_failed">Échec du téléchargement : %1$s</string>
+    <string name="no_location_selected">Aucun emplacement sélectionné.</string>
 
 
 </resources>

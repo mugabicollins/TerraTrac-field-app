@@ -200,12 +200,19 @@
     <string name="enable_backup_message">Deebisaa haalaa gochuun, yommuu walqunnaamtii interneetii argattu, odeeffannoo kee sirriitti tajaajilaa irratti kuusa. Kun yoo meeshaan kee badaa, manca’a yookaan haaraa ta’ee, deebisuu akka dandeessu siif mirkaneessa. Itti fufuu barbaaddaa?</string>
     <string name="disable_backup_message">Deebisaa haalaa gochuu dhiisuu, yeroo interneetiin jiru, odeeffannoo kee tajaajilaa irratti otuu hin kuufamin hambisa. Odeeffannoon duraan kuufamee ture deebisuu ni danda’ama, garuu jijjiirraan haaraan hin kuufamu. Itti fufuu barbaaddaa?</string>
 
-    <!--    <string name="backup_prompt_message">Kuusdeebi\'aa banachuun, odeeffannoo kee ni eegama, bilbila mara irratti ni argama.</string>-->
-<!--    <string name="backup_disable_warning">Kuusdeebi\'aa cufachuun, odeeffannoo kee bilbila kee qofa irratti kuusa. Yoo dhaban, deebifamuu hin danda’u.</string>-->
     <string name="enable_backup">Kuusdeebi’aa bana</string>
     <string name="disable_backup">Kuusdeebi’aa cufaa</string>
     <string name="location_permission_required_for_this_feature">Ijaarsa kana fayyadamuuf eeyyama iddoo barbaachisa</string>
     <string name="fetching_location">Bakka argachaa jira…</string>
+
+    <string name="user_guide_title">Qajeelfama Fayyadamtootaa</string>
+    <string name="welcome_message">
+        Baga nagaan dhufte! Qajeelfamni kun muuxannoo gabaabaa amaloota fi tajaajiloota app kanaa ibsa. Qajeelfama guutuu argachuuf, galmee guutuu assets irraa buufadhaa.
+    </string>
+    <string name="download_user_guide">Qajeelfama Fayyadamtootaa Buufadhu</string>
+    <string name="download_success">Qajeelfamni Fayyadamtootaa milkaa’inaan buufameera.</string>
+    <string name="download_failed">Buufachuun hin milkoofne: %1$s</string>
+    <string name="no_location_selected">Bakki filatame hin jiru.</string>
 
 
 
