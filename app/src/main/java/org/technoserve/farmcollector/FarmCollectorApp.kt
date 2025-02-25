@@ -79,7 +79,7 @@ class FarmCollectorApp : Application() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val workRequest = PeriodicWorkRequestBuilder<SyncWorker>(3, TimeUnit.HOURS)
+        val workRequest = PeriodicWorkRequestBuilder<SyncWorker>(2, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 
