@@ -10,22 +10,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,9 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.technoserve.farmcollector.BuildConfig
 import org.technoserve.farmcollector.R
@@ -45,91 +44,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-//    // Use BuildConfig.USER_GUIDE_URL where the file is hosted.
-//    val response = api.downloadUserGuide("https://docs.google.com/document/d/e/2PACX-1vRAqn1l2Dv_y1vWQJPRBT6Gt2eZK2e2uJS8wayI069YXxOZ9zQovG1CCD8aO2sOLzGRzUCKIa2bBWDl/pub?export=download")
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun UserGuideScreen() {
-//    val context = LocalContext.current
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    // Create the launcher at the composable scope.
-//    val documentLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.CreateDocument("application/pdf"),
-//        onResult = { uri ->
-//            if (uri != null) {
-//                coroutineScope.launch {
-//                    try {
-//                        withContext(Dispatchers.IO) {
-//                            // File name in assets
-//                            val assetFileName = "TerraTrac Mobile Application User Guide.pdf"
-//                            val assetManager = context.assets
-//                            // Open the file from assets
-//                            val inputStream = assetManager.open(assetFileName)
-//                            // Open an output stream to the selected location
-//                            context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-//                                inputStream.copyTo(outputStream)
-//                            }
-//                            inputStream.close()
-//                        }
-//                        Toast.makeText(
-//                            context,
-//                            context.getString(R.string.download_success),
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    } catch (e: Exception) {
-//                        Toast.makeText(
-//                            context,
-//                            context.getString(R.string.download_failed, e.localizedMessage),
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    }
-//                }
-//            } else {
-//                Toast.makeText(
-//                    context,
-//                    context.getString(R.string.no_location_selected),
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            }
-//        }
-//    )
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(title = { Text(text = stringResource(R.string.user_guide_title)) })
-//        }
-//    ) { paddingValues ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//                .padding(16.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center
-//        ) {
-//            Text(
-//                text = stringResource(R.string.welcome_message),
-//                style = MaterialTheme.typography.bodyMedium,
-//                textAlign = TextAlign.Center
-//            )
-//            Spacer(modifier = Modifier.height(24.dp))
-//            Button(onClick = {
-//                // Launch the document creation, suggesting the file name.
-//                documentLauncher.launch("TerraTrac Mobile Application User Guide.pdf")
-//            }) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.save),
-//                    contentDescription = stringResource(id = R.string.download_csv),
-//                    tint = MaterialTheme.colorScheme.onPrimary
-//                )
-//                Spacer(modifier = Modifier.width(8.dp))
-//                Text(text=stringResource(R.string.download_user_guide))
-//            }
-//        }
-//    }
-//}
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -207,34 +122,96 @@ fun UserGuideScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = stringResource(R.string.user_guide_title)) })
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.user_guide_title)) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
+
+            )
         }
     ) { paddingValues ->
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(paddingValues)
+//                .padding(16.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            Text(
+//                text = stringResource(R.string.welcome_message),
+//                style = MaterialTheme.typography.bodyMedium,
+//                textAlign = TextAlign.Center
+//            )
+//            Spacer(modifier = Modifier.height(24.dp))
+//            Button(onClick = {
+//                documentLauncher.launch("TerraTrac Mobile Application User Guide.pdf")
+//            }) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.save),
+//                    contentDescription = stringResource(id = R.string.download_user_guide),
+//                    tint = MaterialTheme.colorScheme.onPrimary
+//                )
+//                Spacer(modifier = Modifier.width(8.dp))
+//                Text(text = stringResource(R.string.download_user_guide))
+//            }
+//        }
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 24.dp), // Added more vertical padding
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            // Welcome message text with more emphasis
             Text(
                 text = stringResource(R.string.welcome_message),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.bodyLarge, // More prominent style
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground, // Ensures good contrast
+                modifier = Modifier.padding(bottom = 32.dp) // Extra padding for spacing
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = {
-                documentLauncher.launch("TerraTrac Mobile Application User Guide.pdf")
-            }) {
+
+            // User Guide Button with more prominent design
+            Button(
+                onClick = {
+                    documentLauncher.launch("TerraTrac Mobile Application User Guide.pdf")
+                },
+                modifier = Modifier
+                    .fillMaxWidth() // Makes the button expand to full width
+                    .height(56.dp), // Consistent height for the button
+                shape = MaterialTheme.shapes.medium, // Rounded corners for the button
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary, // Custom background color
+                    contentColor = MaterialTheme.colorScheme.onPrimary // Custom text color
+                ) // Custom background color
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.save),
                     contentDescription = stringResource(id = R.string.download_user_guide),
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.onPrimary // Makes the icon visible on the button background
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = stringResource(R.string.download_user_guide))
+                Spacer(modifier = Modifier.width(12.dp)) // Increased spacing between the icon and text
+                Text(
+                    text = stringResource(R.string.download_user_guide),
+                    style = MaterialTheme.typography.bodySmall, // A more appropriate text style for a button
+                    color = MaterialTheme.colorScheme.onPrimary // Ensure the text contrasts well
+                )
             }
         }
+
+
     }
 }

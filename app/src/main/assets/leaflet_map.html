@@ -1016,7 +1016,7 @@ ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
                 polyline = L.polyline([]).addTo(map);
 
                 // Change button to Stop state
-                startButton.innerHTML = '<i class="fas fa-stop"></i>';
+                startButton.innerHTML = '<i class="fas fa-check"></i>';
                 startButton.style.backgroundColor = "#000000";
             } else {
                 // Ask for confirmation before stopping
@@ -1161,7 +1161,7 @@ ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
 
 
 
-
+        /*
         // Save plot functionality
         document.getElementById("savePlot").addEventListener("click", () => {
             //            if (points.length < 3) {
@@ -1181,9 +1181,11 @@ ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
 
                 // Change "Save" button back to "Start Capture"
                 saveButton.innerHTML = '<i class="fas fa-play"></i>'; // Change icon to "Start"
-                saveButton.style.backgroundColor = "#4CAF50"; // Change color to indicate restart
+                saveButton.style.backgroundColor = "#000000"; // Change color to indicate restart
                 saveButton.style.display = "none"; // Hide Save button
 
+                startButton.innerHTML = '<i class="fas fa-play">';
+                startButton.style.backgroundColor = "#000000";
                 startButton.style.display = "block"; // Show Start button
                 return;
 
@@ -1197,16 +1199,17 @@ ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
                     window.Android.showPolygonTooSmallDialog();
                 }
 
-
                 // Reset and start capturing new coordinates
                 isCapturing = false;
                 points = [];
 
                 // Change "Save" button back to "Start Capture"
                 saveButton.innerHTML = '<i class="fas fa-play"></i>'; // Change icon to "Start"
-                saveButton.style.backgroundColor = "#4CAF50"; // Change color to indicate restart
+                saveButton.style.backgroundColor = "#000000"; // Change color to indicate restart
                 saveButton.style.display = "none"; // Hide Save button
 
+                startButton.innerHTML = '<i class="fas fa-play">';
+                startButton.style.backgroundColor = "#000000";
                 startButton.style.display = "block"; // Show Start button
 
                 return;
@@ -1243,11 +1246,10 @@ ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
 
             // Reset buttons after saving
 
-
             saveButton.style.display = "none"; // Hide Save button
             startButton.style.display = "block"; // Show Start button again
             startButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset to Start Capture state
-            startButton.style.backgroundColor = "#4CAF50";
+            startButton.style.backgroundColor = "#00000";
 
             console.log("Sending Plot Data to Android:", plotData);
 
@@ -1258,6 +1260,112 @@ ${currentCity ? currentCity + ", " : ""}${currentCountry}<br>
                 console.error("Android interface not available");
             }
         });
+        */
+
+        // Save plot functionality
+        document.getElementById("savePlot").addEventListener("click", () => {
+            const startButton = document.getElementById("startCapture");
+            const saveButton = document.getElementById("savePlot");
+
+            // Check if there are sufficient points for a valid polygon
+            if (points.length < 3) {
+                if (window.Android) {
+                    window.Android.showInsufficientPointsDialog(); // Notify user on insufficient points
+                }
+
+                // Reset and start capturing new coordinates
+                resetCapture();
+
+                return;
+            }
+
+            console.log("Saving the plot...");
+
+            const area = calculateArea(points);
+
+            // Check if the area is too small to be considered valid
+            if (area < 0.000000001) {
+                if (window.Android) {
+                    window.Android.showPolygonTooSmallDialog(); // Notify user on invalid polygon size
+                }
+
+                // Reset and start capturing new coordinates
+                resetCapture();
+
+                return;
+            }
+
+            const centroid = calculateCentroid(points);
+
+            // Prepare plot data for sending to Android
+            const plotData = {
+                siteId: siteId,
+                remoteId: "",
+                farmerPhoto: "photo",
+                farmerName: "test farmer",
+                memberId: "300",
+                village: "test village",
+                district: "test district",
+                purchases: "2.50",
+                size: area,
+                latitude: centroid.lat,
+                longitude: centroid.lng,
+                coordinates: points.map((point) => [point.lat, point.lng]),
+                accuracyArray: accuracyArray,
+                createdAt: "2025-01-17T00:00:00Z",
+                updatedAt: "2025-01-17T01:00:00Z",
+            };
+
+            console.log("Incomplete Plot Data to send to Android:", plotData);
+
+            // Send incomplete data to Android for editing
+            if (typeof Android !== "undefined" && Android.receivePlotData) {
+                Android.receivePlotData(JSON.stringify(plotData));
+            } else {
+                console.error("Android interface not available");
+            }
+
+            // Reset buttons after saving
+            resetButtons();
+
+            console.log("Sending Plot Data to Android:", plotData);
+
+            // Send data to Android
+            if (typeof Android !== "undefined" && Android.receivePlotData) {
+                Android.receivePlotData(JSON.stringify(plotData));
+            } else {
+                console.error("Android interface not available");
+            }
+        });
+
+        // Function to reset the capturing process
+        function resetCapture() {
+            isCapturing = false;
+            points = [];
+
+            // Change the "Save" button back to "Start Capture"
+            const saveButton = document.getElementById("savePlot");
+            saveButton.innerHTML = '<i class="fas fa-play"></i>'; // Change icon to "Start"
+            saveButton.style.backgroundColor = "#000000"; // Change color to indicate restart
+            saveButton.style.display = "none"; // Hide Save button
+
+            const startButton = document.getElementById("startCapture");
+            startButton.innerHTML = '<i class="fas fa-play">'; // Reset to "Start Capture"
+            startButton.style.backgroundColor = "#000000";
+            startButton.style.display = "block"; // Show Start button
+        }
+
+        // Function to reset the buttons to the initial state
+        function resetButtons() {
+            const startButton = document.getElementById("startCapture");
+            const saveButton = document.getElementById("savePlot");
+
+            saveButton.style.display = "none"; // Hide Save button
+            startButton.style.display = "block"; // Show Start button again
+            startButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset to Start Capture state
+            startButton.style.backgroundColor = "#000000"; // Reset color
+        }
+
     });
 </script>
 
