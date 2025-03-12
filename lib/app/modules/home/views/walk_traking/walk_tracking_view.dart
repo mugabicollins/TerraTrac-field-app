@@ -15,6 +15,8 @@ import 'package:terrapipe/widgets/loader/bounce_loader.dart';
 import 'package:terrapipe/widgets/app_buttons/custom_button.dart';
 import 'package:terrapipe/widgets/textfields/custom_text_field.dart';
 
+import '../../../../../widgets/customMap/custom_map_view.dart';
+
 class WalkTrackingPage extends StatefulWidget {
   const WalkTrackingPage({super.key});
 
@@ -373,38 +375,31 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
         ),
         child: Stack(
           children: [
-            FlutterMap(
+            CustomFlutterMap(
               mapController: mapController,
-              options: MapOptions(
+              mapOptions: MapOptions(
                 initialCenter: currentPosition ?? const LatLng(0, 0),
                 initialZoom: 20.0,
               ),
-              children: [
-                TileLayer(
-                  urlTemplate:
-                      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                Obx(
-                  () => PolygonLayer(
-                    polygons: [
-                      if (homeController.shapePoints.isNotEmpty)
-                        Polygon(
-                          points: [
-                            ...homeController.shapePoints,
-                            homeController.shapePoints[0]
-                          ],
-                          borderColor: homeController.selectedColor,
-                          borderStrokeWidth: 2.0,
-                          // isDotted: false,
-                          color: homeController.selectedColor.withOpacity(0.3),
-                          isFilled: false,
-                        ),
+              polygons: [
+                if (homeController.shapePoints.isNotEmpty)
+                  Polygon(
+                    points: [
+                      ...homeController.shapePoints,
+                      homeController.shapePoints[0]
                     ],
+                    borderColor: homeController.selectedColor,
+                    borderStrokeWidth: 2.0,
+                    // isDotted: false,
+                    color: homeController.selectedColor.withOpacity(0.3),
+                    isFilled: false,
                   ),
-                ),
-                MarkerLayer(markers: markers),
               ],
+              markers: homeController.shapePoints,
+              markerColor: Colors.red,
+              mapPath: homeController.mapPath.value,
+              onMapTap: (LatLng point) {
+              },
             ),
             Positioned(
               left: 20,
@@ -446,6 +441,7 @@ class _WalkTrackingPageState extends State<WalkTrackingPage> {
                   if (isAddPointVisible)
                     ElevatedButton.icon(
                       onPressed: () {
+                        stopTracking();
                         homeController.finishShape(context);
                         homeController.shapePoints.length >= 3
                             ? Get.bottomSheet(

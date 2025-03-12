@@ -46,11 +46,15 @@ dependencies:
   flutter_spinkit:
 #    bottom bar
   stylish_bottom_bar:
+  package_info_plus:
 #  image picker
   image_picker:
   lottie:
 #    connectivity
   connectivity_plus:
+
+#    hash package
+  crypto: ^3.0.6
 
   intl_phone_field:
     git:

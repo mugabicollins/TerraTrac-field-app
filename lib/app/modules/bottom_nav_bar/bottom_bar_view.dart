@@ -27,6 +27,7 @@ class _BottomBarViewState extends State<BottomBarView> {
   final ConnectivityService connectivityService = ConnectivityService();
   PageController bottomController = PageController(initialPage: 0);
   SavedFieldController savedFieldController = Get.put(SavedFieldController());
+
   final HomeController homeController = Get.put(HomeController());
   var bottomIcons = [
     {'icon': 'assets/icons/bottombaricons/home.png', 'name': "Home"},
@@ -72,7 +73,6 @@ class _BottomBarViewState extends State<BottomBarView> {
       // Check if the result is a non-empty list
       if (result.isNotEmpty) {
         final connectivityResult = result.first; // Get the first element of the list
-
         setState(() {
           if (connectivityResult == ConnectivityResult.mobile) {
             savedFieldController.connectionStatus.value = true;

@@ -16,7 +16,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as d;
-import 'package:sqflite/sqlite_api.dart';
 import 'package:terrapipe/app/data/repositories/shared_preference.dart';
 import 'package:terrapipe/utils/helper_functions.dart';
 

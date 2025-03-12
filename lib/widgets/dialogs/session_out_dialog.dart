@@ -56,7 +56,7 @@ class SessionExpireDialog extends StatelessWidget {
               width: Get.width * 0.5,
               onTap: () async {
                 await SharedPreference.instance.clearLocalData();
-                Get.offAll(LoginPage());
+                // Get.offAll(LoginPage());
               },
               color: AppColor.primaryColor,
               textColor: AppColor.white,
