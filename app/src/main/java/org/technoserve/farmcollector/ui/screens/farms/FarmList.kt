@@ -505,17 +505,116 @@ fun initiateFileCreation(selectedList: List<Farm>) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+//                HorizontalPager(
+//                    state = pagerState,
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .fillMaxWidth(),
+//                ) { page ->
+//                    // Determine which category to display based on the current tab index
+//                    val filteredListItems = when (page) {
+//                        1 -> filteredListItemsNeedUpdate // Farms that need update
+//                        else -> filteredListItemsNoUpdate // Farms that do not need update
+//                    }
+//                    if (filteredListItems.isNotEmpty() || searchQuery.isNotEmpty()) {
+//                        LazyColumn(
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .padding(bottom = 90.dp)
+//                        ) {
+//                            val pageSize = 5
+//                            val startIndex = maxOf(0, (currentPage - 1) * pageSize) // Ensure startIndex is non-negative
+//                            val endIndex = minOf(filteredListItems.size, startIndex + pageSize) // Ensure endIndex is within bounds
+//
+//                            // Safeguard: Ensure indices are within bounds
+//                            if (filteredListItems.isNotEmpty()) {
+//                                // Show the items for the current page
+//                                items(endIndex - startIndex) { index ->
+//                                    val item = filteredListItems[startIndex + index]
+//                                    FarmCard(
+//                                        farm = item,
+//                                        onCardClick = {
+//                                            navController.currentBackStackEntry?.arguments?.apply {
+//                                                putParcelableArrayList(
+//                                                    "coordinates",
+//                                                    item.coordinates?.map {
+//                                                        it.first?.let { it1 ->
+//                                                            it.second?.let { it2 ->
+//                                                                ParcelablePair(it1, it2)
+//                                                            }
+//                                                        }
+//                                                    }?.let { ArrayList(it) }
+//                                                )
+//                                                putParcelable(
+//                                                    "farmData",
+//                                                    ParcelableFarmData(item, "view")
+//                                                )
+//                                            }
+//                                            mapViewModel.submitForm() // ✅ Submits and clears the form
+//                                            navController.navigate(route = "setPolygon/${siteId}")
+//                                        },
+//                                        onDeleteClick = {
+//                                            selectedIds.add(item.id)
+//                                            selectedFarm.value = item
+//                                            showDeleteDialog.value = true
+//                                        }
+//                                    )
+//                                   // Spacer(modifier = Modifier.height(16.dp))
+//                                }
+//
+//                                item {
+//                                    CustomPaginationControls(
+//                                        currentPage = currentPage,
+//                                        totalPages = when (currentCategoryIndex) {
+//                                            0 -> totalPagesNoUpdate // Pages for farms that do not need updates
+//                                            1 -> totalPagesNeedUpdate // Pages for farms needing updates
+//                                            else -> 0
+//                                        },
+//                                        onPageChange = { newPage ->
+//                                            currentPage = newPage
+//                                        }
+//                                    )
+//                                }
+//                            }
+//
+//                            else {
+//                                item {
+//                                    Text(
+//                                        text = stringResource(R.string.no_results_found),
+//                                        modifier = Modifier
+//                                            .padding(16.dp)
+//                                            .fillMaxWidth(),
+//                                        textAlign = TextAlign.Center,
+//                                        style = MaterialTheme.typography.bodyMedium,
+//                                    )
+//                                }
+//                            }
+//
+//                        }
+//                    } else {
+//                        Spacer(modifier = Modifier.height(8.dp))
+//                        Image(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .align(Alignment.CenterHorizontally)
+//                                .padding(16.dp, 8.dp),
+//                            painter = painterResource(id = R.drawable.no_data2),
+//                            contentDescription = null
+//                        )
+//                    }
+//                }
+
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
                 ) { page ->
-                    // Determine which category to display based on the current tab index
                     val filteredListItems = when (page) {
-                        1 -> filteredListItemsNeedUpdate // Farms that need update
-                        else -> filteredListItemsNoUpdate // Farms that do not need update
+                        1 -> filteredListItemsNeedUpdate // Farms that need updates
+                        else -> filteredListItemsNoUpdate // Farms that do not need updates
                     }
+
                     if (filteredListItems.isNotEmpty() || searchQuery.isNotEmpty()) {
                         LazyColumn(
                             modifier = Modifier
@@ -523,24 +622,28 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                                 .padding(bottom = 90.dp)
                         ) {
                             val pageSize = 5
-                            val startIndex = maxOf(0, (currentPage - 1) * pageSize) // Ensure startIndex is non-negative
-                            val endIndex = minOf(filteredListItems.size, startIndex + pageSize) // Ensure endIndex is within bounds
+                            val startIndex = maxOf(0, (currentPage - 1) * pageSize)
+                            val endIndex = minOf(filteredListItems.size, startIndex + pageSize)
 
-                            // Safeguard: Ensure indices are within bounds
-                            if (filteredListItems.isNotEmpty()) {
-                                // Show the items for the current page
-                                items(endIndex - startIndex) { index ->
-                                    val item = filteredListItems[startIndex + index]
+                            if (startIndex < endIndex) { // Ensure we only proceed if indices are valid
+                                items(
+                                    count = filteredListItems.subList(startIndex, endIndex).size,
+                                    key = { item ->
+                                        val item = filteredListItems[startIndex + item]
+                                        item.id
+                                    }
+                                ) { item ->
+                                    val item = filteredListItems[startIndex + item]
                                     FarmCard(
                                         farm = item,
                                         onCardClick = {
                                             navController.currentBackStackEntry?.arguments?.apply {
                                                 putParcelableArrayList(
                                                     "coordinates",
-                                                    item.coordinates?.map {
-                                                        it.first?.let { it1 ->
-                                                            it.second?.let { it2 ->
-                                                                ParcelablePair(it1, it2)
+                                                    item.coordinates?.mapNotNull { coord ->
+                                                        coord.first?.let { lat ->
+                                                            coord.second?.let { lon ->
+                                                                ParcelablePair(lat, lon)
                                                             }
                                                         }
                                                     }?.let { ArrayList(it) }
@@ -550,7 +653,7 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                                                     ParcelableFarmData(item, "view")
                                                 )
                                             }
-                                            mapViewModel.submitForm() // ✅ Submits and clears the form
+                                            mapViewModel.submitForm()
                                             navController.navigate(route = "setPolygon/${siteId}")
                                         },
                                         onDeleteClick = {
@@ -559,15 +662,15 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                                             showDeleteDialog.value = true
                                         }
                                     )
-                                   // Spacer(modifier = Modifier.height(16.dp))
                                 }
 
+                                // Pagination Controls
                                 item {
                                     CustomPaginationControls(
                                         currentPage = currentPage,
                                         totalPages = when (currentCategoryIndex) {
-                                            0 -> totalPagesNoUpdate // Pages for farms that do not need updates
-                                            1 -> totalPagesNeedUpdate // Pages for farms needing updates
+                                            0 -> totalPagesNoUpdate
+                                            1 -> totalPagesNeedUpdate
                                             else -> 0
                                         },
                                         onPageChange = { newPage ->
@@ -575,9 +678,8 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                                         }
                                     )
                                 }
-                            }
-
-                            else {
+                            } else {
+                                // Show "No Results" message if the list is empty
                                 item {
                                     Text(
                                         text = stringResource(R.string.no_results_found),
@@ -589,7 +691,6 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                                     )
                                 }
                             }
-
                         }
                     } else {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -603,6 +704,7 @@ fun initiateFileCreation(selectedList: List<Farm>) {
                         )
                     }
                 }
+
             }
         } else {
             // Display a message or image indicating no data available
