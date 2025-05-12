@@ -7,6 +7,9 @@ import android.content.Intent
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -21,9 +25,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -47,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.technoserve.farmcollector.R
+import org.technoserve.farmcollector.database.models.Commodity
 import org.technoserve.farmcollector.ui.screens.collectionsites.addSite
 import org.technoserve.farmcollector.utils.isSystemInDarkTheme
 import org.technoserve.farmcollector.viewmodels.FarmViewModel
@@ -113,6 +124,8 @@ fun SiteForm(navController: NavController) {
     val inputTextColor = if (isDarkTheme) Color.White else Color.Black
     val inputBorder = if (isDarkTheme) Color.LightGray else Color.DarkGray
 
+    var selectedCommodity by remember { mutableStateOf(Commodity.COFFEE) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -120,6 +133,13 @@ fun SiteForm(navController: NavController) {
             .padding(16.dp)
             .verticalScroll(state = scrollState)
     ) {
+
+        CommodityDropdownField(
+            commodities = Commodity.entries,
+            selectedCommodity = selectedCommodity,
+            onCommoditySelected = { selectedCommodity = it }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Row {
             TextField(
                 singleLine = true,
@@ -426,7 +446,8 @@ fun SiteForm(navController: NavController) {
                         phoneNumber,
                         email,
                         village,
-                        district
+                        district,
+                        selectedCommodity
                     )
                     val returnIntent = Intent()
                     context.setResult(Activity.RESULT_OK, returnIntent)
@@ -445,3 +466,48 @@ fun SiteForm(navController: NavController) {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommodityDropdownField(
+    label: String = "Select Commodity",
+    commodities: List<Commodity>,
+    selectedCommodity: Commodity,
+    onCommoditySelected: (Commodity) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = selectedCommodity.displayName,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            commodities.forEach { commodity ->
+                DropdownMenuItem(
+                    text = { Text(commodity.displayName) },
+                    onClick = {
+                        onCommoditySelected(commodity)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+

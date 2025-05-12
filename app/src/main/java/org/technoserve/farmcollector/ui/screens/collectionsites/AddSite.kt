@@ -56,6 +56,7 @@ import androidx.navigation.NavController
 import org.joda.time.Instant
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.models.CollectionSite
+import org.technoserve.farmcollector.database.models.Commodity
 import org.technoserve.farmcollector.ui.components.FarmListHeader
 import org.technoserve.farmcollector.ui.components.SiteForm
 import org.technoserve.farmcollector.utils.isSystemInDarkTheme
@@ -102,6 +103,7 @@ fun addSite(
     email: String,
     village: String,
     district: String,
+    commodity: Commodity
 ): CollectionSite {
     val site = CollectionSite(
         name,
@@ -111,7 +113,8 @@ fun addSite(
         village,
         district,
         createdAt = Instant.now().millis,
-        updatedAt = Instant.now().millis
+        updatedAt = Instant.now().millis,
+        commodity = commodity
     )
     farmViewModel.addSite(site) { isAdded ->
         if (isAdded) {

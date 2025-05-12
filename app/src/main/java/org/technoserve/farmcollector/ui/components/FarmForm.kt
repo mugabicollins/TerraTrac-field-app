@@ -74,6 +74,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.technoserve.farmcollector.R
 import org.technoserve.farmcollector.database.helpers.map.LocationHelper
+import org.technoserve.farmcollector.database.models.Commodity
+import org.technoserve.farmcollector.database.models.Farm
 import org.technoserve.farmcollector.database.models.map.LocationState
 import org.technoserve.farmcollector.viewmodels.MapViewModel
 import org.technoserve.farmcollector.utils.map.getCenterOfPolygon
@@ -99,6 +101,20 @@ import java.util.regex.Pattern
  * FarmForm.kt
  *
  */
+
+@Composable
+fun FarmCommodityText(siteId: Long,farmViewModel: FarmViewModel) {
+    print("Site ID: $siteId")
+      val siteState by farmViewModel.getSiteByIdNew(siteId).collectAsState(initial = null)
+
+    siteState?.let { site ->
+        println("Site: $site")
+        Text(text = "Commodity: ${site.commodity.displayName}")
+    } ?: Text("Loading commodity...")
+}
+
+
+
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -151,6 +167,14 @@ fun FarmForm(
 //    var size by remember { mutableStateOf(truncateToDecimalPlaces(farmData.size.toString(), 9)) }
     var size by remember { mutableStateOf(truncateToDecimalPlaces(farmData.size.takeIf { it != 0f }?.toString().orEmpty(), 9)) }
     var accuracyArray by remember { mutableStateOf(farmData.accuracyArray) }
+
+//    var selectedCommodity by remember { mutableStateOf(Commodity.COFFEE) }
+
+
+
+
+
+
 
     // ✅ Handle Back Press to Clear Form Only on Back Navigation
     BackHandler {
@@ -412,6 +436,16 @@ fun FarmForm(
             .padding(16.dp)
             .verticalScroll(state = scrollState)
     ) {
+//        CommodityDropdownField(
+//            commodities = Commodity.entries,
+//            selectedCommodity = selectedCommodity,
+//            onCommoditySelected = { selectedCommodity = it }
+//
+        FarmCommodityText(
+            siteId = siteId,
+            farmViewModel = farmViewModel
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         TextField(
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
