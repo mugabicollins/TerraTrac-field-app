@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">TerraTrac</string>
+    <string name="app_name">FWT Orbit</string>
     <string name="farm_list">Plots List</string>
-    <string name="app_intro">Basic mobile app for traceability for compliance with EU deforestation regulation</string>
+    <string name="app_intro">Mobile app for traceability for compliance with EU deforestation regulation</string>
     <string name="developed_by">Developed By</string>
-    <string name="delete_this_item">Delete this item</string>
+    <string name="delete_this_item">Freewave Technologies Ltd</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="item_will_be_deleted">This item will be deleted.</string>
     <string name="yes">Yes</string>

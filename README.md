@@ -1,7 +1,9 @@
-# TerraTrac Mobile Application
+# FWT Orbit Mobile Application
 
 ## Overview
-TerraTrac is an open-source Android mobile application available on the Google Play Store built using Kotlin, designed to assist buyers in complying with the European Union Deforestation Regulation (EUDR). The app enables users such as buying agents, employees, and factory managers to register and manage farms from which they source commodities.
+FWT Trace is a mobile application developed by Freewave Technologies to support commodity trading companies in registering farmers, farms, and supply chains to meet sustainability and regulatory requirements such as the European Union Deforestation Regulation (EUDR).  
+
+Designed for field teams working in coffee, cocoa, and other agricultural value chains, FWT Trace enables organizations to collect and manage farmer data, farm polygons, and precise GPS coordinates even in remote areas with limited connectivity.  
 
 ### Key Features
 
